@@ -1,0 +1,15 @@
+- id: 87fa9213-2da6-4f15-a867-0df188f54782
+  alias: "Melding: DNSWL ID verlengen"
+  description: "Stuur een melding wanneer het DNSWL ID verlengd moet worden"
+  mode: single
+  trigger:
+    - platform: time
+      at: "20:00"
+  condition: >-
+    {{ as_local(now()).strftime('%Y-%m-%d') >= as_datetime(states('input_datetime.dnswl_renew_date')).strftime('%Y-%m-%d') }}
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "Het is 90 (of meer) dagen geleden dat je het DNSWL ID hebt verlengd. Verleng deze binnen 30 dagen en reset de timer."
+        data:
+          subtitle: "ℹ️ DNSWL ℹ️"

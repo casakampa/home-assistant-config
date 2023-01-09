@@ -1,0 +1,6 @@
+# GPS coördinaten van Ouders
+- name: "Ouders"
+  latitude: !secret ouders_lat
+  longitude: !secret ouders_lon
+  radius: 100
+  icon: mdi:home-heart

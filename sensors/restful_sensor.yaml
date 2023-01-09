@@ -1,0 +1,130 @@
+- platform: rest
+  scan_interval: 300
+  resource: &resource https://version.home-assistant.io/stable.json
+  name: "Home Assistant Core"
+  value_template: "{{ value_json.homeassistant.default }}"
+  headers:
+    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
+
+- platform: rest
+  scan_interval: 300
+  resource: *resource
+  name: "Home Assistant Supervisor"
+  value_template: "{{ value_json.supervisor }}"
+  headers:
+    user-agent: *ua_string
+
+- platform: rest
+  scan_interval: 300
+  resource: *resource
+  name: "Home Assistant OS"
+  value_template: "{{ value_json.hassos.ova }}"
+  headers:
+    user-agent: *ua_string
+
+    # Check GitHub repository dsmrreader/dsmr-reader via https://api.github.com/repos/dsmrreader/dsmr-reader/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/dsmrreader/dsmr-reader/releases
+  name: "DSMR Reader"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
+  name: "Afvalwijzer"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository nextcloud/server via https://api.github.com/repos/nextcloud/server/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/nextcloud/server/releases
+  name: "Nextcloud"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository kalkih/mini-graph-card via https://api.github.com/repos/kalkih/mini-graph-card/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/kalkih/mini-graph-card/releases
+  name: "Mini Graph"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository caddyserver/caddy via https://api.github.com/repos/caddyserver/caddy/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/caddyserver/caddy/releases
+  name: "Caddy"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository Koenkk/Z-Stack-firmware via https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
+- platform: rest
+  scan_interval: 3600
+  resource: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
+  name: "Z-Stack coordinator firmware"
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+- platform: template
+  sensors:
+    z_stack_firmware:
+      friendly_name: "Z-Stack firmware"
+      value_template: "{{ states('sensor.z_stack_coordinator_firmware').split('_')[4] }}"
+
+# Extern IP-adres
+- platform: rest
+  resource: https://www.maartenvandekamp.nl/ip.php
+  name: "Extern IP"
+  value_template: "{{ value_json.ip }}"

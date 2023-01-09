@@ -1,0 +1,314 @@
+- id: 0a69e636-7809-441e-b2a0-5fe663e38a26
+  alias: "Wasprogramma: Start"
+  description: "Automatisering regelt alles vanaf het inschakelen tot het activeren van de automatisering wasprogramma_afronding"
+  trigger:
+    - platform: state
+      entity_id: switch.stekker_wasmachine
+      to: "on"
+      not_from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+  mode: restart
+  trace:
+    stored_traces: 25
+  variables:
+    tag: &tag "wasmachine"
+    subtitle: &subtitle "Wasmachine"
+    wasprogramma: &wasprogramma "input_select.wasprogramma"
+    wasprogramma_startuitstel: &wasprogramma_startuitstel "input_boolean.wasprogramma_startuitstel"
+    wasprogramma_actief: &wasprogramma_actief "input_boolean.wasprogramma_actief"
+    katoen: "katoen_eco"
+    kleuren: "kleding_kleuren"
+    gemengd: "kleding_gemengde_was"
+    startuitstel: "startuitstel"
+    overig: "overig"
+    negeer: "negeren"
+    stekker: "switch.stekker_wasmachine"
+    anchors:
+      - &deactiveer_wasprogramma_actief
+        alias: "Zet de boolean Wasprogramma actief uit"
+        service: input_boolean.turn_off
+        target:
+          entity_id: *wasprogramma_actief
+      - &deactiveer_stekker_wasmachine
+        alias: "Schakel de stekker van de wasmachine uit"
+        service: switch.turn_off
+        target:
+          entity_id: "{{ stekker }}"
+      - &verwijder_notificatie_wasmachine
+        alias: "Verwijder de notificaties van de wasmachine"
+        service: notify.mobile_app_iphone_12_van_maarten
+        data:
+          message: "clear_notification"
+          data:
+            tag: *tag
+      - &activeer_wasprogramma_afronding
+        alias: "Zet de automatisering aan die de afhandeling van de wasmachine regelt zodra het wasprogramma is afgelopen"
+        service: automation.turn_on
+        target:
+          entity_id: automation.wasprogramma_afronding
+      - &activeer_wasprogramma_actief
+        alias: "Zet de boolean Wasprogramma actief aan"
+        service: input_boolean.turn_on
+        target:
+          entity_id: *wasprogramma_actief
+      - &url_wasmachine "/lovelace/wasmachine"
+  condition:
+    - "{{ is_state(wasprogramma_actief, 'off') }}"
+  action:
+    - alias: "Vraag het gekozen wasprogramma"
+      repeat:
+        while: "{{ is_state(wasprogramma, 'Geen') }}"
+        sequence:
+          - service: notify.iphone_12
+            data:
+              message: "Selecteer het wasprogramma 🧺"
+              data:
+                subtitle: *subtitle
+                url: *url_wasmachine
+                actions:
+                  - action: "{{ katoen }}"
+                    title: "Katoen (max 4 uur)"
+                  - action: "{{ kleuren }}"
+                    title: "Kleuren (max 1:20 uur)"
+                  - action: "{{ gemengd }}"
+                    title: "Gemengd (max 1 uur)"
+                  - action: "{{ startuitstel }}"
+                    title: "Startuitstel"
+                    uri: *url_wasmachine
+                  - action: "{{ overig }}"
+                    title: "Overig"
+                  - action: "{{ negeer }}"
+                    title: "Negeren"
+                    destructive: true
+                push:
+                  interruption-level: time-sensitive
+          # stel het gekozen wasprogramma uit bovenstaande automatisering in
+          # selecteer actief wasprogramma uit lijst
+          - alias: "Wacht op gekozen wasprogramma"
+            wait_for_trigger:
+              # We wait for specific actions because we don't want to run for
+              # any action, only for a response to the one we just sent
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ katoen }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ kleuren }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ gemengd }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ startuitstel }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ overig }}"
+              - platform: event
+                event_type: mobile_app_notification_action
+                event_data:
+                  action: "{{ negeer }}"
+            timeout:
+              minutes: "2"
+            continue_on_timeout: true
+          - alias: "Ga door wanneer er via de app een wasprogramma is gekozen binnen de timeout, geef anders een melding dat dit is vergeten"
+            if:
+              - "{{ wait.trigger is not none }}"
+            then:
+              - variables:
+                  programma: "{{ wait.trigger.event.data.action }}"
+              - alias: "Activeer het gekozen wasprogramma"
+                choose:
+                  - conditions: "{{ programma == katoen }}"
+                    sequence:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: *wasprogramma
+                        data:
+                          option: Katoen
+                  - conditions: "{{ programma == gemengd }}"
+                    sequence:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: *wasprogramma
+                        data:
+                          option: Gemengd
+                  - conditions: "{{ programma == kleuren }}"
+                    sequence:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: *wasprogramma
+                        data:
+                          option: Kleuren
+                  - conditions: "{{ programma == startuitstel }}"
+                    sequence:
+                      - alias: "Activeer de boolean startuitstel"
+                        service: input_boolean.turn_on
+                        target:
+                          entity_id: *wasprogramma_startuitstel
+                      - alias: "Schakel de automatisering Wasprogramma: Startuitstel in"
+                        service: automation.turn_on
+                        target:
+                          entity_id: automation.wasprogramma_startuitstel
+                      - alias: "Herinner mij eraan een wasprogramma te selecteren nadat startuitstel is geactiveerd"
+                        service: notify.iphone_12
+                        data:
+                          message: "Vergeet niet een wasprogramma te selecteren 🧺"
+                          data:
+                            subtitle: *subtitle
+                            url: *url_wasmachine
+                            push:
+                              interruption-level: time-sensitive
+                            tag: *tag
+                  - conditions: "{{ programma == overig }}"
+                    sequence:
+                      - service: input_select.select_option
+                        target:
+                          entity_id: *wasprogramma
+                        data:
+                          option: Overig
+                  - conditions: "{{ programma == negeer }}"
+                    sequence:
+                      - service: notify.iphone_12
+                        data:
+                          message: "De wasmachine wordt over 30 seconden uitgeschakeld"
+                          data:
+                            subtitle: *subtitle
+                            tag: *tag
+                      - delay:
+                          seconds: 30
+                      - *deactiveer_stekker_wasmachine
+                      - *verwijder_notificatie_wasmachine
+                      - stop: "Automatisering 'Wasprogramma: Start' is gestopt nadat keuze Negeer in app is gemaakt"
+              - *activeer_wasprogramma_actief
+            else:
+              - alias: "Stuur een melding dat er geen wasprogramma is geselecteerd"
+                service: notify.iphone_12
+                data:
+                  message: "Je bent vergeten het wasprogramma te selecteren. Klik hier om er alsnog een te selecteren."
+                  data:
+                    subtitle: *subtitle
+                    url: *url_wasmachine
+                    tag: *tag
+    - alias: "Controleer of de stekker nog is ingeschakeld door een gemaakte keuze."
+      condition: "{{ is_state(stekker, 'on') }}"
+    - alias: "Controleer of startuitstel is uitgeschakeld, anders neemt een andere automatisering het later over"
+      condition: "{{ is_state(wasprogramma_startuitstel, 'off') }}"
+    - *activeer_wasprogramma_afronding
+
+# start wasprogramma na startuitstel
+- id: f9de5d4d-8ae3-4ebd-98e6-af7a6494485d
+  alias: "Wasprogramma: Startuitstel"
+  description: "Start het wasprogramma na aflopen startuitstel."
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.stekker_wasmachine_power_consumption
+      above: 10
+  trace:
+    stored_traces: 25
+  variables:
+    wasprogramma: *wasprogramma
+    wasprogramma_startuitstel: *wasprogramma_startuitstel
+  condition:
+    - "{{ is_state(wasprogramma_startuitstel, 'on') }}"
+  action:
+    - service: input_boolean.turn_off
+      target:
+        entity_id: *wasprogramma_startuitstel
+    - *activeer_wasprogramma_afronding
+    - if: "{{ is_state(wasprogramma, 'Geen') }}"
+      then:
+        - alias: "Er is geen wasprogramma geselecteerd, vraag alsnog om welk programma het gaat"
+          service: notify.iphone_12
+          data:
+            message: "Startuitstel is afgelopen en de wasmachine is begonnen. Welk wasprogramma is actief?"
+            data:
+              subtitle: *subtitle
+              tag: *tag
+              url: *url_wasmachine
+              push:
+                interruption-level: time-sensitive
+      else:
+        - alias: "Stuur een melding dat het wasprogramma is gestart"
+          service: notify.iphone_12
+          data:
+            message: "Wasprogramma ({{ states(wasprogramma) | lower }}) is gestart."
+            data:
+              subtitle: *subtitle
+              push:
+                interruption-level: passive
+              tag: *tag
+    - alias: "Schakel deze automatisering uit nadat de taak is uitgevoerd"
+      service: automation.turn_off
+      target:
+        entity_id: automation.wasprogramma_startuitstel
+
+# wanneer stroom langer dan x minuten lager is dan xx, geef melding dat wasprogramma x klaar is
+- id: 2855a80e-8b92-456f-8fb7-19ebab828705
+  alias: "Wasprogramma: Afronding"
+  description: "Wordt gestart door wasprogramma_selectie, en handelt alles af van detectie van wasprogramma afgelopen tot en met het herinneren dat de was nog in de wasmachine zit"
+  # initial_state: false # De automatisering wordt ingeschakeld zodra de wasmachine actief is. Anders wordt continu gemonitord of de stekker < 4 watt verbruikt.
+  trigger:
+    # Wasmachine is klaar en staat standby
+    - platform: numeric_state
+      entity_id: sensor.stekker_wasmachine_power_consumption
+      below: 4
+      for:
+        minutes: "{{ states('input_number.wasprogramma_wachttijd_programma_afgerond') | float(5) }}"
+  variables:
+    wasprogramma: *wasprogramma
+    wasprogramma_startuitstel: *wasprogramma_startuitstel
+    wasprogramma_actief: *wasprogramma_actief
+  trace:
+    stored_traces: 25
+  condition:
+    # Er moet een actief wasprogramma zijn
+    - "{{ is_state(wasprogramma_actief, 'on') }}"
+      # onder voorbehoud dat startuitstel is uitgeschakeld, wat betekent dat de wasmachine is gestart met het wasprogramma
+    - "{{ is_state(wasprogramma_startuitstel, 'off') }}"
+  action:
+    - parallel:
+        - alias: "Stuur een eerste melding dat het wasprogramma is afgerond"
+          service: notify.iphone_12
+          data:
+            message: "Wasprogramma ({{ states(wasprogramma) | lower }}) is klaar."
+            data:
+              subtitle: *subtitle
+              tag: *tag
+        - *deactiveer_wasprogramma_actief
+        - alias: "Reset het wasprogramma naar Geen"
+          service: input_select.select_option
+          target:
+            entity_id: *wasprogramma
+          data:
+            option: Geen
+    - delay:
+        minutes: "{{ states('input_number.wasprogramma_interval_herinnering_programma_afgerond') | float(10) }}"
+    - *deactiveer_stekker_wasmachine
+    - alias: "Herinner de wasmachine te legen"
+      repeat:
+        while: "{{ is_state('binary_sensor.deursensor_wasmachine', 'off') }}"
+        sequence:
+          - alias: "Herinner mij om de was uit de wasmachine te halen"
+            service: notify.iphone_12
+            data:
+              message: "De was zit nog in de wasmachine"
+              data:
+                subtitle: *subtitle
+                tag: *tag
+                push:
+                  interruption-level: time-sensitive
+          - alias: "Herhaal de melding na de opgegeven wachttijd"
+            delay:
+              minutes: "{{ states('input_number.wasprogramma_interval_herinnering_programma_afgerond') | float(10) }}"
+    - *verwijder_notificatie_wasmachine
+    - alias: "Zet deze automatisering uit"
+      service: automation.turn_off
+      target:
+        entity_id: automation.wasprogramma_afronding

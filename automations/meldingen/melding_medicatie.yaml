@@ -1,0 +1,15 @@
+- id: 57f0dd9f-8883-445f-8df6-ef7f02ff6efe
+  alias: "Melding: Melatonine ophalen"
+  description: "Stuur een melding wanneer nieuwe melatonine gehaald moet worden"
+  mode: single
+  trigger:
+    - platform: time
+      at: "09:00"
+  condition: >-
+    {{ as_local(now()).strftime('%Y-%m-%d') >= as_datetime(states('input_datetime.melatonine_out_of_stock')).strftime('%Y-%m-%d') }}
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "Het is 90 dagen (of meer) geleden dat je melatonine hebt gehaald. Je bent nu door je voorraad heen."
+        data:
+          subtitle: "🫙 Medicatie 🫙"

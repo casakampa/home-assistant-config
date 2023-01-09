@@ -1,0 +1,26 @@
+- id: a1795406-1759-460a-be3f-8ab5b4ce22c8
+  alias: "Melding: Bewegingsdetectie"
+  description: "Stuur melding wanneer tijdens afwezigheid beweging wordt gedetecteerd"
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.hue_motion_zolder_occupancy
+        - binary_sensor.hue_motion_gang_occupancy
+        - binary_sensor.hue_motion_overloop_occupancy
+        - binary_sensor.hue_motion_woonkamer_occupancy
+        - binary_sensor.hue_motion_achtertuin_occupancy
+      from: "off"
+      to: "on"
+  mode: parallel
+  condition:
+    - "{{ states('zone.home') == '0' }}"
+  #    - "{{ trigger.to_state.state not in ['unknown', 'unavailable', 'none'] }}"
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "Locatie: {{ trigger.to_state.attributes.friendly_name.split(' ')[2] | capitalize }}"
+        data:
+          tag: "notification-movement"
+          subtitle: "Beweging gedetecteerd!"
+          push:
+            interruption-level: time-sensitive

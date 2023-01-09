@@ -1,0 +1,11 @@
+# GPS coördinaten van Werk
+- name: "Aventus Apeldoorn"
+  latitude: !secret werk_apd_lat
+  longitude: !secret werk_apd_lon
+  radius: 250
+  icon: mdi:school
+- name: "Aventus Deventer"
+  latitude: !secret werk_dev_lat
+  longitude: !secret werk_dev_lon
+  radius: 200
+  icon: mdi:school

@@ -1,0 +1,28 @@
+- id: 08ddb14e-3089-428f-a58f-783a3c936162
+  alias: "Melding: Deursensor"
+  description: "Stuur melding wanneer een deur wordt geopend of gesloten"
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.deursensor_voordeur
+        - binary_sensor.deursensor_achterdeur
+      not_from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+      not_to:
+        - "unavailable"
+        - "unknown"
+        - "none"
+  mode: parallel
+  condition:
+    - or:
+        - "{{ states('zone.home') == '0' }}"
+        - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
+  action:
+    - service: notify.iphone_12
+      data:
+        message: >-
+          {{ trigger.to_state.attributes.friendly_name.split(' ')[1] }} is {{ iif(trigger.to_state.state == 'on', 'open', 'dicht') }}
+        data:
+          tag: "{{ this.entity_id }}"

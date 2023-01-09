@@ -1,0 +1,9 @@
+- platform: statistics
+  unique_id: cc8cd889-bf5b-4134-b6a2-132ea6fc45ef
+  name: Gemiddelde binnentemperatuur
+  entity_id: sensor.room_temp_thermostat_otgw
+  state_characteristic: mean
+  sampling_size: 100
+  max_age:
+    days: 7
+  precision: 1

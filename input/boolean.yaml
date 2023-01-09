@@ -1,0 +1,74 @@
+# Wekker
+wekker_status:
+  name: Wekker
+  icon: mdi:alarm
+wekker_maandag:
+  name: Wekker maandag
+  icon: &mdi_alarm_check mdi:alarm-check
+wekker_dinsdag:
+  name: Wekker dinsdag
+  icon: *mdi_alarm_check
+wekker_woensdag:
+  name: Wekker woensdag
+  icon: *mdi_alarm_check
+wekker_donderdag:
+  name: Wekker donderdag
+  icon: *mdi_alarm_check
+wekker_vrijdag:
+  name: Wekker vrijdag
+  icon: *mdi_alarm_check
+# Thuiswerken
+thuiswerk_status:
+  name: Thuiswerken
+  icon: &mdi_home_import mdi:home-import-outline
+thuiswerken_maandag:
+  name: Thuiswerken
+  icon: *mdi_home_import
+thuiswerken_dinsdag:
+  name: Thuiswerken
+  icon: *mdi_home_import
+thuiswerken_woensdag:
+  name: Thuiswerken
+  icon: *mdi_home_import
+thuiswerken_donderdag:
+  name: Thuiswerken
+  icon: *mdi_home_import
+thuiswerken_vrijdag:
+  name: Thuiswerken
+  icon: *mdi_home_import
+# Aanwezigheidssimulatie
+aanwezigheidssimulatie:
+  name: Aanwezigheidssimulatie
+  initial: on
+  icon: mdi:account-group
+# Visite
+visite:
+  name: Visite
+  icon: mdi:account-multiple-plus
+# Deurbel
+status_beldrukker:
+  name: Status beldrukker
+  icon: mdi:bell-ring
+# Wasmachine
+wasprogramma_actief:
+  name: Wasprogramma actief
+  icon: mdi:progress-clock
+wasprogramma_startuitstel:
+  name: Startuitstel
+  icon: mdi:clock-end
+# Kliko herinnering
+kliko_aan_de_weg:
+  name: Kliko aan de weg
+  icon: mdi:truck-delivery
+kliko_wegzetten_herinnering:
+  name: "Herinnering: Kliko aan de weg"
+  icon: mdi:delete-empty
+kliko_wegzetten_herhaal_herinnering:
+  name: Herhaal kliko aan de weg
+  icon: mdi:repeat-variant
+kliko_ophalen_herinnering:
+  name: "Herinnering: Kliko ophalen"
+  icon: mdi:delete-empty-outline
+kliko_ophalen_herhaal_herinnering:
+  name: Herhaal kliko ophalen
+  icon: mdi:repeat-variant

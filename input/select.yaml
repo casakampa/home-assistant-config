@@ -1,0 +1,40 @@
+wasprogramma:
+  name: "Wasprogramma"
+  options:
+    - Geen
+    - Katoen
+    - Gemengd
+    - Kleuren
+    - Overig
+  initial: Geen
+  icon: mdi:format-list-bulleted-square
+werklocatie_maandag:
+  name: "Werklocatie maandag"
+  options:
+    - Apeldoorn
+    - Deventer
+  icon: &icon_work_location mdi:map-marker-radius-outline
+werklocatie_dinsdag:
+  name: "Werklocatie dinsdag"
+  options:
+    - Apeldoorn
+    - Deventer
+  icon: *icon_work_location
+werklocatie_woensdag:
+  name: "Werklocatie woensdag"
+  options:
+    - Apeldoorn
+    - Deventer
+  icon: *icon_work_location
+werklocatie_donderdag:
+  name: "Werklocatie donderdag"
+  options:
+    - Apeldoorn
+    - Deventer
+  icon: *icon_work_location
+werklocatie_vrijdag:
+  name: "Werklocatie vrijdag"
+  options:
+    - Apeldoorn
+    - Deventer
+  icon: *icon_work_location

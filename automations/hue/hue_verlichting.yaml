@@ -1,0 +1,312 @@
+- id: 4f96b956-cc4f-4ac7-b046-4b6bc073e417
+  alias: "Verlichting: Woonkamer"
+  description: >-
+    Deze automatisering regelt de verlichting in de woonkamer.
+
+    Wanneer iemand aanwezig is, wordt de verlichting in de volgende situatie uitgeschakeld:
+      - Er is voldoende daglicht
+
+    Wanneer iemand aanwezig is, wordt de verlichting in de volgende situaties ingeschakeld:
+      - Het schemert, vanwege slecht weer of de zon die opkomt of ondergaat
+      - De vooringestelde hoeveelheid minuten voorafgaand aan het ingestelde tijdstip
+      - Er komt iemand thuis
+
+    Bij bovenstaande situaties wordt gecontroleerd of er visite aanwezig is, anders wordt het niet uitgevoerd
+
+    Wanneer niemand aanwezig is, wordt de verlichting in de volgende situatie ingeschakeld:
+      - Bij zonsondergang (het uitschakelen van de verlichting wordt gedaan door de aanwezigheidssimulatie)
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.woonkamer_dag
+      to: "on"
+      for:
+        minutes: 2
+      id: "dag"
+    - platform: state
+      entity_id: zone.home
+      from: "0"
+      id: "thuiskomst"
+    - platform: state
+      entity_id: binary_sensor.woonkamer_schemer
+      to: "on"
+      for:
+        minutes: 2
+      id: "schemer"
+    - platform: sun
+      event: sunset
+      offset: "-00:15:00"
+      id: "zonsondergang"
+    - platform: sun
+      event: sunset
+      offset: "00:30:00"
+      id: "dimmoment"
+    - platform: template
+      value_template: >-
+        {{ as_local(now() + timedelta(minutes = (states('input_number.verlichting_woonkamer_dimtijd') | int(30)))) >= today_at(states('input_datetime.light_woonkamer_night_time')) }}
+      id: "bedtijd"
+  variables:
+    transition: "30"
+    kelvin: "2400"
+    brightness_pct: "{{ states('input_number.verlichting_woonkamer_lichtsterkte') | int(30) }}"
+    ochtendroutine: "script.wekker_met_ochtendroutine"
+    verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
+    visite: "input_boolean.visite"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - "{{ states('zone.home') >= '1' }}"
+        - "{{ is_state(visite, 'off') }}"
+      then:
+        - choose:
+            - conditions:
+                - condition: trigger
+                  id: "dag"
+                - alias: "Alleen als de zonsondergang niet binnen 20 minuten plaatsvindt"
+                  condition: sun
+                  before: sunset
+                  before_offset: "00:20:00"
+              sequence:
+                - service: light.turn_off
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: "{{ transition }}"
+            - conditions:
+                - or:
+                    - condition: trigger
+                      id: "schemer"
+                    - and:
+                        - condition: trigger
+                          id: "thuiskomst"
+                        - condition: state
+                          entity_id: binary_sensor.woonkamer_schemer
+                          state: "on"
+                - "{{ is_state(ochtendroutine, 'off') }}" # voor het geval om ochtendschemer gaat
+                - "{{ is_state(verlichting, 'off') }}" # mogelijk zijn de lampen al ingeschakeld door een automatisering of iemand
+                - alias: "15 minuten voordat de zon ondergaat"
+                  condition: sun
+                  before: sunset
+                  before_offset: "00:15:00"
+                - condition: time
+                  after: input_datetime.light_home_day_time # niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld
+              sequence:
+                - service: light.turn_on
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: "{{ transition }}"
+                    brightness_pct: "{{ brightness_pct + 10 }}"
+                    kelvin: "{{ kelvin }}"
+            - conditions:
+                - alias: "Vindt 30 minuten na zonsondergang plaats"
+                  condition: trigger
+                  id: "dimmoment"
+                - "{{ is_state(verlichting, 'on') }}" # mogelijk zijn de lampen al ingeschakeld door een automatisering of iemand
+              sequence:
+                - service: light.turn_on
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: 300
+                    brightness_pct: "{{ brightness_pct }}"
+            - conditions:
+                - condition: trigger
+                  id: "bedtijd"
+                - "{{ is_state(verlichting, 'on') }}"
+              sequence:
+                - service: light.turn_off
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: "{{ states('input_number.verlichting_woonkamer_dimtijd') | multiply(60, 1800) }}"
+      else:
+        - if:
+            - "{{ trigger.id == 'zonsondergang' }}"
+            - "{{ is_state(verlichting, 'off') }}"
+          then:
+            - service: light.turn_on
+              target:
+                entity_id: *verlichting
+              data:
+                transition: "{{ transition | multiply(10, 300) }}"
+                brightness_pct: "{{ brightness_pct }}"
+                kelvin: "{{ kelvin }}"
+
+- id: b7481a4a-979c-46bc-a078-9950568a99dc
+  alias: "Bij hoge temperatuur, alle lampen 100%"
+  description: "Zekerheid voor alles, maar stel dat er enorme warmte in een ruimte is dan wil ik hier van op de hoogte worden gebracht."
+  trigger:
+    - platform: numeric_state
+      entity_id:
+        - sensor.hue_motion_woonkamer_temperature
+        - sensor.hue_motion_trap_temperature
+        - sensor.hue_motion_zolder_temperature
+        - sensor.hue_motion_gang_temperature
+        - sensor.hue_motion_overloop_temperature
+      above: 50
+  mode: parallel
+  action:
+    - parallel:
+        - service: light.turn_on
+          target:
+            entity_id: light.alle_lampen_zha_group_0x0006
+          data:
+            brightness_pct: 100
+            flash: long
+        - service: notify.iphone_12
+          data:
+            message: "Waarschuwing: {{ trigger.to_state.name }} meet een temperatuur boven 50 graden"
+            data:
+              push:
+                interruption-level: critical
+
+### Time activated ###
+
+- id: ea4667b4-17d0-46be-ac99-c8415ebced8b
+  alias: "Verlichting: Bioscoopkamer"
+  description: "Deze automatisering regelt de verlichting in de bioscoopkamer"
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.achtertuin_schemer
+      to: "on"
+      id: "schemer"
+    - platform: state
+      entity_id: switch.stekker_bioscoopkamer
+      to: "on"
+      id: "stekker_aan"
+    - platform: state
+      entity_id: switch.stekker_bioscoopkamer
+      to: "off"
+      for:
+        seconds: 30
+      id: "stekker_uit"
+    - platform: state
+      entity_id: media_player.lg_oled
+      to: "off"
+      id: "lg_uit"
+    - platform: state
+      entity_id: media_player.lg_oled
+      attribute: source
+      to:
+        - "Apple TV"
+        - "KPN iTV"
+        - "Live TV"
+        - "Netflix"
+        - "Photo & Video"
+        - "YouTube"
+      id: "streaming_aan"
+  action:
+    - variables:
+        stekker: "switch.stekker_bioscoopkamer"
+        zon: "{{ is_state('sun.sun', 'below_horizon') and is not in ['unknown','unavailable','none'] }}"
+        transitie: &transitie "5"
+        lichtsterkte_laag: "5"
+        lichtsterkte_hoog: "50"
+        lamp: &lamp "light.lamp_bioscoopkamer"
+        kelvin: "2500"
+        kleurtemperatuur: "{{ state_attr('light.lamp_bioscoopkamer', 'max_mireds') | int(454) }}"
+    - alias: "Wat moet er gebeuren?"
+      choose:
+        - conditions:
+            - "{{ is_state(lamp, 'off') }}"
+          sequence:
+            - alias: "De lamp staat uit, kies wat er met de verlichting moet gebeuren"
+              choose:
+                - conditions:
+                    - condition: trigger
+                      id: "schemer"
+                    - "{{ is_state(stekker, 'on') }}"
+                  sequence:
+                    - alias: "Zet bij schemer de verlichting in de bioscoopkamer zachtjes aan"
+                      service: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        brightness_pct: "{{ lichtsterkte_laag }}"
+                        color_temp: "{{ kleurtemperatuur }}"
+                - conditions:
+                    - condition: trigger
+                      id: "stekker_aan"
+                    - "{{ zon }}"
+                  sequence:
+                    - alias: "Zet na zonsondergang de verlichting in de bioscoopkamer aan"
+                      service: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: "{{ lichtsterkte_hoog }}"
+                        kelvin: "{{ kelvin }}"
+        - conditions:
+            - "{{ is_state(lamp, 'on') }}"
+          sequence:
+            - alias: "De lamp staat aan, kies wat er met de verlichting moet gebeuren"
+              choose:
+                - conditions:
+                    - condition: trigger
+                      id: "stekker_uit"
+                  sequence:
+                    - alias: "Zet 30 seconden na het uitschakelen van de stekker de verlichting in de bioscoopkamer uit"
+                      service: light.turn_off
+                      target:
+                        entity_id: *lamp
+                - conditions:
+                    - condition: trigger
+                      id: "lg_uit"
+                  sequence:
+                    - alias: "Verhoog de lichtsterkte wanneer de LG OLED wordt uitgeschakeld"
+                      service: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: "{{ lichtsterkte_hoog }}"
+                        kelvin: "{{ kelvin }}"
+                - conditions:
+                    - condition: trigger
+                      id: "streaming_aan"
+                    - "{{ zon }}"
+                  sequence:
+                    - alias: "Verlaag de lichtsterkte wanneer een streamingapp wordt gestart op de LG OLED"
+                      service: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: "{{ lichtsterkte_laag }}"
+                        color_temp: "{{ kleurtemperatuur }}"
+      default:
+        - stop: "Er is iets misgegaan in de automatisering voor de verlichting van de bioscoopkamer"
+          error: true
+
+- id: a093e168-18fe-49e1-a84c-6912c5b3614c
+  alias: "Verlichting: Voortuin"
+  description: "Deze automatisering regelt de verlichting in de voortuin"
+  trigger:
+    - platform: state
+      entity_id: sun.sun
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    zon: "{{ is_state('sun.sun', 'below_horizon') }}"
+    lamp: "light.buitenlamp_voortuin"
+  action:
+    - if: "{{ zon }}"
+      then:
+        - service: light.turn_on
+          target:
+            entity_id: "{{ lamp }}"
+          data:
+            brightness_pct: 40
+      else:
+        - service: light.turn_off
+          target:
+            entity_id: "{{ lamp }}"

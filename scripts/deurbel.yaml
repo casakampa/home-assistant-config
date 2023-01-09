@@ -1,0 +1,196 @@
+deurbel_start:
+  alias: "Deurbel: aangebeld"
+  description: "Script wordt geactiveerd zodra de deurbel is ingedrukt."
+  icon: mdi:doorbell
+  variables:
+    tijdstip: "{{ now().strftime('%H:%M:%S') }}"
+  sequence:
+    - parallel:
+        - alias: "Stuur een notificatie"
+          service: notify.iphone_12
+          data:
+            message: "Er is aangebeld om {{ tijdstip }}"
+            data:
+              push:
+                interruption-level: time-sensitive
+              tag: "deurbel"
+              actions:
+                - action: "VALS_ALARM"
+                  title: "Vals alarm, reset alles"
+                  icon: "sfsymbols:bell.slash"
+                - action: "VISITE"
+                  title: "Er is visite"
+                  icon: "sfsymbols:person.crop.circle.badge.plus"
+        - alias: "Activeer input_boolean.deurbel_vandaag_ingedrukt"
+          service: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.status_beldrukker
+        - alias: "Update het tekstveld met het tijdstip waarop is aangebeld"
+          service: input_text.set_value
+          target:
+            entity_id: input_text.timestamp_doorbell_pressed
+          data:
+            value: "{{ tijdstip }}"
+        - alias: "Zet een aantal zaken in gang, voornamelijk meldingen en verlichting"
+          service: script.turn_on
+          target:
+            entity_id:
+              # Schakel Hue lamp gang in bij schemer of nacht
+              - script.deurbel_verander_helderheid_lamp_gang_bij_aanbellen
+              # Pauzeer, indien actief, de chromecast in de woonkamer
+              - script.deurbel_melding_chromecast_woonkamer
+              # Pauzeer, indien actief, de LG OLED
+              - script.deurbel_melding_lg_oled
+
+deurbel_deur_geopend:
+  alias: "Deurbel: deur geopend"
+  description: "Script wordt geactiveerd wanneer de deurbel wordt geopend, zodoende wordt de ingeschakelde lamp klaargezet om uit te schakelen wanneer de gang leeg is."
+  icon: "mdi:door-open"
+  sequence:
+    - &verwijder_notificaties
+      alias: "Verwijder de notificatie van de deurbel"
+      service: notify.mobile_app_iphone_12_van_maarten
+      data:
+        message: "clear_notification"
+        data:
+          tag: "deurbel"
+    - &wacht_gesloten_voordeur
+      alias: "Wacht tot de deur dicht is"
+      wait_for_trigger:
+        - platform: state
+          entity_id: binary_sensor.deursensor_voordeur
+          to: "off"
+          for:
+            seconds: 10
+    - alias: "Wacht tot er geen beweging is in de gang"
+      wait_for_trigger:
+        - platform: state
+          entity_id: binary_sensor.hue_motion_gang_occupancy
+          to: "off"
+          for:
+            seconds: 30
+    # Turn off the light
+    - &deactiveer_lamp_gang
+      service: light.turn_off
+      target:
+        entity_id: light.lamp_gang
+      data:
+        transition: 2
+    - &activeer_automatisering_beweging
+      alias: "Zet de automatisering aan voor de verlichting in de gang"
+      service: automation.turn_on
+      target:
+        entity_id: automation.verlichting_gang_beweging
+
+deurbel_deur_niet_geopend:
+  alias: "Deurbel: deur niet geopend"
+  description: "Script wordt geactiveerd wanneer de deurbel niet wordt geopend, zodoende worden de ingeschakelde lampen en actieve mediaspelers teruggezet naar de oorspronkelijke stand."
+  icon: "mdi:door-closed-lock"
+  sequence:
+    # Deactiveer scripts voor gedrag verlichting gang
+    - &deactiveer_scripts
+      service: script.turn_off
+      target:
+        entity_id:
+          # Schakel Hue lamp gang in bij schemer of nacht
+          - script.deurbel_verander_helderheid_lamp_gang_bij_aanbellen
+          # Pauzeer indien actief de chromecast in de woonkamer
+          - script.deurbel_melding_chromecast_woonkamer
+          # Pauzeer indien actief de LG OLED
+          - script.deurbel_melding_lg_oled
+    - *deactiveer_lamp_gang
+    - *activeer_automatisering_beweging
+
+deurbel_vals_alarm:
+  alias: "Deurbel: vals alarm"
+  description: "Script wordt geactiveerd bij een vals alarm, zodoende worden de ingeschakelde lampen en actieve mediaspelers teruggezet naar de oorspronkelijke stand."
+  icon: "mdi:restart"
+  variables:
+    media_player: "media_player.woonkamer"
+  sequence:
+    - *verwijder_notificaties
+    # Deactiveer scripts voor gedrag verlichting gang
+    - *deactiveer_scripts
+    - alias: "Deactiveer input_boolean.deurbel_vandaag_ingedrukt"
+      service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.status_beldrukker
+    - *deactiveer_lamp_gang
+    - *activeer_automatisering_beweging
+    - condition: template
+      value_template: "{{ is_state(media_player, 'paused') }}"
+    # Laat de Chromecast verder gaan met afspelen
+    - &media_player_play
+      service: media_player.media_play
+      target:
+        entity_id: "{{ media_player }}"
+
+deurbel_melding_chromecast_woonkamer:
+  alias: "Script voor Chromecast woonkamer bij aanbellen"
+  icon: "mdi:television-pause"
+  description: "Controleert of de Chromecast woonkamer actief is, en pauzeert deze totdat er weer beweging is in de woonkamer"
+  variables:
+    bezetting: "binary_sensor.hue_motion_woonkamer_occupancy"
+    voordeur: "binary_sensor.deursensor_voordeur"
+    media_player: "media_player.woonkamer"
+  sequence:
+    # Check if i'm home, otherwise bail
+    - &check_aanwezigheid
+      condition: template
+      value_template: "{{ states('zone.home') >= '1' }}"
+    # Check if the media player is available, otherwhise bail
+    - &check_media_player
+      condition: template
+      value_template: "{{ states(media_player) is not in ['off', 'unavailable', 'unknown', 'none'] }}"
+    - choose:
+        - conditions:
+            - "{{ is_state(media_player,'playing') }}"
+          sequence:
+            - &media_player_pause
+              service: media_player.media_pause
+              target:
+                entity_id: "{{ media_player }}"
+            - *wacht_gesloten_voordeur
+            - wait_template: "{{ is_state(bezetting, 'on') }}"
+            - *media_player_play
+        - conditions:
+            - "{{ is_state(media_player,'paused') }}"
+          sequence:
+            - *wacht_gesloten_voordeur
+            - wait_template: "{{ is_state(bezetting, 'on') }}"
+            - *media_player_play
+
+deurbel_melding_lg_oled:
+  alias: "Script voor LG OLED bij aanbellen"
+  icon: "mdi:television-pause"
+  description: "Controleert of de LG OLED actief is, stuurt een melding en pauzeert wat op dat moment actief is."
+  variables:
+    media_player: "media_player.lg_oled"
+  sequence:
+    # Check if i'm home, otherwise bail
+    - *check_aanwezigheid
+    # Check if the media player is available, otherwhise bail
+    - *check_media_player
+    - service: notify.lg_oled
+      data:
+        message: "Er is aangebeld"
+    - *media_player_pause
+
+deurbel_verander_helderheid_lamp_gang_bij_aanbellen:
+  alias: "Zet Hue lamp gang aan bij indrukken deurbel tijdens schemer of nacht"
+  icon: "mdi:lightbulb-on-outline"
+  description: "Verandert de helderheid van de Hue lamp in de gang wanneer het schemert of nacht is volgens een binaire sensor, wanneer de lamp is ingeschakeld en Maarten thuis is"
+  sequence:
+    - condition: template
+      value_template: "{{ not is_state('binary_sensor.gang_dag', 'on' ) }}"
+    - alias: "Zet de automatisering uit voor de verlichting in de gang"
+      service: automation.turn_off
+      target:
+        entity_id: automation.verlichting_gang_beweging
+    - alias: "Zet de verlichting in de gang aan"
+      service: light.turn_on
+      target:
+        entity_id: light.lamp_gang
+      data:
+        transition: 2
+        brightness_pct: "{{ states('input_number.light_gang_day_brightness_pct') | float(80) }}"

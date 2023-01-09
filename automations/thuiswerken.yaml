@@ -1,0 +1,76 @@
+- id: 7c31f1a4-283e-439c-8faf-478618bb8b08
+  alias: "Thuiswerken"
+  description: "Op basis van ingestelde booleans wordt het script van de ochtendroutine onderbroken, zodat automatiseringen niet worden afgemaakt/gestart."
+  initial_state: true
+  trigger:
+    - platform: time
+      at: "06:00"
+    - platform: state
+      entity_id:
+        - input_boolean.thuiswerken_maandag
+        - input_boolean.thuiswerken_dinsdag
+        - input_boolean.thuiswerken_woensdag
+        - input_boolean.thuiswerken_donderdag
+        - input_boolean.thuiswerken_vrijdag
+      to: "on"
+  condition:
+    - "{{ is_state('binary_sensor.workday_sensor', 'on')}}"
+    - "{{ is_state('sensor.wekkermodus', 'Actief') }}"
+  action:
+    - if:
+        - or:
+            - and:
+                - "{{ is_state('input_boolean.thuiswerken_maandag', 'on') }}"
+                - condition: time
+                  weekday:
+                    - mon
+            - and:
+                - "{{ is_state('input_boolean.thuiswerken_dinsdag', 'on') }}"
+                - condition: time
+                  weekday:
+                    - tue
+            - and:
+                - "{{ is_state('input_boolean.thuiswerken_woensdag', 'on') }}"
+                - condition: time
+                  weekday:
+                    - wed
+            - and:
+                - "{{ is_state('input_boolean.thuiswerken_donderdag', 'on') }}"
+                - condition: time
+                  weekday:
+                    - thu
+            - and:
+                - "{{ is_state('input_boolean.thuiswerken_vrijdag', 'on') }}"
+                - condition: time
+                  weekday:
+                    - fri
+      then:
+        - service: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.thuiswerk_status
+      else:
+        - alias: "Deactiveer thuiswerkmodus"
+          service: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.thuiswerk_status
+
+- id: fb44cfe4-dcf9-424d-ad3b-0505cebc82ec
+  alias: "Thuiswerken: uitbreiding"
+  description: "Controleer op twee momenten of thuiswerken actief is en de laptop van het werk is ingeschakeld, en voer de bijbehorende acties uit."
+  initial_state: false
+  trigger:
+    - platform: time
+      at:
+        - "08:30" # een vroege afspraak of les
+        - "09:00" # prima tijd om rustig aan te doen en te beginnen
+  condition:
+    - "{{ is_state('binary_sensor.workday_sensor', 'on')}}"
+    - "{{ is_state('input_boolean.thuiswerk_status', 'on')}}"
+  #    - "{{ is_state('device_tracker.laptop_aventus', 'home')}}" # Device_tracker werkt momenteel niet goed, daardoor zal deze check falen
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.woonkamer_en_keuken_zha_group_0x0007
+    - service: media_player.turn_off
+      target:
+        entity_id: media_player.woonkamer

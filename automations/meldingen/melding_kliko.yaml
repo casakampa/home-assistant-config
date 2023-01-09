@@ -1,0 +1,240 @@
+- id: 31a0cbc3-7158-4c3d-90d1-9ab6d5ad7777
+  alias: "Melding: Kliko wegzetten"
+  description: "Deze automatisering regelt alles vanaf het tijdstip tot het registreren dat de kliko aan de weg staat."
+  mode: parallel
+  trace:
+    stored_traces: 25
+  trigger:
+    - platform: time
+      at: input_datetime.tijdstip_melding_kliko
+      id: "tijdstip"
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "STOP_HERHALING_WEGZETTEN"
+      id: "stop_herinneren"
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "IGNORE"
+      id: "overslaan"
+    - platform: state
+      entity_id: binary_sensor.deursensor_voordeur
+      to: "on"
+      id: "voordeur"
+  variables:
+    boolean_herinnering: "input_boolean.kliko_wegzetten_herinnering"
+    boolean_herhaal_herinnering: "input_boolean.kliko_wegzetten_herhaal_herinnering"
+    sensor_morgen: "sensor.afvalwijzer_tomorrow"
+    afvalsoort: "{{ states('sensor.afvalwijzer_afvalsoort') | lower }}"
+    tag: "notification_kliko_wegzetten"
+    subtitle: "🗑️ Kliko 🗑️"
+    stop_herinnering: "STOP_HERHALING_WEGZETTEN"
+    overslaan: "IGNORE"
+    anchors:
+      - &boolean_herhaal_herinnering
+        alias: "Zet de boolean aan om de melding van de kliko te herhalen"
+        service: input_boolean.turn_on
+        target:
+          entity_id: "{{ boolean_herhaal_herinnering }}"
+      - &interval_herinnering
+        alias: "Herhaal de melding met interval wanneer niet aan de voorwaarde is voldaan"
+        delay:
+          minutes: "{{ states('input_number.kliko_interval_herinnering') | int(15) }}"
+      - &boolean_stop_herinneren
+        alias: "Stop met herinneren"
+        service: input_boolean.turn_off
+        target:
+          entity_id: "{{ boolean_herhaal_herinnering }}"
+      - &verwijder_notificatie_kliko
+        alias: "Verwijder de notificaties van de kliko wegzetten"
+        service: notify.mobile_app_iphone_12_van_maarten
+        data:
+          message: "clear_notification"
+          data:
+            tag: "{{ tag }}"
+      - &action_stop_herinnering
+        action: "{{ stop_herinnering }}"
+        title: "De kliko staat reeds aan de weg"
+      - &action_kliko_overslaan
+        action: "{{ overslaan }}"
+        title: "De leging van deze kliko overslaan"
+        destructive: true
+  condition:
+    - "{{ is_state(boolean_herinnering, 'on') }}"
+    - "{{ states(sensor_morgen) not in ['unknown','unavailable','none', 'Geen'] }}"
+  action:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: "tijdstip"
+          sequence:
+            - *boolean_herhaal_herinnering
+            - service: notify.iphone_12
+              data:
+                message: "Het {{ afvalsoort }} wordt morgen geleegd."
+                data:
+                  subtitle: "{{ subtitle }}"
+                  tag: "{{ tag }}"
+                  actions:
+                    - *action_stop_herinnering
+                    - *action_kliko_overslaan
+                  push:
+                    interruption-level: time-sensitive
+            - delay:
+                minutes: "{{ states('input_number.kliko_interval_herinnering') | int(15) }}"
+            - alias: "Blijf herinneren om de kliko aan de weg te zetten"
+              repeat:
+                while: "{{ is_state(boolean_herhaal_herinnering, 'on') }}"
+                sequence:
+                  - alias: "Herinner mij regelmatig de kliko aan de weg te zetten"
+                    service: notify.iphone_12
+                    data:
+                      message: "Zet het {{ afvalsoort }} aan de weg."
+                      data:
+                        subtitle: "{{ subtitle }}"
+                        tag: "{{ tag }}"
+                        actions:
+                          - *action_stop_herinnering
+                          - *action_kliko_overslaan
+                  - *interval_herinnering
+        - conditions:
+            - alias: "De voordeur of notificatie mogen de trigger zijn nadat de achterdeur open is geweest, of via de app de herinnering is gestopt"
+              or:
+                - condition: trigger
+                  id: "stop_herinneren"
+                - alias: "Aan beide voorwaarden moet voldaan worden, voordat deze trigger wordt toegepast"
+                  and:
+                    - condition: trigger
+                      id: "voordeur"
+                    - alias: "Controleer of de achterdeur maximaal 6 minuten geleden is geopend, om de kliko te vullen en aan de weg te zetten"
+                      not:
+                        - condition: state
+                          entity_id: binary_sensor.deursensor_achterdeur
+                          state: "off"
+                          for:
+                            minutes: 10
+            - alias: "De voordeur of notificatie mogen de trigger zijn na het tijdstip van de melding, anders ben ik niet met de kliko aan de wandel geweest"
+              condition: time
+              after: input_datetime.tijdstip_melding_kliko
+          sequence:
+            - alias: "Zet de boolean aan dat de kliko aan de weg staat"
+              service: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.kliko_aan_de_weg
+            - *boolean_stop_herinneren
+            - *verwijder_notificatie_kliko
+        - conditions:
+            - condition: trigger
+              id: "overslaan"
+          sequence:
+            - *boolean_stop_herinneren
+            - *verwijder_notificatie_kliko
+      default:
+        - stop: "Er is een fout opgetreden bij de automatisering Kliko Wegzetten."
+          error: true
+
+- id: af50ee17-cd5d-423b-a0b4-a070c0a369cb
+  alias: "Melding: Kliko ophalen"
+  description: "Deze automatisering regelt alles vanaf de herinnering tot het registreren dat de kliko is opgehaald."
+  mode: parallel
+  trace:
+    stored_traces: 25
+  trigger:
+    # Deuren
+    - platform: state
+      entity_id: binary_sensor.deursensor_voordeur
+      to: "on"
+      id: "voordeur"
+    - platform: state
+      entity_id: binary_sensor.deursensor_achterdeur
+      to: "on"
+      id: "achterdeur"
+    # Tijdstippen
+    - platform: time
+      at:
+        - "11:00"
+        - "13:00"
+        - "15:00"
+      id: "tijdstip"
+    # Notificatie
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "KLIKO_OPGEHAALD"
+      id: "notificatie"
+  variables:
+    kliko_aan_de_weg: "input_boolean.kliko_aan_de_weg"
+    boolean_herinnering: "input_boolean.kliko_ophalen_herinnering"
+    boolean_herhaal_herinnering: "input_boolean.kliko_ophalen_herhaal_herinnering"
+    sensor_vandaag: "sensor.afvalwijzer_today"
+    werkdag: "binary_sensor.workday_sensor"
+    tag: "notification_kliko_ophalen"
+    subtitle: "🗑️ Kliko 🗑️"
+  condition:
+    - "{{ is_state(kliko_aan_de_weg, 'on') }}"
+    - "{{ is_state(boolean_herinnering, 'on') }}"
+    - "{{ states(sensor_vandaag) not in ['unknown','unavailable','none', 'Geen'] }}"
+  action:
+    - alias: "Controleer eerst of aan de set voorwaarden wordt voldaan, ga anders naar"
+      if:
+        - or:
+            # Trigger op tijdstip, buiten werkdagen om en wanneer iemand thuis is
+            - and:
+                - condition: trigger
+                  id: "tijdstip"
+                # Er wordt niet gewerkt - kans is groot dat het vakantie is
+                - "{{ is_state(werkdag, 'off') }}"
+                # Er is iemand thuis
+                - "{{ states('zone.home') >= '1' }}"
+            # Trigger wanneer de voordeur opent, maar alleen als ik niet op het werk ben
+            - and:
+                - condition: trigger
+                  id: "voordeur"
+                # Er niet wordt gewerkt
+                - "{{ is_state('zone.aventus_apeldoorn', '0') }}"
+                - "{{ is_state('zone.aventus_deventer', '0') }}"
+                - alias: "Enkel na dit tijdstip"
+                  condition: time
+                  after: "13:00"
+      then:
+        - *boolean_herhaal_herinnering
+        - alias: "Herinner de kliko op te halen"
+          repeat:
+            while: "{{ is_state(boolean_herhaal_herinnering, 'on') }}"
+            sequence:
+              - alias: "Herinner mij de kliko op te halen"
+                service: notify.iphone_12
+                data:
+                  message: "De kliko staat nog aan de weg"
+                  data:
+                    push:
+                      interruption-level: time-sensitive
+                    subtitle: "{{ subtitle }}"
+                    tag: "{{ tag }}"
+                    actions:
+                      - action: "KLIKO_OPGEHAALD"
+                        title: "Kliko is opgehaald"
+              - *interval_herinnering
+      else:
+        - or:
+            - condition: trigger
+              id: "notificatie"
+            - alias: "Aan beide voorwaarden moet voldaan worden, voordat deze trigger wordt toegepast"
+              and:
+                - condition: trigger
+                  id: "achterdeur"
+                - alias: "Controleer of de voordeur maximaal 5 minuten geleden is geopend, om de kliko op te halen"
+                  not:
+                    - condition: state
+                      entity_id: binary_sensor.deursensor_voordeur
+                      state: "off"
+                      for:
+                        minutes: 10
+        - alias: "Zet de booleans, die met de kliko en het ophalen te maken hebben, uit"
+          service: input_boolean.turn_off
+          target:
+            entity_id:
+              - "{{ boolean_herhaal_herinnering }}"
+              - "{{ kliko_aan_de_weg }}"
+        - *verwijder_notificatie_kliko

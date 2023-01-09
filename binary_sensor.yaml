@@ -1,0 +1,47 @@
+# Makes a binary sensor with a specific range, observed from another sensor
+- platform: threshold
+  name: woonkamer_dag
+  entity_id: sensor.hue_motion_woonkamer_illuminance
+  upper: 8
+- platform: threshold
+  name: woonkamer_schemer
+  entity_id: sensor.hue_motion_woonkamer_illuminance
+  upper: 8
+  lower: 2
+- platform: threshold
+  name: woonkamer_nacht
+  entity_id: sensor.hue_motion_woonkamer_illuminance
+  lower: 2
+
+- platform: threshold
+  name: gang_dag
+  entity_id: sensor.hue_motion_gang_illuminance
+  upper: 6
+- platform: threshold
+  name: gang_schemer
+  entity_id: sensor.hue_motion_gang_illuminance
+  upper: 6
+  lower: 2
+- platform: threshold
+  name: gang_nacht
+  entity_id: sensor.hue_motion_gang_illuminance
+  lower: 2
+
+- platform: threshold
+  name: achtertuin_dag
+  entity_id: sensor.hue_motion_achtertuin_illuminance
+  upper: 25
+- platform: threshold
+  name: achtertuin_schemer
+  entity_id: sensor.hue_motion_achtertuin_illuminance
+  upper: 25
+  lower: 5
+- platform: threshold
+  name: achtertuin_nacht
+  entity_id: sensor.hue_motion_achtertuin_illuminance
+  lower: 5
+
+# Holidays, weekends are not included in the added list
+- platform: workday
+  country: NL
+  add_holidays: !include holidays.yaml

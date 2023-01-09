@@ -1,0 +1,36 @@
+- id: a29e2af3-286c-43ac-ad36-c93d584568ff
+  alias: "Herlaad Envoy integratie"
+  description: "Herlaad de integratie zodat de verbinding actief blijft. In het verleden raakte af en toe de verbinding verloren, waardoor er geen informatie werd doorgegeven. "
+  initial_state: true
+  trigger:
+    - platform: time
+      at: "03:30:00"
+  action:
+    - service: homeassistant.reload_config_entry
+      data:
+        entry_id: e53e8fcc3831eb08c6a62dda011484be
+
+- id: 8e513b89-3a00-4393-8eaa-04f8405b63f7
+  alias: "Herlaad WebOS integratie"
+  description: "Herlaad de integratie zodat de TV opnieuw wordt uitgelezen. Wordt dit niet gedaan, dan is na 1 keer gebruik de status van de TV niet meer uit te lezen."
+  initial_state: true
+  trigger:
+    - platform: state
+      entity_id: media_player.lg_oled
+      to: "off"
+      for:
+        minutes: 5
+      not_from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+  action:
+    - wait_for_trigger:
+        - platform: state
+          entity_id: switch.stekker_bioscoopkamer
+          to: "off"
+          for:
+            minutes: 5
+    - service: homeassistant.reload_config_entry
+      data:
+        entity_id: media_player.lg_oled

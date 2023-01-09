@@ -1,0 +1,8 @@
+- id: a9fdda9e-9224-47aa-ba9a-59b74c42dff6
+  alias: "Update PVOutput.org"
+  description: "Update per 5 minuten het account van PVOutput via een rest_command"
+  trigger:
+    - platform: time_pattern
+      minutes: "/5"
+  action:
+    - service: rest_command.pvoutput_status_update

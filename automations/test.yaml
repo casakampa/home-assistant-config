@@ -1,0 +1,10 @@
+- id: 05740093-f682-43bf-9449-92bcedd8f094
+  alias: "Test automation"
+  description: "Gebruik deze automatisering om allerlei andere functies en bedenksels te programmeren."
+  initial_state: false
+  trigger: []
+  action:
+    - alias: "Stuur een bericht"
+      service: notify.iphone_12
+      data:
+        message: "De wekker doet het"

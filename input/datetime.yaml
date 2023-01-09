@@ -1,0 +1,64 @@
+# Wekker
+wektijd_maandag:
+  name: "Wektijd"
+  icon: &mdi_clock mdi:bed-clock
+  has_time: true
+wektijd_dinsdag:
+  name: "Wektijd"
+  icon: *mdi_clock
+  has_time: true
+wektijd_woensdag:
+  name: "Wektijd"
+  icon: *mdi_clock
+  has_time: true
+wektijd_donderdag:
+  name: "Wektijd"
+  icon: *mdi_clock
+  has_time: true
+wektijd_vrijdag:
+  name: "Wektijd"
+  icon: *mdi_clock
+  has_time: true
+# Afval
+tijdstip_melding_kliko:
+  name: "Tijdstip melding kliko"
+  icon: mdi:clock-alert-outline
+  has_time: true
+
+### For Zigbee light automations ###
+light_home_day_time:
+  name: "Dag"
+  icon: mdi:weather-sunset-up
+  has_time: true
+  initial: "07:00"
+light_home_night_time:
+  name: "Nacht"
+  icon: mdi:weather-sunset-down
+  has_time: true
+  initial: "22:00"
+light_woonkamer_night_time:
+  name: "Woonkamer nacht"
+  icon: mdi:weather-sunset-down
+  has_time: true
+  initial: "22:30"
+plug_woonkamer_night_time:
+  name: "Stekker woonkamer uitschakelen"
+  icon: mdi:power-plug-off
+  has_time: true
+  initial: "23:00"
+
+time_for_testing:
+  name: "Testtijd"
+  icon: mdi:test-tube
+  has_time: true
+  initial: "12:00"
+
+dnswl_renew_date:
+  name: "DNSWL verversdatum"
+  icon: mdi:refresh
+  has_date: true
+
+melatonine_out_of_stock:
+  name: "Melatonine ophalen"
+  icon: mdi:refresh
+  has_date: true

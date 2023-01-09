@@ -1,0 +1,29 @@
+- id: fed03596-4625-4aa9-965f-325d703981aa
+  alias: "Melding: Batterijniveau onder drempelwaarde"
+  description: "Stuur een melding wanneer het batterijniveau lager is dan de drempelwaarde, zodat de batterij tijdig verwisseld kan worden"
+  trigger:
+    - platform: numeric_state
+      entity_id:
+        - sensor.hue_dimmer_woonkamer_power
+        - sensor.hue_dimmer_eethoek_power
+        - sensor.hue_dimmer_keuken_power
+        - sensor.hue_dimmer_slaapkamer_power
+        - sensor.hue_dimmer_bioscoopkamer_power
+        - sensor.hue_motion_zolder_power
+        - sensor.hue_motion_overloop_power
+        - sensor.hue_motion_gang_power
+        - sensor.hue_motion_trap_power
+        - sensor.hue_motion_woonkamer_power
+        - sensor.deursensor_voordeur_power
+        - sensor.deursensor_achterdeur_power
+        - sensor.hue_motion_achtertuin_power
+      below: input_number.drempelwaarde_batterijniveau
+  mode: queued
+  condition:
+    - "{{ trigger.to_state.state not in ['unknown', 'unavailable', 'none'] }}"
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "{{ trigger.to_state.name }}niveau is lager dan {{ states('input_number.drempelwaarde_batterijniveau') | int(15) }}%"
+        data:
+          subtitle: "🔋 Batterijniveau 🔋"

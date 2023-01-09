@@ -1,0 +1,52 @@
+- id: 6c2bd0ff-ea5e-475e-9cfc-5e56d4db9112
+  alias: "Melding: Software update beschikbaar"
+  trigger:
+    - platform: state
+      entity_id:
+        - sensor.home_assistant_core
+        - sensor.home_assistant_supervisor
+        - sensor.home_assistant_os
+        - sensor.esxi_patch
+        - sensor.zimbra_8_8_patch
+        - sensor.afvalwijzer
+        - sensor.dsmr_reader
+        - sensor.nextcloud
+        - sensor.caddy
+        - sensor.z_stack_firmware
+        - sensor.hue_lampen_software_versie
+      not_from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+      not_to:
+        - "unavailable"
+        - "unknown"
+        - "none"
+  mode: queued
+  condition:
+    - alias: "Stuur alleen een notificatie wanneer zowel de oude als nieuwe staat bekend zijn."
+      condition: template
+      value_template: "{{ (trigger.from_state.state and trigger.to_state.state)|length != 0 }}"
+    - alias: "Stuur geen notificaties bij prereleases. Is er geen veld prerelease aanwezig, dan altijd 'True'"
+      condition: template
+      value_template: >-
+        {{ iif(trigger.to_state.attributes.prerelease is defined,
+        is_state_attr(trigger.entity_id, 'prerelease', false),
+        'True') }}
+    - alias: "Aparte check voor de Z-Stack coordinator firmware. De melding wordt alleen gegeven wanneer de oude en nieuwe versie bekend zijn."
+      condition: template
+      value_template: >-
+        {{ iif(trigger.entity_id == 'sensor.z_stack_firmware',
+        iif('coordinator' in states('sensor.z_stack_coordinator_firmware')),
+        'True') }}
+  action:
+    - alias: "Stuur een notificatie over de software update"
+      service: notify.iphone_12
+      data:
+        message: >-
+          {{ trigger.to_state.attributes.friendly_name }} heeft een update.
+          Nieuw: {{ trigger.to_state.state }}.
+          Oud: {{ trigger.from_state.state }}.
+        data:
+          subtitle: "Update beschikbaar!"
+          tag: "{{ trigger.entity_id }}"

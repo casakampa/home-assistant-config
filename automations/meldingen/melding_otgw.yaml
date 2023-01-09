@@ -1,0 +1,71 @@
+- id: d3674aa8-67d5-43b8-a0bc-16fff9a16dce
+  alias: "Melding: Lage CV-druk"
+  description: "Melding wanneer de ketel bijgevuld dient te worden"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.ch_water_pressure_boiler_otgw
+      below: 1
+  mode: single
+  variables:
+    title: "⚠️ Waarschuwing ⚠️"
+    message: "CV-druk is lager dan {{ trigger.below }} bar. Zo snel mogelijk bijvullen!"
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "{{ message }}"
+        data:
+          subtitle: "{{ title }}"
+          push:
+            interruption-level: critical
+    - service: persistent_notification.create
+      data:
+        title: "{{ title }}"
+        message: "{{ message }}"
+
+- id: b5da03a9-99eb-416d-906c-a6acdf4d2781
+  alias: "Update OTGW" # OTC is Outside Temperature Control
+  description: "Aangezien er geen buitenvoeler op de ketel zit, is dit handig om te gebruiken icm WAR. Met elke update wordt de interne klok gesynchroniseerd"
+  trigger:
+    - platform: state
+      entity_id: sensor.buitentemperatuur
+      not_from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+      not_to:
+        - "unavailable"
+        - "unknown"
+        - "none"
+  mode: queued
+  action:
+    - alias: "Wanneer de sensor wordt bijgewerkt, update de buitentemperatuur in de OTGW"
+      service: opentherm_gw.set_outside_temperature
+      data:
+        gateway_id: otgw
+        temperature: "{{ states('sensor.buitentemperatuur') | float(10) }}"
+    - alias: "Update de klok tegelijkertijd met de buitentemperatuur"
+      service: opentherm_gw.set_clock
+      data:
+        gateway_id: otgw
+
+- id: a8b4f651-e700-4237-a200-2576dc1a7ea6
+  alias: "Diagnosemelding CV"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.slave_diagnostic_indication_boiler_otgw
+      to: "on"
+  variables:
+    title: "⚠️ Waarschuwing ⚠️"
+    message: "Controleer de CV ketel, er is een diagnosemelding."
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "{{ message }}"
+        data:
+          subtitle: "{{ title }}"
+          push:
+            interruption-level: critical
+    - service: persistent_notification.create
+      data:
+        title: "{{ title }}"
+        message: "{{ message }}"

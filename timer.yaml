@@ -1,0 +1,8 @@
+zha_join_60s:
+  name: 60 seconden
+  icon: mdi:timer-outline
+  duration: "00:01:00"
+zha_join_240s:
+  name: 240 seconden
+  icon: mdi:timer-outline
+  duration: "00:04:00"

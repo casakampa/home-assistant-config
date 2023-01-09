@@ -1,0 +1,45 @@
+- id: 4c1da598-5e42-48a6-a32f-f597b8dbaf3a
+  alias: "Stekker: Woonkamer"
+  description: "Op basis van de trigger en voorwaarden wordt een Hue Smart Plug in- of uitgeschakeld"
+  trigger:
+    # Triggers voor inschakelen
+    - platform: state
+      entity_id: zone.home
+      from: "0"
+      id: "turn_on"
+    - platform: time
+      at: input_datetime.light_home_day_time
+      id: "turn_on"
+    # Triggers voor uitschakelen
+    - platform: state
+      entity_id: zone.home
+      to: "0"
+      for:
+        minutes: 15
+      id: "turn_off"
+    - platform: time
+      at: input_datetime.plug_woonkamer_night_time
+      id: "turn_off"
+  condition:
+    - "{{ is_state('input_boolean.visite', 'off') }}"
+    - alias: "Tijdstip waarop de stekker ingeschakeld dient te worden"
+      condition: time
+      after: input_datetime.light_home_day_time
+    # De logica hieronder controleert elke minuut of het tijdstip groter of gelijk is aan de waarde die de input_datetimes bevatten.
+    # Met deze logica valt het opgegeven moment van uitschakelen altijd binnen deze controle, omdat hier 5 minuten bij opgeteld worden.
+    - "{{ states('sensor.time') <= (today_at(states('input_datetime.plug_woonkamer_night_time')) + timedelta(minutes=5)).strftime('%H:%M') }}"
+  variables:
+    stekker: "switch.stekker_woonkamer"
+  action:
+    - alias: "Kies of er in- of uitgeschakeld moet worden op basis van de voorwaarden"
+      or:
+        - and:
+            - "{{ trigger.id == 'turn_on'}}"
+            - "{{ is_state(stekker, 'off') }}"
+        - and:
+            - "{{ trigger.id == 'turn_off'}}"
+            - "{{ is_state(stekker, 'on') }}"
+            - "{{ not is_state('media_player.woonkamer', 'playing') }}"
+    - service: switch.{{ trigger.id }}
+      target:
+        entity_id: "{{ stekker }}"

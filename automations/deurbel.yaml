@@ -1,0 +1,59 @@
+- id: 72b333b7-25a9-440e-a096-33ba1d7bc495
+  alias: "Deurbel"
+  description: "Handelt alles af voor de deurbel. Wanneer er wordt aangebeld, wanneer de deurbel afgaat vanwege EMI in de meterkast (vals alarm), en wanneer de deur niet wordt geopend."
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.deurbel_voordeur
+      from: "off"
+      to: "on"
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "VISITE"
+      id: "visite"
+    - platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: "VALS_ALARM"
+      id: "vals_alarm"
+  mode: restart
+  action:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: "vals_alarm"
+          sequence:
+            - alias: "Vals alarm, waarschijnlijk veroorzaakt door een stroompuls in de meterkast"
+              service: script.turn_on
+              target:
+                entity_id: script.deurbel_vals_alarm
+        - conditions:
+            - condition: trigger
+              id: "visite"
+          sequence:
+            - alias: "Val de gasten niet lastig met automatiseringen die ongevraagd zaken uitschakelen"
+              service: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.visite
+      default:
+        - alias: "Start het eerste script voor de deurbel"
+          service: script.turn_on
+          target:
+            entity_id: script.deurbel_start
+        - alias: "Wacht tot de deur wordt geopend en voer de bijbehorende stappen uit, anders voer het script uit voor geen reactie."
+          wait_template: "{{ is_state('binary_sensor.deursensor_voordeur', 'on') }}"
+          timeout:
+            minutes: 1
+        - alias: "Binnen de wachttijd is de sensor op 'on' gezet, daarmee is de deur geopend."
+          if:
+            - "{{ wait.completed }}"
+          then:
+            - alias: "De deur is geopend, voer het tweede deel van de automatisering uit middels een script"
+              service: script.turn_on
+              target:
+                entity_id: script.deurbel_deur_geopend
+          else:
+            - alias: "Voer het script uit gemaakt voor het niet openen van de deur"
+              service: script.turn_on
+              target:
+                entity_id: script.deurbel_deur_niet_geopend

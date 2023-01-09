@@ -1,0 +1,6 @@
+- name: iphone_12
+  platform: group
+  services:
+    - service: mobile_app_iphone_12_van_maarten
+      data:
+        title: "CasaKampa"

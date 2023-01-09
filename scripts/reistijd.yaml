@@ -1,0 +1,136 @@
+update_travel_time_home_to_aventus_apeldoorn:
+  alias: "Melding: bereken reistijd huis naar Aventus Apeldoorn"
+  icon: mdi:routes-clock
+  variables:
+    tag: "{{ this.entity_id }}"
+    sensor: "sensor.reistijd_huis_naar_aventus_apeldoorn"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    subtitle: "Reistijd huis naar Aventus Apeldoorn"
+    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+    anchors:
+      - &notificatie_berekening_reistijd
+        service: notify.iphone_12
+        data:
+          message: "De reistijd wordt berekend. Dit kan even duren..."
+          data:
+            subtitle: "{{ subtitle }}"
+            tag: "{{ tag }}"
+      - &sensor_update
+        alias: "Update de sensor voor actuele informtaie"
+        service: homeassistant.update_entity
+        target:
+          entity_id:
+            - "{{ sensor_reistijd }}"
+      - &notificatie_reistijd
+        alias: "Meld de reistijd en route"
+        service: notify.iphone_12
+        data:
+          message: "{{ reistijd }} minuten"
+          data:
+            subtitle: "{{ subtitle }}"
+            tag: "{{ tag }}"
+  sequence:
+    - *notificatie_berekening_reistijd
+    - *sensor_update
+    #    - wait_template: "{{ (now() - as_local(states.sensor.reistijd_huis_naar_aventus_apeldoorn_duration_in_traffic.last_updated)) > timedelta(seconds=2) }}" # Ga verder wanneer de sensor is bijgewerkt
+    - *notificatie_reistijd
+
+update_travel_time_home_to_aventus_deventer:
+  alias: "Melding: bereken reistijd huis naar Aventus Deventer"
+  icon: mdi:routes-clock
+  variables:
+    tag: "{{ this.entity_id }}"
+    sensor: "sensor.reistijd_huis_naar_aventus_deventer"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    subtitle: "Reistijd huis naar Aventus Deventer"
+    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+  sequence:
+    - *notificatie_berekening_reistijd
+    - *sensor_update
+    #    - wait_template: "{{ (now() - as_local(states.sensor.reistijd_huis_naar_aventus_deventer_duration_in_traffic.last_updated)) > timedelta(seconds=2) }}" # Ga verder wanneer de sensor is bijgewerkt
+    - *notificatie_reistijd
+
+update_travel_time_aventus_apeldoorn_to_home:
+  alias: "Melding: bereken reistijd Aventus Apeldoorn naar huis"
+  icon: mdi:routes-clock
+  variables:
+    tag: "{{ this.entity_id }}"
+    sensor: "sensor.reistijd_aventus_apeldoorn_naar_huis"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    subtitle: "Reistijd Aventus Apeldoorn naar huis"
+    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+  sequence:
+    - *notificatie_berekening_reistijd
+    - *sensor_update
+    #    - wait_template: "{{ (now() - as_local(states.sensor.reistijd_aventus_apeldoorn_naar_huis_duration_in_traffic.last_updated)) > timedelta(seconds=2) }}" # Ga verder wanneer de sensor is bijgewerkt
+    - delay:
+        seconds: 1
+    - *notificatie_reistijd
+
+update_travel_time_aventus_deventer_to_home:
+  alias: "Melding: bereken reistijd Aventus Deventer naar huis"
+  icon: mdi:routes-clock
+  variables:
+    tag: "{{ this.entity_id }}"
+    sensor: "sensor.reistijd_aventus_deventer_naar_huis"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    subtitle: "Reistijd Aventus Deventer naar huis"
+    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+  sequence:
+    - *notificatie_berekening_reistijd
+    - *sensor_update
+    #    - wait_template: "{{ (now() - as_local(states.sensor.reistijd_aventus_deventer_naar_huis_duration_in_traffic.last_updated)) > timedelta(seconds=2) }}" # Ga verder wanneer de sensor is bijgewerkt
+    - delay:
+        seconds: 1
+    - *notificatie_reistijd
+
+update_travel_time_phone_to_home:
+  alias: "Melding: bereken reistijd telefoon naar huis"
+  icon: mdi:routes-clock
+  variables:
+    tag: "{{ this.entity_id }}"
+    sensor: "sensor.reistijd_telefoon_naar_huis"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    subtitle: "Reistijd huidige locatie naar huis"
+    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+  sequence:
+    - parallel:
+        - *notificatie_berekening_reistijd
+        - service: notify.mobile_app_iphone_12_van_maarten
+          data:
+            message: "request_location_update"
+    - delay:
+        seconds: 2
+    - *sensor_update
+    #    - wait_template: "{{ (now() - as_local(states.sensor.reistijd_telefoon_naar_huis_duration_in_traffic.last_updated)) > timedelta(seconds=2) }}" # Ga verder wanneer de sensor is bijgewerkt
+    - delay:
+        seconds: 1
+    - *notificatie_reistijd
+
+calculate_travel_time_zone_apeldoorn:
+  alias: "Bereken reistijd naar zone Apeldoorn"
+  icon: mdi:map-marker-right-outline
+  variables:
+    sensor: "sensor.reistijd_huis_naar_aventus_apeldoorn"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+  sequence:
+    repeat:
+      while: "{{ is_state('script.wekker_met_ochtendroutine', 'on') }}"
+      sequence:
+        - *sensor_update
+        - delay:
+            minutes: 4
+
+calculate_travel_time_zone_deventer:
+  alias: "Bereken reistijd naar zone Deventer"
+  icon: mdi:map-marker-right-outline
+  variables:
+    sensor: "sensor.reistijd_huis_naar_aventus_deventer"
+    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+  sequence:
+    repeat:
+      while: "{{ is_state('script.wekker_met_ochtendroutine', 'on') }}"
+      sequence:
+        - *sensor_update
+        - delay:
+            minutes: 4

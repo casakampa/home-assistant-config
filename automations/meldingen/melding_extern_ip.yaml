@@ -1,0 +1,34 @@
+- id: e840e14c-0a7b-4c8a-a6e7-16600440b85c
+  alias: "Melding: Extern IP"
+  description: "Automatisering meldt wanneer het externe IP-adres is gewijzigd."
+  trigger:
+    - platform: state
+      entity_id: sensor.extern_ip
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    header: "🌐 Wijziging extern IP"
+    message: "{{ trigger.from_state.state }} naar {{ trigger.to_state.state }}"
+  condition:
+    - "{{ trigger.to_state.state != trigger.from_state.state }}"
+  action:
+    - parallel:
+        - alias: "Stuur altijd een melding, ook als het IP-adres ongewijzigd blijkt"
+          service: notify.iphone_12
+          data:
+            message: "{{ message }}"
+            data:
+              subtitle: "{{ header }}"
+              push:
+                interruption-level: time-sensitive
+        - alias: "Geef de wijziging ook in Home Assistant weer, voor het geval ik op dat moment ingelogd ben"
+          service: persistent_notification.create
+          data:
+            title: "{{ header }}"
+            message: "{{ message }}"

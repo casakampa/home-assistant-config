@@ -1,0 +1,19 @@
+thermostat_temperature:
+  name: "Waarschuwing temperatuur thermostaat"
+  message: "De temperatuur is verhoogd naar {{ state_attr('climate.otgw','temperature') }} °C"
+  entity_id: binary_sensor.overschrijding_maximumtemperatuur_thermostaat
+  state: "on"
+  repeat: 5
+  can_acknowledge: false
+  skip_first: false
+  notifiers:
+    - mobile_app_iphone_12_van_maarten
+  data:
+    #    tag: "alert_thermostat_temperature"
+    subtitle: "🌡️ Thermostaat"
+    push:
+      interruption-level: time-sensitive
+    actions:
+      - action: "mute_alert_temperature_thermostat"
+        title: "Waarschuwing dempen"
+  done_message: "clear_notification"

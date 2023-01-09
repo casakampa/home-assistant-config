@@ -1,0 +1,76 @@
+- id: fe91e5c2-cd20-4dce-833d-ae2b61cac6f6
+  alias: "Melding: Beschikbaarheid lampen"
+  description: "Stuur een melding wanneer een lamp (on)beschikbaar is"
+  trigger:
+    - platform: state
+      entity_id:
+        - light.lamp_zolder_rechts
+        - light.lamp_zolder_links
+        - light.lamp_bioscoopkamer
+        - light.lamp_gang
+        - light.lamp_overloop
+        - light.lamp_slaapkamer_bed
+        - light.lamp_slaapkamer_plafond
+        - light.lamp_woonkamer_tafel
+        - light.lamp_woonkamer_tv
+        - light.lamp_woonkamer_bank_links
+        - light.lamp_woonkamer_bank_rechts
+        - light.hue_lightstrip
+        - light.spot_eethoek
+        - light.buitenlamp_voortuin
+        - light.spot_keuken_1
+        - light.spot_keuken_2
+        - light.spot_keuken_3
+        - light.spot_keuken_4
+        - light.buitenlamp_achtertuin
+      to:
+        - "unavailable"
+        - "unknown"
+        - "none"
+      #      for:
+      #        minutes: 5
+      id: "light_unavailable"
+    - platform: state
+      entity_id:
+        - light.lamp_zolder_rechts
+        - light.lamp_zolder_links
+        - light.lamp_bioscoopkamer
+        - light.lamp_gang
+        - light.lamp_overloop
+        - light.lamp_slaapkamer_bed
+        - light.lamp_slaapkamer_plafond
+        - light.lamp_woonkamer_tafel
+        - light.lamp_woonkamer_tv
+        - light.lamp_woonkamer_bank_links
+        - light.lamp_woonkamer_bank_rechts
+        - light.hue_lightstrip
+        - light.spot_eethoek
+        - light.buitenlamp_voortuin
+        - light.spot_keuken_1
+        - light.spot_keuken_2
+        - light.spot_keuken_3
+        - light.spot_keuken_4
+        - light.buitenlamp_achtertuin
+      from:
+        - "unavailable"
+        - "unknown"
+        - "none"
+      id: "light_available"
+  mode: parallel
+  max: 25
+  variables:
+    message_light_unavailable: "{{ trigger.to_state.attributes.friendly_name }} is onbereikbaar."
+    message_light_available: "{{ trigger.to_state.attributes.friendly_name }} is bereikbaar."
+  action:
+    - alias: "Send the appropriate message depending on the state of the triggered device"
+      parallel:
+        - service: notify.iphone_12
+          data:
+            message: "{{ message_light_unavailable if trigger.id == 'light_unavailable' else message_light_available }}"
+            data:
+              push:
+                tag: "{{ trigger.id }}"
+                interruption-level: passive
+        - service: persistent_notification.create
+          data:
+            message: "{{ message_light_unavailable if trigger.id == 'light_unavailable' else message_light_available }}"

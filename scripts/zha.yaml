@@ -1,0 +1,21 @@
+zha_allow_join_60s:
+  alias: "ZHA: voeg device toe aan netwerk - 60s"
+  icon: "mdi:antenna"
+  sequence:
+    - service: zha.permit
+      data:
+        duration: 60
+    - service: timer.start
+      target:
+        entity_id: timer.zha_join_60s
+
+zha_allow_join_240s:
+  alias: "ZHA: voeg device toe aan netwerk - 240s"
+  icon: "mdi:antenna"
+  sequence:
+    - service: zha.permit
+      data:
+        duration: 240
+    - service: timer.start
+      target:
+        entity_id: timer.zha_join_240s

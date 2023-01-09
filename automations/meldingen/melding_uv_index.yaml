@@ -1,0 +1,23 @@
+- id: df72722a-6e6a-4425-84b7-b3328d77cfbe
+  alias: "Melding: UV-index"
+  description: "Stuur een melding bij een matige en sterke UV-index"
+  mode: queued
+  trigger:
+    - platform: state
+      entity_id: sensor.thuis_uv_index
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  condition: "{{ (trigger.to_state.state | int(4)) > 4 }}"
+  action:
+    - service: notify.iphone_12
+      data:
+        message: "{{ iif((trigger.to_state.state | int(4)) >= 7 , 'UV-index is sterk! ☀', 'UV-index is matig 🌤') }} ({{ trigger.to_state.state }})"
+        data:
+          subtitle: "🧴 Insmeren! 🧴"
+          tag: "{{ this.entity_id }}"

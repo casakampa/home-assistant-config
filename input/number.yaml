@@ -1,0 +1,188 @@
+wekker_wake_up_tijdsspanne:
+  name: "Tijdsspanne"
+  initial: 15
+  min: 5
+  max: 30
+  step: 5
+  icon: mdi:timelapse
+  unit_of_measurement: "min"
+wekker_wake_up_kleurtemperatuur:
+  name: "Kleurtemperatuur"
+  initial: 2500
+  min: 2200
+  max: 3000
+  step: 100
+  unit_of_measurement: "K"
+  icon: mdi:palette
+wekker_wake_up_lichtsterkte:
+  name: "Lichtsterkte"
+  initial: 60
+  min: 50
+  max: 80
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+verlichting_woonkamer_dimtijd:
+  name: "Dimtijd"
+  initial: 30
+  min: 15
+  max: 45
+  step: 5
+  icon: mdi:timer-outline
+  unit_of_measurement: "min"
+verlichting_woonkamer_lichtsterkte:
+  name: "Lichtsterkte"
+  initial: 30
+  min: 20
+  max: 60
+  step: 5
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+### For Zigbee light automations ###
+light_woonkamer_day_brightness_pct:
+  name: "Helderheid overdag"
+  initial: 30
+  min: 20
+  max: 60
+  step: 5
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+light_woonkamer_night_brightness_pct:
+  name: "Helderheid nacht"
+  initial: 20
+  min: 10
+  max: 40
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-night-outline
+light_woonkamer_delay:
+  name: "Vertraging woonkamer"
+  initial: 15
+  min: 10
+  max: 30
+  step: 5
+  icon: mdi:timelapse
+  unit_of_measurement: "sec"
+light_gang_day_brightness_pct:
+  name: "Helderheid overdag"
+  initial: 80
+  min: 60
+  max: 100
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+light_gang_night_brightness_pct:
+  name: "Helderheid nacht"
+  initial: 30
+  min: 10
+  max: 40
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-night-outline
+light_gang_delay:
+  name: "Vertraging gang"
+  initial: 15
+  min: 10
+  max: 30
+  step: 5
+  icon: mdi:timelapse
+  unit_of_measurement: "sec"
+light_overloop_day_brightness_pct:
+  name: "Helderheid overdag"
+  initial: 80
+  min: 60
+  max: 100
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+light_overloop_night_brightness_pct:
+  name: "Helderheid nacht"
+  initial: 20
+  min: 10
+  max: 40
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-night-outline
+light_overloop_delay:
+  name: "Vertraging overloop"
+  initial: 15
+  min: 10
+  max: 30
+  step: 5
+  icon: mdi:timelapse
+  unit_of_measurement: "sec"
+light_zolder_day_brightness_pct:
+  name: "Helderheid overdag"
+  initial: 80
+  min: 60
+  max: 100
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-on-outline
+light_zolder_night_brightness_pct:
+  name: "Helderheid nacht"
+  initial: 20
+  min: 10
+  max: 40
+  step: 10
+  unit_of_measurement: "%"
+  icon: mdi:lightbulb-night-outline
+light_zolder_delay:
+  name: "Vertraging zolder"
+  initial: 15
+  min: 10
+  max: 30
+  step: 5
+  icon: mdi:timelapse
+  unit_of_measurement: "sec"
+# Wasmachine
+wasprogramma_wachttijd_programma_afgerond:
+  name: "Vertraging wasprogramma afgerond"
+  initial: 5
+  min: 2
+  max: 10
+  step: 1
+  icon: mdi:progress-check
+  unit_of_measurement: "min"
+wasprogramma_interval_herinnering_programma_afgerond:
+  name: "Interval herinnering"
+  initial: 10
+  min: 5
+  max: 30
+  step: 5
+  icon: mdi:clock-alert-outline
+  unit_of_measurement: "min"
+# Kliko herinnering
+kliko_interval_herinnering:
+  name: "Interval herinnering kliko"
+  initial: 15
+  min: 5
+  max: 30
+  step: 5
+  icon: mdi:message-text-clock-outline
+  unit_of_measurement: "min"
+# Batterij monitoring
+drempelwaarde_batterijniveau:
+  name: "Batterijniveau"
+  initial: 15
+  min: 5
+  max: 25
+  step: 5
+  icon: mdi:battery-alert
+  unit_of_measurement: "%"
+thermostaat_maximum_temperatuur:
+  name: "Maximumtemperatuur"
+  initial: 19.5
+  min: 18
+  max: 21
+  step: 0.5
+  icon: mdi:thermometer-alert
+  unit_of_measurement: "°C"
+thermostaat_test_temperatuur:
+  name: "Testtemperatuur"
+  initial: 19.5
+  min: 18
+  max: 21
+  step: 0.5
+  icon: mdi:thermometer-alert
+  unit_of_measurement: "°C"

@@ -1,0 +1,311 @@
+### Motion activated ###
+
+- id: 637c6e76-84b2-4c29-b12c-6bc7f77cd866
+  alias: "Verlichting: Woonkamer (beweging)"
+  description: "Activeer verlichting woonkamer op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_motion_woonkamer_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
+    anchors:
+      - &lamp_aan
+        service: light.turn_on
+        target:
+          entity_id: "{{ lamp }}"
+      - &lamp_uit
+        service: light.turn_off
+        target:
+          entity_id: "{{ lamp }}"
+      - &beweging_gedetecteerd "{{ trigger.to_state.state == 'on' }}"
+  condition:
+    - *beweging_gedetecteerd
+    - and:
+        - "{{ is_state('binary_sensor.woonkamer_nacht', 'on') }}"
+        - "{{ is_state('input_boolean.visite', 'off') }}"
+        - or:
+            - condition: time
+              before: input_datetime.light_home_day_time
+            - condition: time
+              after: input_datetime.light_woonkamer_night_time
+  action:
+    - <<: *lamp_aan
+      data:
+        brightness_pct: 1
+        kelvin: 3000
+    - alias: "Wacht tot er 15 seconden geen beweging is gedetecteerd in de woonkamer"
+      wait_for_trigger:
+        - platform: state
+          entity_id: binary_sensor.hue_motion_woonkamer_occupancy
+          to: "off"
+          for:
+            seconds: "{{ states('input_number.light_woonkamer_delay') | float(15) }}"
+    - *lamp_uit
+
+- id: 090e2979-ea12-4c4e-83f2-bb442815fcb1
+  alias: "Verlichting: Zolder (beweging)"
+  description: "Activeer verlichting zolder op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_motion_zolder_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    delay: "{{states('input_number.light_zolder_delay') | int(15) }}"
+    transition: &transitie "0.5"
+    helderheid_dag: "{{ states('input_number.light_zolder_day_brightness_pct') | float(80) }}"
+    helderheid_nacht: "{{ states('input_number.light_zolder_night_brightness_pct') | float(20) }}"
+    lamp: "light.zolder_zha_group_0x0004"
+    anchors:
+      - &vertraging
+        delay:
+          seconds: "{{ delay }}"
+      - &disable_logic
+        alias: "Controleer of de lamp nog brandt"
+        if: "{{ is_state(lamp, 'on') }}"
+        then:
+          - <<: *lamp_aan
+            data:
+              brightness_pct: 10
+              transition: *transitie
+          - *vertraging
+          - *lamp_uit
+      - &vroege_ochtend_late_avond
+        alias: "Tijdsspannes tussen ingestelde tijden"
+        or:
+          - condition: time
+            after: "06:00"
+            before: input_datetime.light_home_day_time
+          - condition: time
+            after: input_datetime.light_home_night_time
+            before: "23:59:59"
+      - &nacht
+        alias: "Nacht"
+        condition: time
+        after: "00:00"
+        before: "06:00"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+        - or:
+            - "{{ states('sensor.hue_motion_zolder_illuminance') | float(20) <= 20 }}"
+            - "{{ is_state('light.zolder_zha_group_0x0004', 'on') }}"
+      then:
+        - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
+          choose:
+            - conditions:
+                - condition: time
+                  after: input_datetime.light_home_day_time
+                  before: input_datetime.light_home_night_time
+              sequence:
+                - <<: *lamp_aan
+                  data:
+                    brightness_pct: "{{ helderheid_dag }}"
+                    transition: *transitie
+            - conditions:
+                - *vroege_ochtend_late_avond
+              sequence:
+                - <<: *lamp_aan
+                  data:
+                    brightness_pct: "{{ helderheid_nacht }}"
+                    transition: *transitie
+            - conditions:
+                - *nacht
+              sequence:
+                - <<: *lamp_aan
+                  data:
+                    brightness_pct: 10
+                - *vertraging
+                - *lamp_uit
+      else:
+        - *vertraging
+        - *disable_logic
+
+- id: 0221c907-db60-44c4-9735-e7a210bbcce4
+  alias: "Verlichting: Achtertuin (beweging)"
+  description: "Bewegingsensor activeert bij beweging verlichting achtertuin tijdens schemer of nacht"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_motion_achtertuin_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    delay: "15"
+    transition: "1"
+    lamp: "light.buitenlamp_achtertuin"
+  condition:
+    - "{{ not is_state('binary_sensor.achtertuin_dag', 'on') }}"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+      then:
+        - if: "{{ is_state('binary_sensor.achtertuin_schemer', 'on')}}"
+          then:
+            - alias: "Wordt uitgevoerd bij schemer"
+              <<: *lamp_aan
+              data:
+                transition: "{{ transition }}"
+                brightness_pct: 80
+          else:
+            - alias: "Wordt uitgevoerd bij nacht"
+              <<: *lamp_aan
+              data:
+                transition: "{{ transition }}"
+                brightness_pct: 30
+      else:
+        - *vertraging
+        - *disable_logic
+
+- id: 6f855c9d-9a85-4771-84df-868c0ec5ffb8
+  alias: "Verlichting: Gang (beweging)"
+  description: "Activeer verlichting gang op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.gang_template_motion_sensor
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    delay: "{{ states('input_number.light_gang_delay') | int(15) }}"
+    helderheid_dag: "{{ states('input_number.light_gang_day_brightness_pct') | float(80) }}"
+    helderheid_nacht: "{{ states('input_number.light_gang_night_brightness_pct') | float(30) }}"
+    lamp: "light.lamp_gang"
+    anchors:
+      - &enable_logic_with_kelvin
+        alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
+        choose:
+          - conditions:
+              - alias: "Tijd tussen de zonsopkomst en zonsondergang geldt als dag"
+                condition: sun
+                before: sunset
+                after: sunrise
+            sequence:
+              - <<: *lamp_aan
+                data:
+                  brightness_pct: "{{ helderheid_dag }}"
+                  transition: *transitie
+                  kelvin: 3500
+          - conditions:
+              - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
+                or:
+                  - and:
+                      - condition: time
+                        after: input_datetime.light_home_day_time
+                      - condition: sun
+                        before: sunrise
+                  - and:
+                      - condition: time
+                        before: input_datetime.light_home_night_time
+                      - condition: sun
+                        after: sunset
+            sequence:
+              - <<: *lamp_aan
+                data:
+                  brightness_pct: "{{ helderheid_dag }}"
+                  transition: *transitie
+                  kelvin: 2500
+          - conditions:
+              - *vroege_ochtend_late_avond
+            sequence:
+              - <<: *lamp_aan
+                data:
+                  brightness_pct: "{{ helderheid_nacht }}"
+                  transition: *transitie
+                  kelvin: 2500
+          - conditions:
+              - *nacht
+            sequence:
+              - <<: *lamp_aan
+                data:
+                  brightness_pct: "{{ helderheid_nacht }}"
+                  kelvin: 2250
+              - *vertraging
+              - *lamp_uit
+        default:
+          - stop: "Er was geen passend scenario voor deze trigger"
+      - &disable_logic_with_kelvin
+        alias: "Controleer of de lamp nog brandt"
+        if: "{{ is_state(lamp, 'on') }}"
+        then:
+          - *vertraging
+          - <<: *lamp_aan
+            data:
+              brightness_pct: 10
+              transition: *transitie
+          - *vertraging
+          - *lamp_uit
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+        - "{{ states('sensor.hue_motion_gang_illuminance') | float(20) <= 20 }}"
+      then:
+        - *enable_logic_with_kelvin
+      else:
+        - *disable_logic_with_kelvin
+
+- id: caeb83c2-c9a7-43cd-87e6-bf7c3378e83b
+  alias: "Verlichting: Overloop (beweging)"
+  description: "Activeer verlichting overloop op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_motion_overloop_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  variables:
+    delay: "{{ states('input_number.light_overloop_delay') | int(15) }}"
+    helderheid_dag: "{{ states('input_number.light_overloop_day_brightness_pct') | float(80) }}"
+    helderheid_nacht: "{{ states('input_number.light_overloop_night_brightness_pct') | float(20) }}"
+    lamp: "light.lamp_overloop"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+        - "{{ states('sensor.hue_motion_overloop_illuminance') | float(20) <= 20 }}"
+      then:
+        - *enable_logic_with_kelvin
+      else:
+        - *disable_logic_with_kelvin

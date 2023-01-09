@@ -1,0 +1,123 @@
+# Bereken de staat en bijbehorende afbeelding voor deze zelfgemaakte sensor
+- sensor:
+    - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
+      name: "Afvalwijzer afvalsoort"
+      icon: mdi:delete-restore
+      state: >-
+        {% set afvalsoorten = {
+                        'papier': 'Papier',
+                        'gft': 'GFT',
+                        'pmd': 'Plastic',
+                        'restafval': 'Restafval'
+                        } %}
+        {{ iif(states('sensor.afvalwijzer_next_type'),
+          afvalsoorten.get(states('sensor.afvalwijzer_next_type')),
+          'Geen') }}
+      picture: >-
+        {{ iif(states('sensor.afvalwijzer_next_type'),
+          'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
+          'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
+      availability: "{{ states('sensor.afvalwijzer_next_type') not in ['unknown', 'unavailable', 'none'] }}"
+# Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
+- sensor:
+    - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
+      name: "Buitentemperatuur"
+      icon: mdi:thermometer
+      state: "{{ (( state_attr('weather.thuis', 'temperature') + state_attr('weather.home', 'temperature')) / 2 ) | round(1, 0) }}"
+      unit_of_measurement: "°C"
+      availability: "{{ is_number(state_attr('weather.thuis', 'temperature')) and is_number(state_attr('weather.home', 'temperature')) }}"
+      device_class: temperature
+      state_class: measurement
+# Maak een nieuwe template sensor voor beweging in de gang
+- trigger:
+    - platform: state
+      entity_id: binary_sensor.hue_motion_gang_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+    - platform: state
+      entity_id: binary_sensor.hue_motion_trap_occupancy
+      not_from:
+        - "unknown"
+        - "unavailable"
+        - "none"
+      not_to:
+        - "unknown"
+        - "unavailable"
+        - "none"
+  binary_sensor:
+    - unique_id: afb7cb84-af8e-423f-8562-41744ce0e8b7
+      name: "Gang template motion sensor"
+      icon: mdi:motion-sensor
+      state: "{{ is_state('binary_sensor.hue_motion_gang_occupancy', 'on') or is_state('binary_sensor.hue_motion_trap_occupancy', 'on') }}"
+      device_class: motion
+# Maakt een sensor die wordt ingeschakeld wanneer de thermostaat de ingestelde maximumtemperatuur overschrijdt
+- trigger:
+    - platform: state
+      entity_id: climate.otgw
+      attribute: temperature
+  #  - platform: state # voor testdoeleinden
+  #    entity_id: input_number.thermostaat_test_temperatuur
+  binary_sensor:
+    - unique_id: 5080c052-00c1-4318-8d39-95efda56f34a
+      name: "Overschrijding Maximumtemperatuur Thermostaat"
+      state: "{{ state_attr(trigger.entity_id, 'temperature') | float(19.5) > states('input_number.thermostaat_maximum_temperatuur') | float(19.5) }}"
+      # state: "{{ states(trigger.entity_id) | float(19.5) > states('input_number.thermostaat_maximum_temperatuur') | float(19.5) }}" # voor testdoeleinden
+- trigger:
+    - platform: state
+      entity_id: input_boolean.wekker_status
+  sensor:
+    - unique_id: cc6c6db8-06d4-40ff-997e-704ae9724fc2
+      name: "Wekkermodus"
+      state: "{{ iif(is_state(trigger.entity_id, 'on'), 'Actief', 'Vakantie') }}"
+      icon: "{{ iif(is_state(trigger.entity_id, 'on'), 'mdi:alarm', 'mdi:beach') }}"
+# Knoppen om scripts te activeren
+- button:
+    - unique_id: b4ad4b16-567e-4ba4-a7c4-4a9d47650493
+      name: "Maak Backup"
+      icon: mdi:arrange-bring-forward
+      press:
+        - service: script.turn_on
+          target:
+            entity_id: script.backup_script
+- button:
+    - unique_id: 40d0a386-fe2a-4501-b315-0c400b9fd838
+      name: "Korte pixel refresh"
+      icon: mdi:television-shimmer
+      press:
+        - service: script.turn_on
+          target:
+            entity_id: script.lg_pixel_refresh_kort
+- button:
+    - unique_id: a6d6c20d-4569-4a52-a3ec-60d128f56eec
+      name: "Lange pixel refresh"
+      icon: mdi:television-shimmer
+      press:
+        - service: script.turn_on
+          target:
+            entity_id: script.lg_pixel_refresh_lang
+- button:
+    - unique_id: 8c50d327-0425-43a5-82c3-2531d24357ec
+      name: "Reset DNSWL timer"
+      icon: mdi:calendar-refresh
+      press:
+        - service: input_datetime.set_datetime
+          target:
+            entity_id: input_datetime.dnswl_renew_date
+          data:
+            date: "{{ (now() + timedelta(days=90)).strftime('%Y-%m-%d') }}"
+- button:
+    - unique_id: 98f4f388-1b66-49ec-9985-e24546d1e9f4
+      name: "Reset Melatonine melding"
+      icon: mdi:calendar-refresh
+      press:
+        - service: input_datetime.set_datetime
+          target:
+            entity_id: input_datetime.melatonine_out_of_stock
+          data:
+            date: "{{ (now() + timedelta(days=90)).strftime('%Y-%m-%d') }}"

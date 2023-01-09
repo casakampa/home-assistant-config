@@ -1,0 +1,90 @@
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies: !secret http_trusted_proxies
+
+# mariadb database (add-on)
+recorder:
+  db_url: !secret mariadb_db_url
+  purge_keep_days: 5
+  include:
+    domains:
+      - sensor
+      - light
+      - climate
+      - person
+    entities:
+      # Zon
+      - sun.sun
+      # Accounts of personen
+      # Telefoon
+      - device_tracker.iphone_12_van_maarten
+      # Binaire sensoren
+      - binary_sensor.slave_diagnostic_indication_boiler_otgw
+      - binary_sensor.achtertuin_dag
+      - binary_sensor.achtertuin_schemer
+      - binary_sensor.achtertuin_nacht
+      - binary_sensor.gang_dag
+      - binary_sensor.gang_schemer
+      - binary_sensor.gang_nacht
+      - binary_sensor.woonkamer_dag
+      - binary_sensor.woonkamer_schemer
+      - binary_sensor.woonkamer_nacht
+
+history:
+  include:
+    domains:
+      - device_tracker
+      - light
+      - climate
+  exclude:
+    entities:
+      - sensor.dsmr_reading_timestamp
+      - sensor.time
+      - sensor.dsmr_consumption_gas_read_at
+
+logbook:
+  include:
+    domains:
+      - sensor
+      - light
+      - climate
+      - person
+    entities:
+      # Zon
+      - sun.sun
+      # Accounts of personen
+      # Telefoon
+      - device_tracker.iphone_12_van_maarten
+  exclude:
+    entities:
+      - sensor.dsmr_reading_timestamp
+      - sensor.time
+      - sensor.dsmr_consumption_gas_read_at
+      - sensor.thuis_pressure_tendency
+
+logger:
+  default: warning
+  logs:
+    pychromecast.socket_client: critical # Mute cast reconnection warnings/errors
+
+# Uitgebreide onderdelen
+alert: !include alerts.yaml
+binary_sensor: !include binary_sensor.yaml
+group: !include groups.yaml
+automation: !include_dir_merge_list automations/
+script: !include_dir_merge_named scripts/
+zone: !include_dir_merge_list zones/
+sensor: !include_dir_merge_list sensors/
+input_boolean: !include input/boolean.yaml
+input_button: !include input/button.yaml
+input_datetime: !include input/datetime.yaml
+input_number: !include input/number.yaml
+input_select: !include input/select.yaml
+input_text: !include input/text.yaml
+notify: !include notify.yaml
+timer: !include timer.yaml
+template: !include templates.yaml
+rest_command: !include rest_command.yaml
+mqtt: !include mqtt.yaml

@@ -1,0 +1,10 @@
+# Dit RESTful command wordt gebruikt om informatie te uploaden naar PVOutput middels een automatisering
+pvoutput_status_update:
+  url: "https://pvoutput.org/service/r2/addstatus.jsp"
+  method: POST
+  headers:
+    X-Pvoutput-Apikey: !secret pvoutput_apikey
+    X-Pvoutput-SystemId: !secret pvoutput_systemid
+  content_type: application/x-www-form-urlencoded
+  timeout: 30
+  payload: "d={{now().strftime('%Y%m%d')}}&t={{now().strftime('%H:%M')}}&v2={{ states('sensor.envoy_current_power_production') | int(0) }}&v4={{ ( states('sensor.dsmr_reading_electricity_currently_delivered') | multiply(1000) ) | int(0) }}&v5={{ states('sensor.buitentemperatuur') }}&v6={{ states('sensor.dsmr_reading_phase_voltage_l1') | round(1, 0) }}"

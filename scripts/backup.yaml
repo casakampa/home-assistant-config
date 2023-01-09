@@ -1,0 +1,18 @@
+backup_script:
+  alias: "Backup: Volledig"
+  description: "Script voor het maken van een backup, en meldt wanneer deze is gemaakt"
+  icon: mdi:cloud-upload
+  variables:
+    moment: "{{ now().strftime('%Y-%m-%d %H:%M') }}"
+  sequence:
+    - service: hassio.backup_full
+      data:
+        name: >-
+          Volledige backup van {{ moment }}
+    - service: notify.iphone_12
+      data:
+        message: >-
+          Backup {{ moment }} is gemaakt
+        data:
+          push:
+            interruption-level: passive

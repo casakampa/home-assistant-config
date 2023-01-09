@@ -1,0 +1,17 @@
+/.HA_VERSION
+/.cloud
+/.shopping_list.json
+/.storage
+/custom_components
+/deps
+/home-assistant.log
+/home-assistant.log.1
+/home-assistant.log.fault
+/mobile_app
+/secrets.yaml
+/tts
+/webostv.conf
+/zigbee.db
+/zigbee.db-shm
+/zigbee.db-wal
+aanwezigheidssimulatie.yaml
