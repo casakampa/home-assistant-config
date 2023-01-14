@@ -44,7 +44,7 @@
       service: notify.iphone_12
       data:
         message: >-
-          {{ trigger.to_state.attributes.friendly_name }} heeft een update.
+          {{ state_attr(trigger.entity_id, 'friendly_name') }} heeft een update.
           Nieuw: {{ trigger.to_state.state }}.
           Oud: {{ trigger.from_state.state }}.
         data:
