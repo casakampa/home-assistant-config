@@ -13,14 +13,13 @@
       to: "on"
   mode: parallel
   condition:
-    - "{{ states('zone.home') == '0' }}"
-  #    - "{{ trigger.to_state.state not in ['unknown', 'unavailable', 'none'] }}"
+    - "{{ is_state('zone.home', '0') }}"
   action:
     - service: notify.iphone_12
       data:
-        message: "Locatie: {{ trigger.to_state.attributes.friendly_name.split(' ')[2] | capitalize }}"
+        message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[2] | capitalize }}"
         data:
-          tag: "notification-movement"
+          tag: "bewegingsdetectie"
           subtitle: "Beweging gedetecteerd!"
           push:
             interruption-level: time-sensitive

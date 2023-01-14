@@ -17,12 +17,12 @@
   mode: parallel
   condition:
     - or:
-        - "{{ states('zone.home') == '0' }}"
+        - "{{ is_state('zone.home', '0') }}"
         - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
   action:
     - service: notify.iphone_12
       data:
         message: >-
-          {{ trigger.to_state.attributes.friendly_name.split(' ')[1] }} is {{ iif(trigger.to_state.state == 'on', 'open', 'dicht') }}
+          {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[1] }} is {{ iif(trigger.to_state.state == 'on', 'open', 'dicht') }}
         data:
           tag: "{{ this.entity_id }}"
