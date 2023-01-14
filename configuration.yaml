@@ -78,7 +78,6 @@ script: !include_dir_merge_named scripts/
 zone: !include_dir_merge_list zones/
 sensor: !include_dir_merge_list sensors/
 input_boolean: !include input/boolean.yaml
-input_button: !include input/button.yaml
 input_datetime: !include input/datetime.yaml
 input_number: !include input/number.yaml
 input_select: !include input/select.yaml
