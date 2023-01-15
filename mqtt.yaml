@@ -1,7 +1,6 @@
 binary_sensor:
   - name: "Deurbel voordeur"
     state_topic: "doorbell/button"
+    availability_topic: "doorbell/status"
     enabled_by_default: false
     icon: mdi:bell-ring-outline
-    payload_on: "ON"
-    payload_off: "OFF"
