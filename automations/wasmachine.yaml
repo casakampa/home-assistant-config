@@ -24,7 +24,6 @@
     startuitstel: "startuitstel"
     overig: "overig"
     negeer: "negeren"
-    stekker: "switch.stekker_wasmachine"
     anchors:
       - &deactiveer_wasprogramma_actief
         alias: "Zet de boolean Wasprogramma actief uit"
@@ -35,7 +34,7 @@
         alias: "Schakel de stekker van de wasmachine uit"
         service: switch.turn_off
         target:
-          entity_id: "{{ stekker }}"
+          entity_id: "switch.stekker_wasmachine"
       - &verwijder_notificatie_wasmachine
         alias: "Verwijder de notificaties van de wasmachine"
         service: notify.mobile_app_iphone_12_van_maarten
