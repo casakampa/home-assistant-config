@@ -1,5 +1,5 @@
 update_travel_time_to_aventus_apeldoorn:
-  alias: "Melding: bereken reistijd huis naar Aventus Apeldoorn"
+  alias: "Melding: bereken reistijd naar Aventus Apeldoorn"
   icon: mdi:routes-clock
   variables:
     tag: "{{ this.entity_id }}"
@@ -29,27 +29,31 @@ update_travel_time_to_aventus_apeldoorn:
           message: >-
             {{ iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
             'Let op: de reistijd is (veel) langer dan gewoonlijk, namelijk '~ reistijd ~' minuten',
-            'Reistijd ' ~ reistijd ~' minuten') }}
+            'Reistijd '~ reistijd ~' minuten') }}
           data:
             subtitle: "{{ subtitle }}"
             tag: "{{ tag }}"
   sequence:
     - *notificatie_berekening_reistijd
     - *sensor_update
+    - delay:
+        seconds: 1
     - *notificatie_reistijd
 
 update_travel_time_to_aventus_deventer:
-  alias: "Melding: bereken reistijd huis naar Aventus Deventer"
+  alias: "Melding: bereken reistijd naar Aventus Deventer"
   icon: mdi:routes-clock
   variables:
     tag: "{{ this.entity_id }}"
     sensor: "sensor.reistijd_huis_naar_aventus_deventer"
-    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+    sensor_reistijd: "{{ sensor }}_duration_in_traffic"
     subtitle: "Reistijd naar Aventus Deventer"
     reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
   sequence:
     - *notificatie_berekening_reistijd
     - *sensor_update
+    - delay:
+        seconds: 1
     - *notificatie_reistijd
 
 calculate_travel_time_zone_apeldoorn:
