@@ -17,7 +17,10 @@ wekker_met_ochtendroutine:
         alias: "Geef een melding van de actuele reistijd naar de vooringestelde werklocatie"
         service: script.turn_on
         target:
-          entity_id: "script.update_travel_time_home_to_aventus_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
+          entity_id: "script.update_travel_time_to_aventus_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
+        data:
+          variables:
+            werklocatie: "{{ werklocatie }}"
   sequence:
     - alias: "Start de verlichting zwak en zo warm mogelijk"
       service: light.turn_on
