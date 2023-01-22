@@ -81,7 +81,6 @@ input_boolean: !include input/boolean.yaml
 input_datetime: !include input/datetime.yaml
 input_number: !include input/number.yaml
 input_select: !include input/select.yaml
-input_text: !include input/text.yaml
 notify: !include notify.yaml
 timer: !include timer.yaml
 template: !include templates.yaml

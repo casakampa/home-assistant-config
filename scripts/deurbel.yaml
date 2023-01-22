@@ -25,12 +25,12 @@ deurbel_start:
           service: input_boolean.turn_on
           target:
             entity_id: input_boolean.status_beldrukker
-        - alias: "Update het tekstveld met het tijdstip waarop is aangebeld"
-          service: input_text.set_value
+        - alias: "Actualiseer de input_datetime met het tijdstip waarop is aangebeld"
+          service: input_datetime.set_datetime
           target:
-            entity_id: input_text.timestamp_doorbell_pressed
+            entity_id: input_datetime.deurbel_tijdstip_aanbellen
           data:
-            value: "{{ tijdstip }}"
+            time: "{{ tijdstip }}"
         - alias: "Zet een aantal zaken in gang, voornamelijk meldingen en verlichting"
           service: script.turn_on
           target:

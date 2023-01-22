@@ -24,6 +24,11 @@ tijdstip_melding_kliko:
   name: "Tijdstip melding kliko"
   icon: mdi:clock-alert-outline
   has_time: true
+# Deurbel
+deurbel_tijdstip_aanbellen:
+  name: "Deurbel"
+  icon: mdi:doorbell
+  has_time: true
 
 ### For Zigbee light automations ###
 light_home_day_time:

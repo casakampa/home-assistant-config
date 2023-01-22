@@ -1,4 +1,0 @@
-timestamp_doorbell_pressed:
-  name: "Deurbel"
-  max: 8
-  icon: mdi:doorbell
