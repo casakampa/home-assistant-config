@@ -28,7 +28,7 @@ wekker_met_ochtendroutine:
         entity_id: *slaapkamer
       data:
         brightness_pct: 1
-        color_temp: "{{ state_attr('light.lamp_slaapkamer_plafond', 'max_mireds') | int(454) }}"
+        color_temp: "{{ int(state_attr('light.lamp_slaapkamer_plafond', 'max_mireds'), 454) }}"
     - alias: "Laat de lampen 10 seconden branden, voordat er verder wordt gegaan"
       delay:
         seconds: 10
@@ -37,9 +37,9 @@ wekker_met_ochtendroutine:
       target:
         entity_id: *slaapkamer
       data:
-        transition: "{{ (states('input_number.wekker_wake_up_tijdsspanne') | float(15) ) | multiply(60, 900) -10 }}" # -10 seconden vanwege de delay
-        brightness_pct: "{{ states('input_number.wekker_wake_up_lichtsterkte') | float(80) }}"
-        kelvin: "{{ states('input_number.wekker_wake_up_kleurtemperatuur') | float(2500) }}"
+        transition: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) -10 }}" # -10 seconden vanwege de delay
+        brightness_pct: "{{ float(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
+        kelvin: "{{ float(states('input_number.wekker_wake_up_kleurtemperatuur'), 2500) }}"
     - alias: "Laat mij weten dat ik er nu uit zou moeten/kunnen gaan"
       service: notify.iphone_12
       data:
@@ -50,7 +50,7 @@ wekker_met_ochtendroutine:
             interruption-level: time-sensitive
     - alias: "Wacht evenlang als dat de verlichting nodig heeft om de juiste helderheid te bereiken, alvorens verder te gaan"
       delay:
-        minutes: "{{ states('input_number.wekker_wake_up_tijdsspanne') | float(15) }}"
+        minutes: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15) }}"
     - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden"
       service: script.turn_on
       target:

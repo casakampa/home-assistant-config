@@ -49,7 +49,7 @@
           entity_id: binary_sensor.hue_motion_woonkamer_occupancy
           to: "off"
           for:
-            seconds: "{{ states('input_number.light_woonkamer_delay') | float(15) }}"
+            seconds: "{{ float(states('input_number.light_woonkamer_delay'), 15) }}"
     - *lamp_uit
 
 - id: 090e2979-ea12-4c4e-83f2-bb442815fcb1
@@ -69,10 +69,10 @@
         - "unavailable"
         - "none"
   variables:
-    delay: "{{states('input_number.light_zolder_delay') | int(15) }}"
+    delay: "{{ int(states('input_number.light_zolder_delay'), 15) }}"
     transition: &transitie "0.5"
-    helderheid_dag: "{{ states('input_number.light_zolder_day_brightness_pct') | float(80) }}"
-    helderheid_nacht: "{{ states('input_number.light_zolder_night_brightness_pct') | float(20) }}"
+    helderheid_dag: "{{ float(states('input_number.light_zolder_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ float(states('input_number.light_zolder_night_brightness_pct'), 20) }}"
     lamp: "light.zolder_zha_group_0x0004"
     anchors:
       - &vertraging
@@ -107,7 +107,7 @@
       if:
         - *beweging_gedetecteerd
         - or:
-            - "{{ states('sensor.hue_motion_zolder_illuminance') | float(20) <= 20 }}"
+            - "{{ float(states('sensor.hue_motion_zolder_illuminance'), 20) <= 20 }}"
             - "{{ is_state('light.zolder_zha_group_0x0004', 'on') }}"
       then:
         - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
@@ -201,9 +201,9 @@
         - "unavailable"
         - "none"
   variables:
-    delay: "{{ states('input_number.light_gang_delay') | int(15) }}"
-    helderheid_dag: "{{ states('input_number.light_gang_day_brightness_pct') | float(80) }}"
-    helderheid_nacht: "{{ states('input_number.light_gang_night_brightness_pct') | float(30) }}"
+    delay: "{{ int(states('input_number.light_gang_delay'), 15) }}"
+    helderheid_dag: "{{ float(states('input_number.light_gang_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ float(states('input_number.light_gang_night_brightness_pct'), 30) }}"
     lamp: "light.lamp_gang"
     anchors:
       - &enable_logic_with_kelvin
@@ -273,7 +273,7 @@
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - *beweging_gedetecteerd
-        - "{{ states('sensor.hue_motion_gang_illuminance') | float(20) <= 20 }}"
+        - "{{ float(states('sensor.hue_motion_gang_illuminance'), 20) <= 20 }}"
       then:
         - *enable_logic_with_kelvin
       else:
@@ -296,15 +296,15 @@
         - "unavailable"
         - "none"
   variables:
-    delay: "{{ states('input_number.light_overloop_delay') | int(15) }}"
-    helderheid_dag: "{{ states('input_number.light_overloop_day_brightness_pct') | float(80) }}"
-    helderheid_nacht: "{{ states('input_number.light_overloop_night_brightness_pct') | float(20) }}"
+    delay: "{{ int(states('input_number.light_overloop_delay'), 15) }}"
+    helderheid_dag: "{{ float(states('input_number.light_overloop_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ float(states('input_number.light_overloop_night_brightness_pct'), 20) }}"
     lamp: "light.lamp_overloop"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - *beweging_gedetecteerd
-        - "{{ states('sensor.hue_motion_overloop_illuminance') | float(20) <= 20 }}"
+        - "{{ float(states('sensor.hue_motion_overloop_illuminance'), 20) <= 20 }}"
       then:
         - *enable_logic_with_kelvin
       else:

@@ -66,8 +66,8 @@
   binary_sensor:
     - unique_id: 5080c052-00c1-4318-8d39-95efda56f34a
       name: "Overschrijding Maximumtemperatuur Thermostaat"
-      state: "{{ state_attr(trigger.entity_id, 'temperature') | float(19.5) > states('input_number.thermostaat_maximum_temperatuur') | float(19.5) }}"
-      # state: "{{ states(trigger.entity_id) | float(19.5) > states('input_number.thermostaat_maximum_temperatuur') | float(19.5) }}" # voor testdoeleinden
+      state: "{{ float(state_attr(trigger.entity_id, 'temperature'), 19.5) > float(states('input_number.thermostaat_maximum_temperatuur'), 19.5) }}"
+      # state: "{{ float(states(trigger.entity_id), 19.5) > float(states('input_number.thermostaat_maximum_temperatuur'), 19.5) }}" # voor testdoeleinden
 - trigger:
     - platform: state
       entity_id: input_boolean.wekker_status

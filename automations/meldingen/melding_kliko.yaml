@@ -40,7 +40,7 @@
       - &interval_herinnering
         alias: "Herhaal de melding met interval wanneer niet aan de voorwaarde is voldaan"
         delay:
-          minutes: "{{ states('input_number.kliko_interval_herinnering') | int(15) }}"
+          minutes: "{{ int(states('input_number.kliko_interval_herinnering'), 15) }}"
       - &boolean_stop_herinneren
         alias: "Stop met herinneren"
         service: input_boolean.turn_off
@@ -82,7 +82,7 @@
                   push:
                     interruption-level: time-sensitive
             - delay:
-                minutes: "{{ states('input_number.kliko_interval_herinnering') | int(15) }}"
+                minutes: "{{ int(states('input_number.kliko_interval_herinnering'), 15) }}"
             - alias: "Blijf herinneren om de kliko aan de weg te zetten"
               repeat:
                 while: "{{ is_state(boolean_herhaal_herinnering, 'on') }}"

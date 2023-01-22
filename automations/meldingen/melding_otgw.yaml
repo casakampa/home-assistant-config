@@ -42,7 +42,7 @@
       service: opentherm_gw.set_outside_temperature
       data:
         gateway_id: otgw
-        temperature: "{{ states('sensor.buitentemperatuur') | float(10) }}"
+        temperature: "{{ float(states('sensor.buitentemperatuur'), 10) }}"
     - alias: "Update de klok tegelijkertijd met de buitentemperatuur"
       service: opentherm_gw.set_clock
       data:

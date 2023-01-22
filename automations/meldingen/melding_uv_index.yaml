@@ -13,11 +13,12 @@
         - "unknown"
         - "unavailable"
         - "none"
-  condition: "{{ (trigger.to_state.state | int(4)) > 4 }}"
+  condition: "{{ int(trigger.to_state.state, 4) > 4 }}"
   action:
     - service: notify.iphone_12
       data:
-        message: "{{ iif((trigger.to_state.state | int(4)) >= 7 , 'UV-index is sterk! ☀', 'UV-index is matig 🌤') }} ({{ trigger.to_state.state }})"
+        message: >-
+          {{ iif(int(trigger.to_state.state, 4) >= 7 , 'UV-index is sterk! ☀', 'UV-index is matig 🌤') }} ({{ trigger.to_state.state }})
         data:
           subtitle: "🧴 Insmeren! 🧴"
           tag: "{{ this.entity_id }}"

@@ -193,4 +193,4 @@ deurbel_verander_helderheid_lamp_gang_bij_aanbellen:
         entity_id: light.lamp_gang
       data:
         transition: 2
-        brightness_pct: "{{ states('input_number.light_gang_day_brightness_pct') | float(80) }}"
+        brightness_pct: "{{ float(states('input_number.light_gang_day_brightness_pct'), 80) }}"

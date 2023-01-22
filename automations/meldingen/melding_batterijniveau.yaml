@@ -24,7 +24,7 @@
   action:
     - service: notify.iphone_12
       data:
-        message: "{{ state_attr(trigger.entity_id, 'friendly_name') }}niveau is lager dan {{ states(trigger.below) | int(15) }}%"
+        message: "{{ state_attr(trigger.entity_id, 'friendly_name') }}niveau is lager dan {{ int(states(trigger.below), 15) }}%"
         data:
           subtitle: "🔋 Batterijniveau 🔋"
           url: "/lovelace/batterijen"

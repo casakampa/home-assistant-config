@@ -43,12 +43,12 @@
       id: "dimmoment"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = (states('input_number.verlichting_woonkamer_dimtijd') | int(30)))) >= today_at(states('input_datetime.light_woonkamer_night_time')) }}
+        {{ as_local(now() + timedelta(minutes = int(states('input_number.verlichting_woonkamer_dimtijd'), 30))) >= today_at(states('input_datetime.light_woonkamer_night_time')) }}
       id: "bedtijd"
   variables:
     transition: "30"
     kelvin: "2400"
-    brightness_pct: "{{ states('input_number.verlichting_woonkamer_lichtsterkte') | int(30) }}"
+    brightness_pct: "{{ int(states('input_number.verlichting_woonkamer_lichtsterkte'), 30) }}"
     ochtendroutine: "script.wekker_met_ochtendroutine"
     verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
     visite: "input_boolean.visite"
@@ -206,7 +206,7 @@
         lichtsterkte_hoog: "50"
         lamp: &lamp "light.lamp_bioscoopkamer"
         kelvin: "2500"
-        kleurtemperatuur: "{{ state_attr('light.lamp_bioscoopkamer', 'max_mireds') | int(454) }}"
+        kleurtemperatuur: "{{ int(state_attr('light.lamp_bioscoopkamer', 'max_mireds'), 454) }}"
     - alias: "Wat moet er gebeuren?"
       choose:
         - conditions:

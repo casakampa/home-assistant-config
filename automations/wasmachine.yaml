@@ -260,7 +260,7 @@
       entity_id: sensor.stekker_wasmachine_power_consumption
       below: 4
       for:
-        minutes: "{{ states('input_number.wasprogramma_wachttijd_programma_afgerond') | float(5) }}"
+        minutes: "{{ float(states('input_number.wasprogramma_wachttijd_programma_afgerond'), 5) }}"
   variables:
     wasprogramma: *wasprogramma
     wasprogramma_startuitstel: *wasprogramma_startuitstel
@@ -289,7 +289,7 @@
           data:
             option: Geen
     - delay:
-        minutes: "{{ states('input_number.wasprogramma_interval_herinnering_programma_afgerond') | float(10) }}"
+        minutes: "{{ float(states('input_number.wasprogramma_interval_herinnering_programma_afgerond'), 10) }}"
     - *deactiveer_stekker_wasmachine
     - alias: "Herinner de wasmachine te legen"
       repeat:
@@ -306,7 +306,7 @@
                   interruption-level: time-sensitive
           - alias: "Herhaal de melding na de opgegeven wachttijd"
             delay:
-              minutes: "{{ states('input_number.wasprogramma_interval_herinnering_programma_afgerond') | float(10) }}"
+              minutes: "{{ float(states('input_number.wasprogramma_interval_herinnering_programma_afgerond'), 10) }}"
     - *verwijder_notificatie_wasmachine
     - alias: "Zet deze automatisering uit"
       service: automation.turn_off
