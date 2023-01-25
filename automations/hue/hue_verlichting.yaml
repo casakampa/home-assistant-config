@@ -52,16 +52,16 @@
     ochtendroutine: "script.wekker_met_ochtendroutine"
     verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
     visite: "input_boolean.visite"
+  condition:
+    - "{{ is_state(visite, 'off') }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - "{{ states('zone.home') >= '1' }}"
-        - "{{ is_state(visite, 'off') }}"
       then:
         - choose:
             - conditions:
-                - condition: trigger
-                  id: "dag"
+                - "{{ trigger.id == 'dag' }}"
                 - alias: "Alleen als de zonsondergang niet binnen 20 minuten plaatsvindt"
                   condition: sun
                   before: sunset
@@ -74,11 +74,9 @@
                     transition: "{{ transition }}"
             - conditions:
                 - or:
-                    - condition: trigger
-                      id: "schemer"
+                    - "{{ trigger.id == 'schemer' }}"
                     - and:
-                        - condition: trigger
-                          id: "thuiskomst"
+                        - "{{ trigger.id == 'thuiskomst' }}"
                         - condition: state
                           entity_id: binary_sensor.woonkamer_schemer
                           state: "on"
@@ -88,8 +86,9 @@
                   condition: sun
                   before: sunset
                   before_offset: "00:15:00"
-                - condition: time
-                  after: input_datetime.light_home_day_time # niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld
+                - alias: "Niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld"
+                  condition: time
+                  after: input_datetime.light_home_day_time
               sequence:
                 - service: light.turn_on
                   target:
@@ -99,10 +98,28 @@
                     brightness_pct: "{{ brightness_pct + 10 }}"
                     kelvin: "{{ kelvin }}"
             - conditions:
-                - alias: "Vindt 30 minuten na zonsondergang plaats"
-                  condition: trigger
-                  id: "dimmoment"
-                - "{{ is_state(verlichting, 'on') }}" # mogelijk zijn de lampen al ingeschakeld door een automatisering of iemand
+                - condition: trigger
+                  id: "bedtijd"
+                - "{{ is_state(verlichting, 'on') }}"
+              sequence:
+                - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximaal minimale waarde"
+                  service: light.turn_on
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: "{{ states('input_number.verlichting_woonkamer_dimtijd') | multiply(60, 1800) - 10 }}"
+                    brightness_pct: "1"
+                    color_temp: "{{ int(state_attr('light.woonkamer_zha_group_0x0003', 'min_mireds'), 153) }}"
+                - delay:
+                    seconds: 10
+                - service: light.turn_off
+                  target:
+                    entity_id: *verlichting
+      else:
+        - choose:
+            - conditions:
+                - "{{ trigger.id == 'dimmoment' }}"
+                - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders is er niets te dimmen.
               sequence:
                 - service: light.turn_on
                   target:
@@ -111,27 +128,16 @@
                     transition: 300
                     brightness_pct: "{{ brightness_pct }}"
             - conditions:
-                - condition: trigger
-                  id: "bedtijd"
-                - "{{ is_state(verlichting, 'on') }}"
+                - "{{ trigger.id == 'zonsondergang' }}"
+                - "{{ is_state(verlichting, 'off') }}"
               sequence:
-                - service: light.turn_off
+                - service: light.turn_on
                   target:
                     entity_id: *verlichting
                   data:
-                    transition: "{{ states('input_number.verlichting_woonkamer_dimtijd') | multiply(60, 1800) }}"
-      else:
-        - if:
-            - "{{ trigger.id == 'zonsondergang' }}"
-            - "{{ is_state(verlichting, 'off') }}"
-          then:
-            - service: light.turn_on
-              target:
-                entity_id: *verlichting
-              data:
-                transition: "{{ transition | multiply(10, 300) }}"
-                brightness_pct: "{{ brightness_pct }}"
-                kelvin: "{{ kelvin }}"
+                    transition: "{{ transition | multiply(10, 300) }}"
+                    brightness_pct: "{{ brightness_pct }}"
+                    kelvin: "{{ kelvin }}"
 
 - id: b7481a4a-979c-46bc-a078-9950568a99dc
   alias: "Bij hoge temperatuur, alle lampen 100%"
