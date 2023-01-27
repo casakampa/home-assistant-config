@@ -55,80 +55,80 @@
   condition:
     - "{{ is_state(visite, 'off') }}"
   action:
-    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
-      if:
-        - "{{ states('zone.home') >= '1' }}"
+    - if:
+        - "{{ trigger.id == 'dimmoment' }}"
+        - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders is er niets te dimmen en wordt de verlichting juist ingeschakeld.
       then:
-        - choose:
-            - conditions:
-                - "{{ trigger.id == 'dag' }}"
-                - alias: "Alleen als de zonsondergang niet binnen 20 minuten plaatsvindt"
-                  condition: sun
-                  before: sunset
-                  before_offset: "00:20:00"
-              sequence:
-                - service: light.turn_off
-                  target:
-                    entity_id: *verlichting
-                  data:
-                    transition: "{{ transition }}"
-            - conditions:
-                - or:
-                    - "{{ trigger.id == 'schemer' }}"
-                    - and:
-                        - "{{ trigger.id == 'thuiskomst' }}"
-                        - condition: state
-                          entity_id: binary_sensor.woonkamer_schemer
-                          state: "on"
-                - "{{ is_state(ochtendroutine, 'off') }}" # voor het geval om ochtendschemer gaat
-                - "{{ is_state(verlichting, 'off') }}" # mogelijk zijn de lampen al ingeschakeld door een automatisering of iemand
-                - alias: "15 minuten voordat de zon ondergaat"
-                  condition: sun
-                  before: sunset
-                  before_offset: "00:15:00"
-                - alias: "Niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld"
-                  condition: time
-                  after: input_datetime.light_home_day_time
-              sequence:
-                - service: light.turn_on
-                  target:
-                    entity_id: *verlichting
-                  data:
-                    transition: "{{ transition }}"
-                    brightness_pct: "{{ brightness_pct + 10 }}"
-                    kelvin: "{{ kelvin }}"
-            - conditions:
-                - condition: trigger
-                  id: "bedtijd"
-                - "{{ is_state(verlichting, 'on') }}"
-              sequence:
-                - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximaal minimale waarde"
-                  service: light.turn_on
-                  target:
-                    entity_id: *verlichting
-                  data:
-                    transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) - 10}}"
-                    brightness_pct: "1"
-                    color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
-                - alias: "Wacht tot de brightness in HA is gezakt tot 1%, wat bij de attributen een integer met waarde 3 is"
-                  wait_template: "{{ is_state_attr(verlichting, 'brightness', 3) }}"
-                - delay:
-                    seconds: 10
-                - service: light.turn_off
-                  target:
-                    entity_id: *verlichting
+        - service: light.turn_on
+          target:
+            entity_id: *verlichting
+          data:
+            transition: 300
+            brightness_pct: "{{ brightness_pct }}"
       else:
-        - choose:
+        - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+          choose:
             - conditions:
-                - "{{ trigger.id == 'dimmoment' }}"
-                - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders is er niets te dimmen.
+                - "{{ states('zone.home') >= '1' }}"
               sequence:
-                - service: light.turn_on
-                  target:
-                    entity_id: *verlichting
-                  data:
-                    transition: 300
-                    brightness_pct: "{{ brightness_pct }}"
+                - choose:
+                    - conditions:
+                        - "{{ trigger.id == 'dag' }}"
+                        - alias: "Alleen als de zonsondergang niet binnen 20 minuten plaatsvindt"
+                          condition: sun
+                          before: sunset
+                          before_offset: "00:20:00"
+                      sequence:
+                        - service: light.turn_off
+                          target:
+                            entity_id: *verlichting
+                          data:
+                            transition: "{{ transition }}"
+                    - conditions:
+                        - or:
+                            - "{{ trigger.id == 'schemer' }}"
+                            - and:
+                                - "{{ trigger.id == 'thuiskomst' }}"
+                                - condition: state
+                                  entity_id: binary_sensor.woonkamer_schemer
+                                  state: "on"
+                        - "{{ is_state(ochtendroutine, 'off') }}" # voor het geval om ochtendschemer gaat
+                        - "{{ is_state(verlichting, 'off') }}" # mogelijk zijn de lampen al ingeschakeld door een automatisering of iemand
+                        - alias: "15 minuten voordat de zon ondergaat"
+                          condition: sun
+                          before: sunset
+                          before_offset: "00:15:00"
+                        - alias: "Niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld"
+                          condition: time
+                          after: input_datetime.light_home_day_time
+                      sequence:
+                        - service: light.turn_on
+                          target:
+                            entity_id: *verlichting
+                          data:
+                            transition: "{{ transition }}"
+                            brightness_pct: "{{ brightness_pct + 10 }}"
+                            kelvin: "{{ kelvin }}"
+                    - conditions:
+                        - condition: trigger
+                          id: "bedtijd"
+                        - "{{ is_state(verlichting, 'on') }}"
+                      sequence:
+                        - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximaal minimale waarde"
+                          service: light.turn_on
+                          target:
+                            entity_id: *verlichting
+                          data:
+                            transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) - 10}}"
+                            brightness_pct: "1"
+                            color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
+                        - alias: "Wacht tot de brightness in HA is gezakt tot 1%, wat bij de attributen een integer met waarde 3 (2.55 naar boven afgerond) is"
+                          wait_template: "{{ is_state_attr(verlichting, 'brightness', 3) }}"
+                        - delay:
+                            seconds: 10
+                        - service: light.turn_off
+                          target:
+                            entity_id: *verlichting
             - conditions:
                 - "{{ trigger.id == 'zonsondergang' }}"
                 - "{{ is_state(verlichting, 'off') }}"
@@ -140,6 +140,8 @@
                     transition: "{{ transition | multiply(10, 300) }}"
                     brightness_pct: "{{ brightness_pct }}"
                     kelvin: "{{ kelvin }}"
+          default:
+            - stop: "Er was geen passend scenario voor deze trigger"
 
 - id: b7481a4a-979c-46bc-a078-9950568a99dc
   alias: "Bij hoge temperatuur, alle lampen 100%"
