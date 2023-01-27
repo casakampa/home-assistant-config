@@ -107,9 +107,11 @@
                   target:
                     entity_id: *verlichting
                   data:
-                    transition: "{{ states('input_number.verlichting_woonkamer_dimtijd') | multiply(60, 1800) - 10 }}"
+                    transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) - 10}}"
                     brightness_pct: "1"
-                    color_temp: "{{ int(state_attr('light.woonkamer_zha_group_0x0003', 'min_mireds'), 153) }}"
+                    color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
+                - alias: "Wacht tot de brightness in HA is gezakt tot 1%, wat bij de attributen een integer met waarde 3 is"
+                  wait_template: "{{ is_state_attr(verlichting, 'brightness', 3) }}"
                 - delay:
                     seconds: 10
                 - service: light.turn_off
