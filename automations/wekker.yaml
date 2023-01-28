@@ -6,23 +6,23 @@
   trigger:
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15))) >= today_at(states('input_datetime.wektijd_maandag')) }}
+        {{ now() > today_at(states('input_datetime.wektijd_maandag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
       id: "wekker_maandag"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15))) >= today_at(states('input_datetime.wektijd_dinsdag')) }}
+        {{ now() > today_at(states('input_datetime.wektijd_dinsdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
       id: "wekker_dinsdag"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15))) >= today_at(states('input_datetime.wektijd_woensdag')) }}
+        {{ now() > today_at(states('input_datetime.wektijd_woensdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
       id: "wekker_woensdag"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15))) >= today_at(states('input_datetime.wektijd_donderdag')) }}
+        {{ now() > today_at(states('input_datetime.wektijd_donderdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
       id: "wekker_donderdag"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15))) >= today_at(states('input_datetime.wektijd_vrijdag')) }}
+        {{ now() > today_at(states('input_datetime.wektijd_vrijdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
       id: "wekker_vrijdag"
   condition:
     - "{{ is_state('binary_sensor.workday_sensor', 'on') }}"

@@ -40,11 +40,14 @@
     - platform: sun
       event: sunset
       offset: "00:30:00"
-      id: "dimmoment"
+      id: "helderheid_verlagen"
     - platform: template
       value_template: >-
-        {{ as_local(now() + timedelta(minutes = int(states('input_number.verlichting_woonkamer_dimtijd'), 30))) >= today_at(states('input_datetime.light_woonkamer_night_time')) }}
-      id: "bedtijd"
+        {{ now() > today_at(states('input_datetime.light_woonkamer_night_time')) - timedelta(minutes = int(states('input_number.verlichting_woonkamer_dimtijd'), 30)) }}
+      id: "verlichting_dimmen"
+    - platform: time
+      at: input_datetime.light_woonkamer_night_time
+      id: "verlichting_uit"
   variables:
     transition: "30"
     kelvin: "2400"
@@ -56,7 +59,7 @@
     - "{{ is_state(visite, 'off') }}"
   action:
     - if:
-        - "{{ trigger.id == 'dimmoment' }}"
+        - "{{ trigger.id == 'helderheid_verlagen' }}"
         - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders is er niets te dimmen en wordt de verlichting juist ingeschakeld.
       then:
         - service: light.turn_on
@@ -110,25 +113,26 @@
                             brightness_pct: "{{ brightness_pct + 10 }}"
                             kelvin: "{{ kelvin }}"
                     - conditions:
-                        - condition: trigger
-                          id: "bedtijd"
                         - "{{ is_state(verlichting, 'on') }}"
                       sequence:
-                        - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximaal minimale waarde"
-                          service: light.turn_on
-                          target:
-                            entity_id: *verlichting
-                          data:
-                            transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) - 10}}"
-                            brightness_pct: "1"
-                            color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
-                        - alias: "Wacht tot de brightness in HA is gezakt tot 1%, wat bij de attributen een integer met waarde 3 (2.55 naar boven afgerond) is"
-                          wait_template: "{{ is_state_attr(verlichting, 'brightness', 3) }}"
-                        - delay:
-                            seconds: 10
-                        - service: light.turn_off
-                          target:
-                            entity_id: *verlichting
+                        - choose:
+                            - conditions:
+                                - "{{ trigger.id == 'verlichting_dimmen' }}"
+                              sequence:
+                                - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximale waarde"
+                                  service: light.turn_on
+                                  target:
+                                    entity_id: *verlichting
+                                  data:
+                                    transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
+                                    brightness_pct: "1"
+                                    color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
+                            - conditions:
+                                - "{{ trigger.id == 'verlichting_uit' }}"
+                              sequence:
+                                - service: light.turn_off
+                                  target:
+                                    entity_id: *verlichting
             - conditions:
                 - "{{ trigger.id == 'zonsondergang' }}"
                 - "{{ is_state(verlichting, 'off') }}"
