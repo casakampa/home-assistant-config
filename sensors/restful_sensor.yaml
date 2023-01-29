@@ -1,32 +1,40 @@
 - platform: rest
+  unique_id: 026b7fc5-a6a6-4849-97cd-a0438b0b5e0a
   scan_interval: 300
   resource: &resource https://version.home-assistant.io/stable.json
   name: "Home Assistant Core"
+  icon: mdi:home-assistant
   value_template: "{{ value_json.homeassistant.default }}"
   headers:
     user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:108.0) Gecko/20100101 Firefox/108.0"
 
 - platform: rest
+  unique_id: 74d859f7-1ca7-4c38-a7f7-8272e9b378d9
   scan_interval: 300
   resource: *resource
   name: "Home Assistant Supervisor"
+  icon: mdi:account-supervisor-outline
   value_template: "{{ value_json.supervisor }}"
   headers:
     user-agent: *ua_string
 
 - platform: rest
+  unique_id: 139112d7-d203-4de2-897c-e69f542b2725
   scan_interval: 300
   resource: *resource
   name: "Home Assistant OS"
+  icon: mdi:linux
   value_template: "{{ value_json.hassos.ova }}"
   headers:
     user-agent: *ua_string
 
     # Check GitHub repository dsmrreader/dsmr-reader via https://api.github.com/repos/dsmrreader/dsmr-reader/releases
 - platform: rest
+  unique_id: 06df5ab3-70e8-48b2-b83c-da5acc620624
   scan_interval: 3600
   resource: https://api.github.com/repos/dsmrreader/dsmr-reader/releases
   name: "DSMR Reader"
+  icon: mdi:gauge
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -40,9 +48,11 @@
 
 # Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
 - platform: rest
+  unique_id: 0ecd889e-2679-44d1-ac34-30531c35ddcb
   scan_interval: 3600
   resource: https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
   name: "Afvalwijzer"
+  icon: mdi:delete-restore
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -56,9 +66,11 @@
 
 # Check GitHub repository nextcloud/server via https://api.github.com/repos/nextcloud/server/releases
 - platform: rest
+  unique_id: a8c86d93-b746-44f9-88d6-03901cfc5319
   scan_interval: 3600
   resource: https://api.github.com/repos/nextcloud/server/releases
   name: "Nextcloud"
+  icon: mdi:folder-sync
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -72,9 +84,11 @@
 
 # Check GitHub repository kalkih/mini-graph-card via https://api.github.com/repos/kalkih/mini-graph-card/releases
 - platform: rest
+  unique_id: 8ad8b831-6662-40e9-abb3-e5bae0f8da52
   scan_interval: 3600
   resource: https://api.github.com/repos/kalkih/mini-graph-card/releases
   name: "Mini Graph"
+  icon: mdi:chart-line-variant
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -88,9 +102,11 @@
 
 # Check GitHub repository caddyserver/caddy via https://api.github.com/repos/caddyserver/caddy/releases
 - platform: rest
+  unique_id: 9d3effaf-f8b5-4e97-a57f-59c93503d936
   scan_interval: 3600
   resource: https://api.github.com/repos/caddyserver/caddy/releases
   name: "Caddy"
+  icon: mdi:web-box
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -104,6 +120,7 @@
 
 # Check GitHub repository Koenkk/Z-Stack-firmware via https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
 - platform: rest
+  unique_id: 8a6fafe0-f14a-4dd9-9a80-71396b9e522e
   scan_interval: 3600
   resource: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
   name: "Z-Stack coordinator firmware"
@@ -120,11 +137,13 @@
 - platform: template
   sensors:
     z_stack_firmware:
+      unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       friendly_name: "Z-Stack firmware"
-      value_template: "{{ states('sensor.z_stack_coordinator_firmware').split('_')[4] }}"
+      value_template: "{{ states('sensor.z_stack_coordinator_firmware').split('_')[3] }}"
 
 # Extern IP-adres
 - platform: rest
+  unique_id: 153ac06c-58ac-46fe-93bb-4de62e3bda40
   resource: https://www.maartenvandekamp.nl/ip.php
   name: "Extern IP"
   value_template: "{{ value_json.ip }}"

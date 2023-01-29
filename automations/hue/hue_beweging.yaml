@@ -71,8 +71,8 @@
   variables:
     delay: "{{ int(states('input_number.light_zolder_delay'), 15) }}"
     transition: &transitie "0.5"
-    helderheid_dag: "{{ float(states('input_number.light_zolder_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ float(states('input_number.light_zolder_night_brightness_pct'), 20) }}"
+    helderheid_dag: "{{ int(states('input_number.light_zolder_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ int(states('input_number.light_zolder_night_brightness_pct'), 20) }}"
     lamp: "light.zolder_zha_group_0x0004"
     anchors:
       - &vertraging
@@ -202,8 +202,8 @@
         - "none"
   variables:
     delay: "{{ int(states('input_number.light_gang_delay'), 15) }}"
-    helderheid_dag: "{{ float(states('input_number.light_gang_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ float(states('input_number.light_gang_night_brightness_pct'), 30) }}"
+    helderheid_dag: "{{ int(states('input_number.light_gang_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ int(states('input_number.light_gang_night_brightness_pct'), 30) }}"
     lamp: "light.lamp_gang"
     anchors:
       - &enable_logic_with_kelvin
@@ -252,7 +252,7 @@
             sequence:
               - <<: *lamp_aan
                 data:
-                  brightness_pct: "{{ helderheid_nacht }}"
+                  brightness_pct: 10
                   kelvin: 2250
               - *vertraging
               - *lamp_uit
@@ -297,8 +297,8 @@
         - "none"
   variables:
     delay: "{{ int(states('input_number.light_overloop_delay'), 15) }}"
-    helderheid_dag: "{{ float(states('input_number.light_overloop_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ float(states('input_number.light_overloop_night_brightness_pct'), 20) }}"
+    helderheid_dag: "{{ int(states('input_number.light_overloop_day_brightness_pct'), 80) }}"
+    helderheid_nacht: "{{ int(states('input_number.light_overloop_night_brightness_pct'), 20) }}"
     lamp: "light.lamp_overloop"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"

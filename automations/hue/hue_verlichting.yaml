@@ -124,9 +124,9 @@
                                   target:
                                     entity_id: *verlichting
                                   data:
-                                    transition: "{{ float(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
+                                    transition: "{{ int(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
                                     brightness_pct: "1"
-                                    color_temp: "{{ int(state_attr(verlichting, 'max_mireds'), 500) }}"
+                                    kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
                             - conditions:
                                 - "{{ trigger.id == 'verlichting_uit' }}"
                               sequence:
@@ -222,7 +222,7 @@
         lichtsterkte_hoog: "50"
         lamp: &lamp "light.lamp_bioscoopkamer"
         kelvin: "2500"
-        kleurtemperatuur: "{{ int(state_attr('light.lamp_bioscoopkamer', 'max_mireds'), 454) }}"
+        min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
     - alias: "Wat moet er gebeuren?"
       choose:
         - conditions:
@@ -241,7 +241,7 @@
                         entity_id: *lamp
                       data:
                         brightness_pct: "{{ lichtsterkte_laag }}"
-                        color_temp: "{{ kleurtemperatuur }}"
+                        kelvin: "{{ min_color_temp_kelvin }}"
                 - conditions:
                     - condition: trigger
                       id: "stekker_aan"
@@ -292,7 +292,7 @@
                       data:
                         transition: *transitie
                         brightness_pct: "{{ lichtsterkte_laag }}"
-                        color_temp: "{{ kleurtemperatuur }}"
+                        kelvin: "{{ min_color_temp_kelvin }}"
       default:
         - stop: "Er is iets misgegaan in de automatisering voor de verlichting van de bioscoopkamer"
           error: true
@@ -312,16 +312,15 @@
         - "unavailable"
         - "none"
   variables:
-    zon: "{{ is_state('sun.sun', 'below_horizon') }}"
     lamp: "light.buitenlamp_voortuin"
   action:
-    - if: "{{ zon }}"
+    - if: "{{ is_state('sun.sun', 'below_horizon') }}"
       then:
         - service: light.turn_on
           target:
             entity_id: "{{ lamp }}"
           data:
-            brightness_pct: 40
+            brightness_pct: 30
       else:
         - service: light.turn_off
           target:

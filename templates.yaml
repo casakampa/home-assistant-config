@@ -40,7 +40,7 @@
       icon: mdi:motion-sensor
       state: "{{ is_state('binary_sensor.hue_motion_gang_occupancy', 'on') or is_state('binary_sensor.hue_motion_trap_occupancy', 'on') }}"
       device_class: motion
-      availability: "{{ (states('binary_sensor.hue_motion_gang_occupancy') and states('binary_sensor.hue_motion_trap_occupancy')) not in ['unknown','unavailable','unknown'] }}"
+      availability: "{{ (states('binary_sensor.hue_motion_gang_occupancy') and states('binary_sensor.hue_motion_trap_occupancy')) not in ['unknown','unavailable','none'] }}"
 # Maakt een sensor die wordt ingeschakeld wanneer de thermostaat de ingestelde maximumtemperatuur overschrijdt
 - trigger:
     - platform: state
@@ -51,7 +51,7 @@
   binary_sensor:
     - unique_id: 5080c052-00c1-4318-8d39-95efda56f34a
       name: "Overschrijding Maximumtemperatuur Thermostaat"
-      state: "{{ float(state_attr(trigger.entity_id, 'temperature')) > float(states('input_number.thermostaat_maximum_temperatuur')) }}"
+      state: "{{ float(state_attr(trigger.entity_id, 'temperature'), 19.5) > float(states('input_number.thermostaat_maximum_temperatuur'), 19.5) }}"
       availability: "{{ is_number(state_attr('climate.otgw', 'temperature')) and is_number(states('input_number.thermostaat_maximum_temperatuur')) }}"
       # state: "{{ float(states(trigger.entity_id), 19.5) > float(states('input_number.thermostaat_maximum_temperatuur'), 19.5) }}" # voor testdoeleinden
 - trigger:
