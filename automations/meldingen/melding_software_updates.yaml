@@ -14,6 +14,7 @@
         - sensor.caddy
         - sensor.z_stack_firmware
         - sensor.hue_lampen_software_versie
+        - sensor.nuc12_uefi
       not_from:
         - "unavailable"
         - "unknown"
