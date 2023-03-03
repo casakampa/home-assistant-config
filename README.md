@@ -4,9 +4,7 @@
 Het doel van deze automatiseringen is een waardevolle toevoeging te zijn op het dagelijkse leven, waardoor er niet nagedacht hoeft te worden over eenvoudige handelingen.
 
 ## Begin
-
 In 2018 ben ik begonnen met Home Assistant op een Raspberry Pi 3B. In de loop der jaren is dit gegroeid naar onderstaande situatie: 
-
 
 # Smart Home
 Mijn Smart Home bestaat uit de volgende software en hardware:
@@ -19,7 +17,6 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 		 - Netwerk: IPv4 & IPv6
 		 - Zigbee: [Electrolama ZZH!](https://electrolama.com/projects/zig-a-zig-ah/) (CC2652R), toegevoegd als USB device aan de virtuele machine
 			 - Reserve: [Slae.sh](https://slae.sh/projects/cc2652/) (CC2652RB)
-
 - ### Philips Hue
 	- [Hue White E27 - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---800/8719514329843) (Zigbee)
 	- [Hue White E27 - 1100lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---1100/8719514288232) (Zigbee & Bluetooth)
@@ -32,14 +29,19 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 	 - [Hue Motion Sensor](https://www.philips-hue.com/nl-nl/p/hue-bewegingssensor/8719514342125) (Zigbee)
 	 - [Hue Smart Stekker](https://www.philips-hue.com/nl-nl/p/hue-smart-stekker/8719514342309) (Zigbee) en (Zigbee & Bluetooth)
 	 - Hue Dimmer Switch V1 (Zigbee)
-
 - ### Aquara
 	 - [Door & Windows sensor](https://www.aqara.com/en/door_and_window_sensor.html) (Zigbee)
  - ### Blitzwolf
 	 - [Blitzwolf BW-SHP13](https://www.blitzwolfeurope.com/BlitzWolf-BW-SHP13-ZigBee-WIFI-Smart-Socket) (Zigbee) - oude generatie met werkende energiemeting
+ - ### Chromecast
+	 - Google Chromecast (2018)
+ - ### Raspberry Pi 3B
+	 - [Raspberry Pi OS Bullseye 64-bit](https://www.raspberrypi.com/software/operating-systems/)
+	   - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
+	   - [Doorbell](https://gist.github.com/casakampa/4fd5d7139456ef94376124bf4e28aa7d) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
+
 
 ## Integraties
-
 De volgende integraties worden gebruikt:
 
 - [Accuweather](https://www.home-assistant.io/integrations/accuweather/)
@@ -67,7 +69,6 @@ De volgende add-ons worden gebruikt:
 - [Terminal & SSH](https://github.com/home-assistant/addons/blob/master/ssh/DOCS.md)
 
 ## Javascript
-
 Als uitbreiding op de Home Assistant front-end worden de volgende scripts gebruikt:
 
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card)
@@ -79,7 +80,6 @@ Het volgende custom component wordt gebruikt:
 - [Home Assistant Afvalwijzer](https://github.com/xirixiz/homeassistant-afvalwijzer)
 
 # Automatiseringen
-
 De automatiseringen nemen onder andere de volgende taken uit handen:
 
 - [In- en uitschakelen van verlichting of apparatuur op basis van tijd, beweging, locatie of bediening](https://github.com/mvandek/home-assistant-config/tree/master/automations/hue)
