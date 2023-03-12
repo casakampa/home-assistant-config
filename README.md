@@ -38,7 +38,7 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
  - ### Raspberry Pi 3B
 	 - [Raspberry Pi OS Bullseye 64-bit](https://www.raspberrypi.com/software/operating-systems/)
 	   - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
-	   - [Doorbell](https://gist.github.com/casakampa/4fd5d7139456ef94376124bf4e28aa7d) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
+	   - [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
 
 
 ## Integraties
