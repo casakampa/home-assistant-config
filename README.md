@@ -40,7 +40,6 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 	   - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
 	   - [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
 
-
 ## Integraties
 De volgende integraties worden gebruikt:
 
@@ -51,7 +50,6 @@ De volgende integraties worden gebruikt:
 - [Google Cast](https://www.home-assistant.io/integrations/cast/)
 - [HERE Travel Time](https://www.home-assistant.io/integrations/here_travel_time/)
 - [LG webOS Smart TV](https://www.home-assistant.io/integrations/webostv/)
-- [Local IP Address](https://www.home-assistant.io/integrations/local_ip/)
 - [Met.no](https://www.home-assistant.io/integrations/met/)
 - [Home Assistant iOS](https://www.home-assistant.io/integrations/ios/)
 - [Mosquitto broker](https://www.home-assistant.io/integrations/mqtt/)

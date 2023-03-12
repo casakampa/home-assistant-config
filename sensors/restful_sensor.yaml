@@ -140,10 +140,3 @@
       unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       friendly_name: "Z-Stack firmware"
       value_template: "{{ states('sensor.z_stack_coordinator_firmware').split('_')[3] }}"
-
-# Extern IP-adres
-- platform: rest
-  unique_id: 153ac06c-58ac-46fe-93bb-4de62e3bda40
-  resource: https://www.maartenvandekamp.nl/ip.php
-  name: "Extern IP"
-  value_template: "{{ value_json.ip }}"
