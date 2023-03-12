@@ -80,7 +80,8 @@
           seconds: "{{ delay }}"
       - &disable_logic
         alias: "Controleer of de lamp nog brandt"
-        if: "{{ is_state(lamp, 'on') }}"
+        if:
+          - "{{ is_state(lamp, 'on') }}"
         then:
           - <<: *lamp_aan
             data:
@@ -167,7 +168,8 @@
       if:
         - *beweging_gedetecteerd
       then:
-        - if: "{{ is_state('binary_sensor.achtertuin_schemer', 'on')}}"
+        - if:
+            - "{{ is_state('binary_sensor.achtertuin_schemer', 'on')}}"
           then:
             - alias: "Wordt uitgevoerd bij schemer"
               <<: *lamp_aan
@@ -260,7 +262,8 @@
           - stop: "Er was geen passend scenario voor deze trigger"
       - &disable_logic_with_kelvin
         alias: "Controleer of de lamp nog brandt"
-        if: "{{ is_state(lamp, 'on') }}"
+        if:
+          - "{{ is_state(lamp, 'on') }}"
         then:
           - *vertraging
           - <<: *lamp_aan

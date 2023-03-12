@@ -6,12 +6,12 @@
       event: sunset
   variables:
     kwh_opgewekt: "{{ float(states('sensor.envoy_energy_production_today'), 0) / 1000 }} "
-    kwh_teruggeleverd: "{{ states('sensor.dsmr_day_consumption_electricity_returned_merged') }}"
+    kwh_teruggeleverd: "{{ states('sensor.dsmr_day_consumption_electricity_returned_merged', with_unit=True) }}"
     kwh_kwp: "{{ ( float(states('sensor.envoy_energy_production_today'), 0) / 3120 ) | round(2, 0.00) }}"
   action:
     - service: notify.iphone_12
       data:
-        message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} kWh is teruggeleverd. kWh/kWp is {{ kwh_kwp }}."
+        message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} is teruggeleverd. kWh/kWp is {{ kwh_kwp }}."
         data:
           subtitle: "☀ Energierapport zonnepanelen ☀"
 

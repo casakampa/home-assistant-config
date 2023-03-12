@@ -85,7 +85,8 @@
         - conditions:
             - "{{ command == 'off_hold' }}"
           sequence:
-            - if: "{{ is_state(area, 'on') }}"
+            - if:
+                - "{{ is_state(area, 'on') }}"
               then:
                 - parallel:
                     - alias: "Zet alle lampen in het huis uit"

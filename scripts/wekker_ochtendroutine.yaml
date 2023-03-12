@@ -79,7 +79,8 @@ wekker_met_ochtendroutine:
         entity_id: *slaapkamer
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
-      if: "{{ is_state('input_boolean.thuiswerk_status', 'off') }}"
+      if:
+        - "{{ is_state('input_boolean.thuiswerk_status', 'off') }}"
       then:
         # Bereken op de achtergrond de reistijd naar de betreffende werklocatie zodat deze gegevens actueel zijn
         - *bereken_reistijd_huis_naar_werk

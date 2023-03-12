@@ -25,6 +25,7 @@
             message: "{{ message }}"
             data:
               subtitle: "{{ header }}"
+              group: "{{ trigger.id }}"
               push:
                 interruption-level: time-sensitive
         - alias: "Geef de wijziging ook in Home Assistant weer, voor het geval ik op dat moment ingelogd ben"

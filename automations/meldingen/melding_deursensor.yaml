@@ -25,4 +25,4 @@
         message: >-
           {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[1] }} is {{ iif(trigger.to_state.state == 'on', 'open', 'dicht') }}
         data:
-          tag: "{{ this.entity_id }}"
+          group: "{{ this.entity_id }}"

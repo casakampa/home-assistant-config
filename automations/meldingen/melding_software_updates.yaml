@@ -15,6 +15,7 @@
         - sensor.z_stack_firmware
         - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
+        - sensor.b550i_aorus_pro_ax_bios
       not_from:
         - "unavailable"
         - "unknown"

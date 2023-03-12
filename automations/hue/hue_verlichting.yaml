@@ -314,7 +314,8 @@
   variables:
     lamp: "light.buitenlamp_voortuin"
   action:
-    - if: "{{ is_state('sun.sun', 'below_horizon') }}"
+    - if:
+        - "{{ is_state('sun.sun', 'below_horizon') }}"
       then:
         - service: light.turn_on
           target:
