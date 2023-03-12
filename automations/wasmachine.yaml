@@ -96,7 +96,6 @@
                   minutes: "2"
               - alias: "Controleer of er gekozen is voor 'Startuitstel' of 'Uitschakelen' en voer de bijbehorende acties uit, of ga verder bij 'else'"
                 if:
-                  - "{{ not wait.completed }}"
                   - "{{ wait.trigger is not none }}"
                 then:
                   - variables:
