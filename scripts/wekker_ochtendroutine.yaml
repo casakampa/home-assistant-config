@@ -35,7 +35,7 @@ wekker_met_ochtendroutine:
             entity_id: *slaapkamer
           data:
             brightness_pct: 1
-            kelvin: "{{ int(state_attr('light.lamp_slaapkamer_plafond', 'min_color_temp_kelvin'), 2202) }}"
+            color_temp_kelvin: "{{ int(state_attr('light.lamp_slaapkamer_plafond', 'min_color_temp_kelvin'), 2202) }}"
     - alias: "Laat de lampen 10 seconden branden, voordat er verder wordt gegaan"
       delay:
         seconds: 10
@@ -46,7 +46,7 @@ wekker_met_ochtendroutine:
       data:
         transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 10 }}" # -10 seconden vanwege de delay
         brightness_pct: "{{ int(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
-        kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 2500) }}"
+        color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 2500) }}"
     - alias: "Laat mij weten dat ik er nu uit zou moeten/kunnen gaan"
       service: notify.iphone_12
       data:
@@ -138,12 +138,12 @@ controle_daglicht_woonkamer:
                 entity_id: light.woonkamer_zha_group_0x0003
               data:
                 brightness_pct: 40
-                kelvin: 2250
+                color_temp_kelvin: 2250
             - service: light.turn_on
               target:
                 entity_id: light.keuken_zha_group_0x0002
               data:
                 brightness_pct: 25
-                kelvin: 2500
+                color_temp_kelvin: 2500
       else:
         stop: "Er is voldoende daglicht aanwezig, de verlichting blijft uitgeschakeld."

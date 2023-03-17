@@ -42,7 +42,7 @@
     - <<: *lamp_aan
       data:
         brightness_pct: 1
-        kelvin: 3000
+        color_temp_kelvin: 3000
     - alias: "Wacht tot er 15 seconden geen beweging is gedetecteerd in de woonkamer"
       wait_for_trigger:
         - platform: state
@@ -221,7 +221,7 @@
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
                   transition: *transitie
-                  kelvin: 3500
+                  color_temp_kelvin: 3500
           - conditions:
               - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
                 or:
@@ -240,7 +240,7 @@
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
                   transition: *transitie
-                  kelvin: 2500
+                  color_temp_kelvin: 2500
           - conditions:
               - *vroege_ochtend_late_avond
             sequence:
@@ -248,14 +248,14 @@
                 data:
                   brightness_pct: "{{ helderheid_nacht }}"
                   transition: *transitie
-                  kelvin: 2500
+                  color_temp_kelvin: 2500
           - conditions:
               - *nacht
             sequence:
               - <<: *lamp_aan
                 data:
                   brightness_pct: 10
-                  kelvin: 2250
+                  color_temp_kelvin: 2250
               - *vertraging
               - *lamp_uit
         default:

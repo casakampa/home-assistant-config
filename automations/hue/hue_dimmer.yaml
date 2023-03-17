@@ -37,7 +37,7 @@
                       - <<: *turn_on_entities
                         data:
                           brightness_pct: "{{ brightness }}"
-                          kelvin: 3500
+                          color_temp_kelvin: 3500
                           transition: 0.75
                   - conditions:
                       - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
@@ -57,7 +57,7 @@
                         data:
                           brightness_pct: "{{ brightness }}"
                           transition: 0.75
-                          kelvin: 2700
+                          color_temp_kelvin: 2700
                   - conditions:
                       - alias: "Tijdsspannes tussen ingestelde tijden"
                         or:
@@ -72,7 +72,7 @@
                         data:
                           brightness_pct: 10
                           transition: 0.75
-                          kelvin: 2500
+                          color_temp_kelvin: 2500
                   - conditions:
                       - alias: "Nacht"
                         condition: time
@@ -82,7 +82,7 @@
                       - <<: *turn_on_entities
                         data:
                           brightness_pct: 10
-                          kelvin: 2250
+                          color_temp_kelvin: 2250
                 default:
                   - stop: "Er was geen passend scenario voor de automatisering Hue Dimmer."
                     error: true
