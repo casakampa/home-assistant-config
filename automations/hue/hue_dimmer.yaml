@@ -16,94 +16,95 @@
     brightness: "50"
     entities: "light.lamp_bioscoopkamer"
     area: "light.alle_lampen_zha_group_0x0006"
-  action:
-    - &hue_dimmer_logica
-      choose:
-        - conditions:
-            - "{{ command == 'on_short_release' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                brightness_pct: "{{ brightness }}"
-                kelvin: 2700 # standaard kleurtemperatuur voor niet-ambiance lampen die ook gebruikt worden.
-                transition: 0.75
-        - conditions:
-            - "{{ command == 'on_hold' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ area }}"
-              data:
-                brightness_pct: 100
-                transition: 1
-        - conditions:
-            - "{{ command == 'up_short_release' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                brightness_step_pct: 10
-        - conditions:
-            - "{{ command == 'up_hold' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                color_temp: >-
-                  {{ state_attr(entities, 'color_temp') + 25 }}
-                transition: 0.75
-        - conditions:
-            - "{{ command == 'down_short_release' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                brightness_step_pct: -10
-        - conditions:
-            - "{{ command == 'down_hold' }}"
-          sequence:
-            - service: light.turn_on
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                color_temp: >-
-                  {{ state_attr(entities, 'color_temp') - 25 }}
-                transition: 0.75
-        - conditions:
-            - "{{ command == 'off_short_release' }}"
-          sequence:
-            - service: light.turn_off
-              target:
-                entity_id: "{{ entities }}"
-              data:
-                transition: 0.75
-        - conditions:
-            - "{{ command == 'off_hold' }}"
-          sequence:
-            - if:
-                - "{{ is_state(area, 'on') }}"
-              then:
-                - parallel:
-                    - alias: "Zet alle lampen in het huis uit"
-                      service: light.turn_off
-                      target:
-                        entity_id: "{{ area }}"
-                      data:
-                        transition: 1
-                    - alias: "Zet de gekozen media_player uit"
-                      service: media_player.turn_off
-                      target:
-                        entity_id: "{{ media_player }}"
-              else:
-                - alias: "Zet de gekozen media_player uit"
-                  service: media_player.turn_off
-                  target:
-                    entity_id: "{{ media_player }}"
+    anchors:
+      - &hue_dimmer_logica
+        choose:
+          - conditions:
+              - "{{ command == 'on_short_release' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  brightness_pct: "{{ brightness }}"
+                  color_temp_kelvin: 2700
+                  transition: 0.75
+          - conditions:
+              - "{{ command == 'on_hold' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ area }}"
+                data:
+                  brightness_pct: 100
+                  transition: 1
+          - conditions:
+              - "{{ command == 'up_short_release' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  brightness_step_pct: 10
+          - conditions:
+              - "{{ command == 'up_hold' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  color_temp_kelvin: >-
+                    {{ state_attr(entities, 'color_temp_kelvin') + 150 }}
+                  transition: 0.75
+          - conditions:
+              - "{{ command == 'down_short_release' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  brightness_step_pct: -10
+          - conditions:
+              - "{{ command == 'down_hold' }}"
+            sequence:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  color_temp_kelvin: >-
+                    {{ state_attr(entities, 'color_temp_kelvin') - 150 }}
+                  transition: 0.75
+          - conditions:
+              - "{{ command == 'off_short_release' }}"
+            sequence:
+              - service: light.turn_off
+                target:
+                  entity_id: "{{ entities }}"
+                data:
+                  transition: 0.75
+          - conditions:
+              - "{{ command == 'off_hold' }}"
+            sequence:
+              - if:
+                  - "{{ is_state(area, 'on') }}"
+                then:
+                  - parallel:
+                      - alias: "Zet alle lampen in het huis uit"
+                        service: light.turn_off
+                        target:
+                          entity_id: "{{ area }}"
+                        data:
+                          transition: 1
+                      - alias: "Zet de gekozen media_player uit"
+                        service: media_player.turn_off
+                        target:
+                          entity_id: "{{ media_player }}"
+                else:
+                  - alias: "Zet de gekozen media_player uit"
+                    service: media_player.turn_off
+                    target:
+                      entity_id: "{{ media_player }}"
+  action: *hue_dimmer_logica
 
 - id: 6befb167-171a-468f-a743-bef7634edc9e
   alias: "Verlichting: Overloop (dimmer)"
