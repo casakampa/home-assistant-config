@@ -12,7 +12,7 @@
         - sensor.dsmr_reader
         - sensor.nextcloud
         - sensor.caddy
-        - sensor.z_stack_firmware
+        - sensor.z_stack_coordinator_firmware
         - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
@@ -35,18 +35,12 @@
         {{ iif(trigger.to_state.attributes.prerelease is defined,
         is_state_attr(trigger.entity_id, 'prerelease', false),
         'True') }}
-    - alias: "Aparte check voor de Z-Stack coordinator firmware. De melding wordt alleen gegeven wanneer de oude en nieuwe versie bekend zijn."
-      condition: template
-      value_template: >-
-        {{ iif(trigger.entity_id == 'sensor.z_stack_firmware',
-        iif('coordinator' in states('sensor.z_stack_coordinator_firmware')),
-        'True') }}
   action:
     - alias: "Stuur een notificatie over de software update"
       service: notify.iphone_12
       data:
         message: >-
-          {{ state_attr(trigger.entity_id, 'friendly_name') }} heeft een update.
+          Software: {{ state_attr(trigger.entity_id, 'friendly_name') }}.
           Nieuw: {{ trigger.to_state.state }}.
           Oud: {{ trigger.from_state.state }}.
         data:
