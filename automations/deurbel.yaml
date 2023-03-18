@@ -36,7 +36,7 @@
               target:
                 entity_id: input_boolean.visite
       default:
-        - alias: "Start het eerste script voor de deurbel"
+        - alias: "Start het eerste deel voor de deurbel"
           service: script.turn_on
           target:
             entity_id: script.deurbel_start
@@ -44,7 +44,7 @@
           wait_template: "{{ is_state('binary_sensor.deursensor_voordeur', 'on') }}"
           timeout:
             minutes: 1
-        - alias: "Binnen de wachttijd is de sensor op 'on' gezet, daarmee is de deur geopend."
+        - alias: "De staat van de sensor is 'on' - het wachten op de ingestelde staat is voltooid (completed) binnen de timeout, daarmee is de deur geopend."
           if:
             - "{{ wait.completed }}"
           then:

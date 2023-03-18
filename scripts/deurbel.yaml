@@ -32,7 +32,11 @@ deurbel_start:
           data:
             time: "{{ tijdstip }}"
         - parallel:
+<<<<<<< HEAD
             - alias: "Stuur een melding van aanbellen en schakel de verlichting in de gang in."
+=======
+            - alias: "Meldt dat de deurbel is ingedrukt en "
+>>>>>>> 25186eea4ef1f041d774d85f31818069c16c486a
               service: script.turn_on
               target:
                 entity_id:
