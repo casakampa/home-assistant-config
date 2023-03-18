@@ -31,16 +31,24 @@ deurbel_start:
             entity_id: input_datetime.deurbel_tijdstip_aanbellen
           data:
             time: "{{ tijdstip }}"
-        - alias: "Zet een aantal zaken in gang, voornamelijk meldingen en verlichting"
-          service: script.turn_on
-          target:
-            entity_id:
-              # Schakel Hue lamp gang in bij schemer of nacht
-              - script.deurbel_verander_helderheid_lamp_gang_bij_aanbellen
-              # Pauzeer, indien actief, de chromecast in de woonkamer
-              - script.deurbel_melding_chromecast_woonkamer
-              # Pauzeer, indien actief, de LG OLED
-              - script.deurbel_melding_lg_oled
+        - parallel:
+            - alias: "Stuur een melding van aanbellen en schakel de verlichting in de gang in."
+              service: script.turn_on
+              target:
+                entity_id:
+                  # Schakel Hue lamp gang in bij schemer of nacht
+                  - script.deurbel_verander_helderheid_lamp_gang_bij_aanbellen
+                  # Pauzeer, indien actief, de LG OLED
+                  - script.deurbel_melding_lg_oled
+            - if:
+                - "{{ is_state('script.deurbel_melding_chromecast_woonkamer', 'off') }}"
+              then:
+                - alias: "Pauzeer, indien actief, de chromecast in de woonkamer en wacht totdat deze verder mag spelen"
+                  service: script.turn_on
+                  target:
+                    entity_id: script.deurbel_melding_chromecast_woonkamer
+              else:
+                - stop: "Het script 'deurbel_melding_chromecast_woonkamer' is al actief"
 
 deurbel_deur_geopend:
   alias: "Deurbel: deur geopend"
@@ -182,7 +190,7 @@ deurbel_verander_helderheid_lamp_gang_bij_aanbellen:
   description: "Verandert de helderheid van de Hue lamp in de gang wanneer het schemert of nacht is volgens een binaire sensor, wanneer de lamp is ingeschakeld en Maarten thuis is"
   sequence:
     - condition: template
-      value_template: "{{ not is_state('binary_sensor.gang_dag', 'on' ) }}"
+      value_template: "{{ is_state('binary_sensor.gang_dag', 'off' ) }}"
     - alias: "Zet de automatisering uit voor de verlichting in de gang"
       service: automation.turn_off
       target:
