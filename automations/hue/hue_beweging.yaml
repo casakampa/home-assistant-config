@@ -162,7 +162,7 @@
     transition: "1"
     lamp: "light.buitenlamp_achtertuin"
   condition:
-    - "{{ not is_state('binary_sensor.achtertuin_dag', 'on') }}"
+    - "{{ is_state('binary_sensor.achtertuin_dag', 'off') }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
