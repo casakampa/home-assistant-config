@@ -13,162 +13,148 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.lg_oled"
-    brightness: "50"
-    transition: &transitie "0.75"
-    entities: "light.lamp_bioscoopkamer"
+    brightness: 50
+    transition: 0.75
+    light: "light.lamp_bioscoopkamer"
     area: "light.alle_lampen_zha_group_0x0006"
-    anchors:
+    anchor:
       - &turn_on_entities
         service: light.turn_on
         target:
-          entity_id: "{{ entities }}"
-      - &hue_dimmer_logica
-        choose:
-          - conditions:
-              - "{{ command == 'on_short_release' }}"
-            sequence:
-              - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
-                choose:
-                  - conditions:
-                      - alias: "Tijd tussen de zonsopkomst en zonsondergang geldt als dag"
-                        condition: sun
-                        before: sunset
-                        after: sunrise
-                    sequence:
-                      - <<: *turn_on_entities
-                        data:
-                          brightness_pct: "{{ brightness }}"
-                          color_temp_kelvin: 3500
-                          transition: *transitie
-                  - conditions:
-                      - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
-                        or:
-                          - and:
-                              - condition: time
-                                after: input_datetime.light_home_day_time
-                              - condition: sun
-                                before: sunrise
-                          - and:
-                              - condition: time
-                                before: input_datetime.light_home_night_time
-                              - condition: sun
-                                after: sunset
-                    sequence:
-                      - <<: *turn_on_entities
-                        data:
-                          brightness_pct: "{{ brightness }}"
-                          transition: *transitie
-                          color_temp_kelvin: 2700
-                  - conditions:
-                      - alias: "Tijdsspannes tussen ingestelde tijden"
-                        or:
-                          - condition: time
-                            after: "06:00"
-                            before: input_datetime.light_home_day_time
-                          - condition: time
-                            after: input_datetime.light_home_night_time
-                            before: "23:59:59"
-                    sequence:
-                      - <<: *turn_on_entities
-                        data:
-                          brightness_pct: 10
-                          transition: *transitie
-                          color_temp_kelvin: 2500
-                  - conditions:
-                      - alias: "Nacht"
-                        condition: time
-                        after: "00:00"
-                        before: "06:00"
-                    sequence:
-                      - <<: *turn_on_entities
-                        data:
-                          brightness_pct: 10
-                          color_temp_kelvin: 2250
-                default:
-                  - stop: "Er was geen passend scenario voor de automatisering Hue Dimmer."
-                    error: true
-          - conditions:
-              - "{{ command == 'on_hold' }}"
-            sequence:
-              - service: light.turn_on
-                target:
-                  entity_id: "{{ area }}"
-                data:
-                  brightness_pct: 100
-                  transition: 1
-          - conditions:
-              - "{{ command == 'up_short_release' }}"
-            sequence:
-              - <<: *turn_on_entities
-                data:
-                  brightness_step_pct: 10
-          - conditions:
-              - "{{ command == 'up_hold' }}"
-            sequence:
-              - <<: *turn_on_entities
-                data:
-                  color_temp_kelvin: >-
-                    {{ state_attr(entities, 'color_temp_kelvin') + 150 }}
-                  transition: 0.5
-          - conditions:
-              - "{{ command == 'down_short_release' }}"
-            sequence:
-              - <<: *turn_on_entities
-                data:
-                  brightness_step_pct: -10
-          - conditions:
-              - "{{ command == 'down_hold' }}"
-            sequence:
-              - <<: *turn_on_entities
-                data:
-                  color_temp_kelvin: >-
-                    {{ state_attr(entities, 'color_temp_kelvin') - 150 }}
-                  transition: 0.5
-          - conditions:
-              - "{{ command == 'off_short_release' }}"
-            sequence:
-              - service: light.turn_off
-                target:
-                  entity_id: "{{ entities }}"
-                data:
-                  transition: *transitie
-          - conditions:
-              - "{{ command == 'off_hold' }}"
-            sequence:
-              - if:
-                  - "{{ is_state(area, 'on') }}"
-                then:
-                  - parallel:
-                      - alias: "Zet alle lampen in het huis uit"
-                        service: light.turn_off
-                        target:
-                          entity_id: "{{ area }}"
-                        data:
-                          transition: 1
-                      - alias: "Zet de gekozen media_player uit"
-                        service: media_player.turn_off
-                        target:
-                          entity_id: "{{ media_player }}"
-                else:
-                  - alias: "Zet de gekozen media_player uit"
-                    service: media_player.turn_off
-                    target:
-                      entity_id: "{{ media_player }}"
-  action: *hue_dimmer_logica
-
-- id: 6befb167-171a-468f-a743-bef7634edc9e
-  alias: "Verlichting: Overloop (dimmer)"
-  description: "Activeer verlichting overloop op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
-  initial_state: true
-  mode: restart
-  trigger: []
-  variables:
-    command: "{{ trigger.event.data.command }}"
-    media_player: media_player.woonkamer
-    brightness: "50"
-    entities: "light.lamp_overloop"
-    area: "light.alle_lampen_zha_group_0x0006"
-  action: *hue_dimmer_logica
+          entity_id: "{{ light }}"
+  action:
+    - &hue_dimmer_logica
+      choose:
+        - conditions:
+            - "{{ command == 'on_short_release' }}"
+          sequence:
+            - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
+              choose:
+                - conditions:
+                    - alias: "Tijd tussen de zonsopkomst en zonsondergang geldt als dag"
+                      condition: sun
+                      before: sunset
+                      after: sunrise
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: "{{ brightness }}"
+                        color_temp_kelvin: 3500
+                        transition: "{{ transition }}"
+                - conditions:
+                    - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
+                      or:
+                        - and:
+                            - condition: time
+                              after: input_datetime.light_home_day_time
+                            - condition: sun
+                              before: sunrise
+                        - and:
+                            - condition: time
+                              before: input_datetime.light_home_night_time
+                            - condition: sun
+                              after: sunset
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: "{{ brightness }}"
+                        transition: "{{ transition }}"
+                        color_temp_kelvin: 2700
+                - conditions:
+                    - alias: "Tijdsspannes tussen ingestelde tijden"
+                      or:
+                        - condition: time
+                          after: "06:00"
+                          before: input_datetime.light_home_day_time
+                        - condition: time
+                          after: input_datetime.light_home_night_time
+                          before: "23:59:59"
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: 10
+                        transition: "{{ transition }}"
+                        color_temp_kelvin: 2500
+                - conditions:
+                    - alias: "Nacht"
+                      condition: time
+                      after: "00:00"
+                      before: "06:00"
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: 10
+                        color_temp_kelvin: 2250
+              default:
+                - stop: "Er was geen passend scenario voor de automatisering Hue Dimmer."
+                  error: true
+        - conditions:
+            - "{{ command == 'on_hold' }}"
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: "{{ area }}"
+              data:
+                brightness_pct: 100
+                transition: 1
+        - conditions:
+            - "{{ command == 'up_short_release' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                brightness_step_pct: 10
+        - conditions:
+            - "{{ command == 'up_hold' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                color_temp_kelvin: >-
+                  {{ state_attr(light, 'color_temp_kelvin') + 150 }}
+                transition: 0.5
+        - conditions:
+            - "{{ command == 'down_short_release' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                brightness_step_pct: -10
+        - conditions:
+            - "{{ command == 'down_hold' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                color_temp_kelvin: >-
+                  {{ state_attr(light, 'color_temp_kelvin') - 150 }}
+                transition: 0.5
+        - conditions:
+            - "{{ command == 'off_short_release' }}"
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: "{{ light }}"
+              data:
+                transition: "{{ transition }}"
+        - conditions:
+            - "{{ command == 'off_hold' }}"
+          sequence:
+            - if:
+                - "{{ is_state(area, 'on') }}"
+              then:
+                - parallel:
+                    - alias: "Zet alle lampen in het huis uit"
+                      service: light.turn_off
+                      target:
+                        entity_id: "{{ area }}"
+                      data:
+                        transition: 1
+                    - alias: "Zet de gekozen media_player uit"
+                      service: media_player.turn_off
+                      target:
+                        entity_id: "{{ media_player }}"
+              else:
+                - alias: "Zet de gekozen media_player uit"
+                  service: media_player.turn_off
+                  target:
+                    entity_id: "{{ media_player }}"
 
 - id: 56bc495a-439f-46d1-8f11-749f9286a238
   alias: "Verlichting: Keuken (dimmer)"
@@ -183,8 +169,9 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
-    brightness: "75"
-    entities: "light.keuken_zha_group_0x0002"
+    brightness: 75
+    transition: 0.75
+    light: "light.keuken_zha_group_0x0002"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
   action: *hue_dimmer_logica
 
@@ -201,8 +188,9 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
-    brightness: "50"
-    entities: "light.slaapkamer_zha_group_0x0005"
+    brightness: 50
+    transition: 0.75
+    light: "light.slaapkamer_zha_group_0x0005"
     area: "light.alle_lampen_zha_group_0x0006"
   action: *hue_dimmer_logica
 
@@ -219,8 +207,9 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
-    brightness: "50"
-    entities: "light.woonkamer_zha_group_0x0003"
+    brightness: 50
+    transition: 0.75
+    light: "light.woonkamer_zha_group_0x0003"
     area: "light.alle_lampen_zha_group_0x0006"
   action: *hue_dimmer_logica
 
@@ -237,7 +226,8 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
-    brightness: "75"
-    entities: "light.spot_eethoek"
+    brightness: 75
+    transition: 0.75
+    light: "light.spot_eethoek"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
   action: *hue_dimmer_logica
