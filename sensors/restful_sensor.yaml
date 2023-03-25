@@ -124,7 +124,7 @@
   scan_interval: 3600
   resource: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
   name: "Z-Stack firmware releases"
-  value_template: "{{ value_json.0.tag_name }}"
+  value_template: "{{ value_json | map(attribute='tag_name') | select('contains', 'coordinator') | first }}"
   json_attributes:
     - prerelease
   username: !secret github_username
@@ -140,9 +140,9 @@
       unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       friendly_name: "Z-Stack coordinator firmware"
       value_template: >
-        {% set origin = states('sensor.z_stack_firmware_releases') %}
+        {% set version = states('sensor.z_stack_firmware_releases').split('_')[3] %}
         {% set old = states('sensor.z_stack_coordinator_firmware') %}
-        {% set version = origin.split('_')[3] %}
-        {{ iif( origin | length > 0 and 'coordinator' in origin, version, old if old is not in ['unknown', 'unavailable'] else '00000000') }}
-      # Bovenstaande controleert of sensor.z_stack_firmware_releases inhoud heeft en of in de string het woord coordinator voorkomt,
-      # anders houdt het de oorspronkelijke waarde aan.
+        {{ iif( version | length > 0, version, old) }}
+      # Er worden enkele variabelen gevuld:
+      # De variabele 'version' wordt gevuld met de waarde van de REST sensor genaamd sensor.z_stack_firmware_releases en opgesplitst tot de derde _, waarachter het versienummer staat.
+      # Als laatste wordt gecontroleerd of version inhoud heeft zodat er een versienummer getoond kan worden, anders wordt de oude waarde getoond.
