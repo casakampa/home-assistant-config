@@ -11,7 +11,7 @@
     - name: "Home Assistant Supervisor"
       unique_id: 74d859f7-1ca7-4c38-a7f7-8272e9b378d9
       icon: mdi:account-supervisor-outline
-      value_template: "{{ value_json.hassos.ova }}"
+      value_template: "{{ value_json.supervisor }}"
     - name: "Home Assistant OS"
       unique_id: 139112d7-d203-4de2-897c-e69f542b2725
       icon: mdi:linux
