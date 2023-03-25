@@ -86,3 +86,4 @@ timer: !include timer.yaml
 template: !include templates.yaml
 rest_command: !include rest_command.yaml
 mqtt: !include mqtt.yaml
+rest: !include rest.yaml

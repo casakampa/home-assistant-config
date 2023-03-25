@@ -1,0 +1,18 @@
+- resource: https://version.home-assistant.io/stable.json
+  scan_interval: 600
+  timeout: 30
+  headers:
+    user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0"
+  sensor:
+    - name: "Home Assistant Core"
+      unique_id: 026b7fc5-a6a6-4849-97cd-a0438b0b5e0a
+      icon: mdi:home-assistant
+      value_template: "{{ value_json.homeassistant.default }}"
+    - name: "Home Assistant Supervisor"
+      unique_id: 74d859f7-1ca7-4c38-a7f7-8272e9b378d9
+      icon: mdi:account-supervisor-outline
+      value_template: "{{ value_json.hassos.ova }}"
+    - name: "Home Assistant OS"
+      unique_id: 139112d7-d203-4de2-897c-e69f542b2725
+      icon: mdi:linux
+      value_template: "{{ value_json.hassos.ova }}"

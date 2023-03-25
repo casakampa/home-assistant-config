@@ -1,34 +1,4 @@
-- platform: rest
-  unique_id: 026b7fc5-a6a6-4849-97cd-a0438b0b5e0a
-  scan_interval: 600
-  resource: &resource https://version.home-assistant.io/stable.json
-  name: "Home Assistant Core"
-  icon: mdi:home-assistant
-  value_template: "{{ value_json.homeassistant.default }}"
-  headers:
-    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0"
-
-- platform: rest
-  unique_id: 74d859f7-1ca7-4c38-a7f7-8272e9b378d9
-  scan_interval: 3600
-  resource: *resource
-  name: "Home Assistant Supervisor"
-  icon: mdi:account-supervisor-outline
-  value_template: "{{ value_json.supervisor }}"
-  headers:
-    user-agent: *ua_string
-
-- platform: rest
-  unique_id: 139112d7-d203-4de2-897c-e69f542b2725
-  scan_interval: 3600
-  resource: *resource
-  name: "Home Assistant OS"
-  icon: mdi:linux
-  value_template: "{{ value_json.hassos.ova }}"
-  headers:
-    user-agent: *ua_string
-
-    # Check GitHub repository dsmrreader/dsmr-reader via https://api.github.com/repos/dsmrreader/dsmr-reader/releases
+# Check GitHub repository dsmrreader/dsmr-reader via https://api.github.com/repos/dsmrreader/dsmr-reader/releases
 - platform: rest
   unique_id: 06df5ab3-70e8-48b2-b83c-da5acc620624
   scan_interval: 3600
@@ -44,7 +14,7 @@
   headers:
     accept: application/vnd.github.v3+json
     content-type: application/json
-    user-agent: *ua_string
+    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/110.0"
 
 # Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
 - platform: rest
