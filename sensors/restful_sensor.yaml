@@ -143,6 +143,6 @@
         {% set origin = states('sensor.z_stack_firmware_releases') %}
         {% set old = states('sensor.z_stack_coordinator_firmware') %}
         {% set version = origin.split('_')[3] %}
-        {{ iif( origin | length > 0 and 'coordinator' in origin, version, old if old | is_defined ) }}
+        {{ iif( origin | length > 0 and 'coordinator' in origin, version, old if old is not in ['unknown', 'unavailable'] else '00000000') }}
       # Bovenstaande controleert of sensor.z_stack_firmware_releases inhoud heeft en of in de string het woord coordinator voorkomt,
       # anders houdt het de oorspronkelijke waarde aan.
