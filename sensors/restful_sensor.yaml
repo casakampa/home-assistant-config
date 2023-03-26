@@ -110,9 +110,11 @@
       unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       friendly_name: "Z-Stack coordinator firmware"
       value_template: >
-        {% set version = states('sensor.z_stack_firmware_releases').split('_')[3] %}
-        {% set old = states('sensor.z_stack_coordinator_firmware') %}
-        {{ iif( version | length > 0, version, old) }}
-      # Er worden enkele variabelen gevuld:
-      # De variabele 'version' wordt gevuld met de waarde van de REST sensor genaamd sensor.z_stack_firmware_releases en opgesplitst tot de derde _, waarachter het versienummer staat.
-      # Als laatste wordt gecontroleerd of version inhoud heeft zodat er een versienummer getoond kan worden, anders wordt de oude waarde getoond.
+        {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
+        {% set version = states('sensor.z_stack_firmware_releases') -%}
+        {# Vul de variabele 'prerelease' en controleer of de nieuwste versie een prerelease is (true) -#}
+        {% set prerelease = is_state_attr('sensor.z_stack_firmware_releases', 'prerelease', true) -%}
+        {# Vul de variabele 'old' met de huidige staat van de sensor -#}
+        {% set old = states('sensor.z_stack_coordinator_firmware') -%}
+        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (old) -#}
+        {{ version.split('_')[3] if version | length > 0 and not prerelease else old }}
