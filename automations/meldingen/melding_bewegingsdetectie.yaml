@@ -22,4 +22,4 @@
           tag: "bewegingsdetectie"
           subtitle: "Beweging gedetecteerd!"
           push:
-            interruption-level: time-sensitive
+            interruption-level: passive
