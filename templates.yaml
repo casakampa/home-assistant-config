@@ -10,11 +10,9 @@
                         'pmd': 'Plastic',
                         'restafval': 'Restafval'
                         } %}
-        {{ iif(states('sensor.afvalwijzer_next_type'),
-          afvalsoorten.get(states('sensor.afvalwijzer_next_type')),
-          'Geen') }}
+        {{ afvalsoorten.get(states('sensor.afvalwijzer_next_type'), 'Geen') }}
       picture: >-
-        {{ iif(states('sensor.afvalwijzer_next_type'),
+        {{ iif(has_value('sensor.afvalwijzer_next_type'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
       availability: "{{ states('sensor.afvalwijzer_next_type') not in ['unknown', 'unavailable', 'none'] }}"
