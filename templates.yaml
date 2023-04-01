@@ -15,7 +15,7 @@
         {{ iif(has_value('sensor.afvalwijzer_next_type'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
-      availability: "{{ states('sensor.afvalwijzer_next_type') not in ['unknown', 'unavailable', 'none'] }}"
+      availability: "{{ has_value('sensor.afvalwijzer_next_type') }}"
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
@@ -38,7 +38,7 @@
       icon: mdi:motion-sensor
       state: "{{ is_state('binary_sensor.hue_motion_gang_occupancy', 'on') or is_state('binary_sensor.hue_motion_trap_occupancy', 'on') }}"
       device_class: motion
-      availability: "{{ (states('binary_sensor.hue_motion_gang_occupancy') and states('binary_sensor.hue_motion_trap_occupancy')) not in ['unknown','unavailable','none'] }}"
+      availability: "{{ (has_value('binary_sensor.hue_motion_gang_occupancy') and has_value('binary_sensor.hue_motion_trap_occupancy')) }}"
 # Maakt een sensor die wordt ingeschakeld wanneer de thermostaat de ingestelde maximumtemperatuur overschrijdt
 - trigger:
     - platform: state
@@ -60,7 +60,7 @@
       name: "Wekkermodus"
       state: "{{ iif(is_state(trigger.entity_id, 'on'), 'Actief', 'Vakantie') }}"
       icon: "{{ iif(is_state(trigger.entity_id, 'on'), 'mdi:alarm', 'mdi:beach') }}"
-      availability: "{{ states(trigger.entity_id) not in ['unknown','unavailable','unknown'] }}"
+      availability: "{{ has_value(trigger.entity_id) }}"
 # Monitor de beschikbaarheid van de lampen in het Zigbee netwerk.
 - binary_sensor:
     - unique_id: c5bc96be-8d86-4a41-94f1-1f594427f912

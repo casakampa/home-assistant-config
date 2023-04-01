@@ -16,16 +16,9 @@
         - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
-      not_from:
-        - "unavailable"
-        - "unknown"
-        - "none"
-      not_to:
-        - "unavailable"
-        - "unknown"
-        - "none"
   mode: queued
   condition:
+    - "{{ has_value(trigger.entity_id) }}"
     - alias: "Stuur alleen een notificatie wanneer zowel de oude als nieuwe staat bekend zijn."
       condition: template
       value_template: "{{ (trigger.from_state.state and trigger.to_state.state)|length != 0 }}"

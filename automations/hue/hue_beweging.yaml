@@ -8,14 +8,6 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.hue_motion_woonkamer_occupancy
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
     lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
     anchors:
@@ -29,6 +21,7 @@
           entity_id: "{{ lamp }}"
       - &beweging_gedetecteerd "{{ trigger.to_state.state == 'on' }}"
   condition:
+    - "{{ has_value(trigger.entity_id) }}"
     - *beweging_gedetecteerd
     - and:
         - "{{ is_state('binary_sensor.woonkamer_nacht', 'on') }}"
@@ -60,14 +53,6 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.hue_motion_zolder_occupancy
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
     delay: "{{ int(states('input_number.light_zolder_delay'), 15) }}"
     transition: &transitie "0.5"
@@ -103,6 +88,8 @@
         condition: time
         after: "00:00"
         before: "06:00"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
@@ -149,19 +136,12 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.hue_motion_achtertuin_occupancy
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
     delay: "15"
     transition: "1"
     lamp: "light.buitenlamp_achtertuin"
   condition:
+    - "{{ has_value(trigger.entity_id) }}"
     - "{{ is_state('binary_sensor.achtertuin_dag', 'off') }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
@@ -194,14 +174,6 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.gang_template_motion_sensor
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
     delay: "{{ int(states('input_number.light_gang_delay'), 15) }}"
     helderheid_dag: "{{ int(states('input_number.light_gang_day_brightness_pct'), 80) }}"
@@ -272,6 +244,8 @@
               transition: *transitie
           - *vertraging
           - *lamp_uit
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
@@ -303,6 +277,8 @@
     helderheid_dag: "{{ int(states('input_number.light_overloop_day_brightness_pct'), 80) }}"
     helderheid_nacht: "{{ int(states('input_number.light_overloop_night_brightness_pct'), 20) }}"
     lamp: "light.lamp_overloop"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:

@@ -20,7 +20,7 @@
       below: input_number.drempelwaarde_batterijniveau
   mode: queued
   condition:
-    - "{{ trigger.to_state.state not in ['unknown', 'unavailable', 'none'] }}"
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - service: notify.iphone_12
       data:

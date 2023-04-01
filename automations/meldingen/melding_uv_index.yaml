@@ -5,15 +5,9 @@
   trigger:
     - platform: state
       entity_id: sensor.thuis_uv_index
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
-  condition: "{{ int(trigger.to_state.state, 4) > 4 }}"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ int(trigger.to_state.state, 4) > 4 }}"
   action:
     - service: notify.iphone_12
       data:

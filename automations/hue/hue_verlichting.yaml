@@ -216,7 +216,7 @@
   action:
     - variables:
         stekker: "switch.stekker_bioscoopkamer"
-        zon: "{{ is_state('sun.sun', 'below_horizon') and is not in ['unknown','unavailable','none'] }}"
+        zon: "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
         transitie: &transitie "5"
         lichtsterkte_laag: "5"
         lichtsterkte_hoog: "50"
@@ -303,16 +303,10 @@
   trigger:
     - platform: state
       entity_id: sun.sun
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
     lamp: "light.buitenlamp_voortuin"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - if:
         - "{{ is_state('sun.sun', 'below_horizon') }}"
