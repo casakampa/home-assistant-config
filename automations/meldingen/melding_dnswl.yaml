@@ -6,7 +6,7 @@
     - platform: time
       at: "20:00"
   condition: >-
-    {{ as_local(now()).strftime('%Y-%m-%d') >= as_datetime(states('input_datetime.dnswl_renew_date')).strftime('%Y-%m-%d') }}
+    {{ as_timestamp(now()) >= as_timestamp(states('input_datetime.dnswl_renew_date')) }}
   action:
     - service: notify.iphone_12
       data:
