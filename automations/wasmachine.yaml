@@ -5,10 +5,7 @@
     - platform: state
       entity_id: switch.stekker_wasmachine
       to: "on"
-      not_from:
-        - "unavailable"
-        - "unknown"
-        - "none"
+      from: "off"
   mode: restart
   trace:
     stored_traces: 25
