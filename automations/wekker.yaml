@@ -6,111 +6,25 @@
   trigger:
     - platform: template
       value_template: >-
-        {{ now() > today_at(states('input_datetime.wektijd_maandag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
-      id: "wekker_maandag"
-    - platform: template
-      value_template: >-
-        {{ now() > today_at(states('input_datetime.wektijd_dinsdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
-      id: "wekker_dinsdag"
-    - platform: template
-      value_template: >-
-        {{ now() > today_at(states('input_datetime.wektijd_woensdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
-      id: "wekker_woensdag"
-    - platform: template
-      value_template: >-
-        {{ now() > today_at(states('input_datetime.wektijd_donderdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
-      id: "wekker_donderdag"
-    - platform: template
-      value_template: >-
-        {{ now() > today_at(states('input_datetime.wektijd_vrijdag')) - timedelta(minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) }}
-      id: "wekker_vrijdag"
+        {% set today = {'Monday': 'maandag', 'Tuesday': 'dinsdag', 'Wednesday': 'woensdag', 'Thursday': 'donderdag', 'Friday': 'vrijdag'}[now().strftime('%A')] %}
+        {% if now().isoweekday() in range(6) and is_state('input_boolean.wekker_' ~ today, 'on') and now() > today_at( states('input_datetime.wektijd_' ~ today) ) - timedelta( minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15) ) %}
+          true
+        {% else %}
+          false
+        {% endif %}
   condition:
     - "{{ is_state('binary_sensor.workday_sensor', 'on') }}"
     - "{{ is_state('sensor.wekkermodus', 'Actief') }}"
   action:
-    - variables:
-        anchors:
-          - &start_script_ochtendroutine
-            service: script.turn_on
-            target:
-              entity_id: script.wekker_met_ochtendroutine
-    - alias: "Execute the automation based on the conditions, weekday and calculated trigger time"
-      choose:
-        - conditions:
-            - condition: trigger
-              id: "wekker_maandag"
-            - condition: time
-              weekday:
-                - mon
-            - alias: "Is de wekker voor vandaag ingeschakeld"
-              condition: state
-              entity_id: input_boolean.wekker_maandag
-              state: "on"
-          sequence:
-            - <<: *start_script_ochtendroutine
-              data:
-                variables:
-                  werklocatie: "{{ states('input_select.werklocatie_maandag') | lower }}"
-        - conditions:
-            - condition: trigger
-              id: "wekker_dinsdag"
-            - condition: time
-              weekday:
-                - tue
-            - alias: "Is de wekker voor vandaag ingeschakeld"
-              condition: state
-              entity_id: input_boolean.wekker_dinsdag
-              state: "on"
-          sequence:
-            - <<: *start_script_ochtendroutine
-              data:
-                variables:
-                  werklocatie: "{{ states('input_select.werklocatie_dinsdag') | lower }}"
-        - conditions:
-            - condition: trigger
-              id: "wekker_woensdag"
-            - condition: time
-              weekday:
-                - wed
-            - alias: "Is de wekker voor vandaag ingeschakeld"
-              condition: state
-              entity_id: input_boolean.wekker_woensdag
-              state: "on"
-          sequence:
-            - <<: *start_script_ochtendroutine
-              data:
-                variables:
-                  werklocatie: "{{ states('input_select.werklocatie_woensdag') | lower }}"
-        - conditions:
-            - condition: trigger
-              id: "wekker_donderdag"
-            - condition: time
-              weekday:
-                - thu
-            - alias: "Is de wekker voor vandaag ingeschakeld"
-              condition: state
-              entity_id: input_boolean.wekker_donderdag
-              state: "on"
-          sequence:
-            - <<: *start_script_ochtendroutine
-              data:
-                variables:
-                  werklocatie: "{{ states('input_select.werklocatie_donderdag') | lower }}"
-        - conditions:
-            - condition: trigger
-              id: "wekker_vrijdag"
-            - condition: time
-              weekday:
-                - fri
-            - alias: "Is de wekker voor vandaag ingeschakeld"
-              condition: state
-              entity_id: input_boolean.wekker_vrijdag
-              state: "on"
-          sequence:
-            - <<: *start_script_ochtendroutine
-              data:
-                variables:
-                  werklocatie: "{{ states('input_select.werklocatie_vrijdag') | lower }}"
+    - alias: "Genereer de juiste werkdag en geef de variabele werklocatie door aan script.wekker_met_ochtendroutine"
+      service: script.turn_on
+      target:
+        entity_id: script.wekker_met_ochtendroutine
+      data:
+        variables:
+          werklocatie: >-
+            {% set today = {'Monday': 'maandag', 'Tuesday': 'dinsdag', 'Wednesday': 'woensdag', 'Thursday': 'donderdag', 'Friday': 'vrijdag'}[now().strftime('%A')] %}
+            {{ states('input_select.werklocatie_' ~ today) | lower }}
 
 - id: 8753cfbe-5d4b-4e2b-aca0-c9b43ebd3141
   alias: "Wekker: Controle actieve modus"
