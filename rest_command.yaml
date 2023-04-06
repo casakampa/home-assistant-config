@@ -7,4 +7,5 @@ pvoutput_status_update:
     X-Pvoutput-SystemId: !secret pvoutput_systemid
   content_type: application/x-www-form-urlencoded
   timeout: 30
-  payload: "d={{now().strftime('%Y%m%d')}}&t={{now().strftime('%H:%M')}}&v2={{ int(states('sensor.envoy_current_power_production'), 0) }}&v4={{ ( int(states('sensor.dsmr_reading_electricity_currently_delivered'), 0) | multiply(1000)) }}&v5={{ states('sensor.buitentemperatuur') }}&v6={{ states('sensor.dsmr_reading_phase_voltage_l1') | round(1, 0) }}"
+  payload: "d={{now().strftime('%Y%m%d')}}&t={{now().strftime('%H:%M')}}&v1={{ states('sensor.envoy_energy_production_today') }}&v2={{ int(states('sensor.envoy_current_power_production'), 0) }}&v3={{ float(states('sensor.dsmr_day_consumption_electricity_merged'), 0) | multiply(1000) | round(0) }}&v4={{ int(states('sensor.dsmr_reading_electricity_currently_delivered'), 0) | multiply(1000) }}&n=1&v5={{ states('sensor.buitentemperatuur') }}&v6={{ states('sensor.dsmr_reading_phase_voltage_l1') | round(1, 0) }}"
+  # origineelpayload: "d={{now().strftime('%Y%m%d')}}&t={{now().strftime('%H:%M')}}&v2={{ int(states('sensor.envoy_current_power_production'), 0) }}&v4={{ ( int(states('sensor.dsmr_reading_electricity_currently_delivered'), 0) | multiply(1000)) }}&v5={{ states('sensor.buitentemperatuur') }}&v6={{ states('sensor.dsmr_reading_phase_voltage_l1') | round(1, 0) }}"
