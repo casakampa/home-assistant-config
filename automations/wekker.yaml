@@ -27,7 +27,7 @@
             {{ states('input_select.werklocatie_' ~ today) | lower }}
 
 - id: 8753cfbe-5d4b-4e2b-aca0-c9b43ebd3141
-  alias: "Wekker: Controle actieve modus"
+  alias: "Wekker: Statuscontrole"
   description: "Ga elke zondag om 20:30 na of de wekker ingeschakeld moet worden, bij actieve vakantiemodus"
   trigger:
     - platform: time
