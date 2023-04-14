@@ -26,7 +26,7 @@
     boolean_herinnering: "input_boolean.kliko_wegzetten_herinnering"
     boolean_herhaal_herinnering: "input_boolean.kliko_wegzetten_herhaal_herinnering"
     sensor_morgen: "sensor.afvalwijzer_tomorrow"
-    afvalsoort: "{{ states('sensor.afvalwijzer_afvalsoort') | lower }}"
+    afvalsoort: "{{ state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort') | lower }}"
     tag: "notification_kliko_wegzetten"
     subtitle: "🗑️ Kliko 🗑️"
     stop_herinnering: "STOP_HERHALING_WEGZETTEN"

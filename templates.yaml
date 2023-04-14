@@ -9,6 +9,15 @@
         {{ iif(has_value('sensor.afvalwijzer_next_type'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
+      attributes:
+        afvalsoort: >-
+          {% set afvalsoorten = {
+                          'papier': 'Papier',
+                          'gft': 'GFT',
+                          'pmd': 'Plastic',
+                          'restafval': 'Restafval'
+                          } %}
+          {{ afvalsoorten.get(states('sensor.afvalwijzer_next_type'), 'Geen') }}
       availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
