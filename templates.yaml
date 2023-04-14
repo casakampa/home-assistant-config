@@ -1,21 +1,15 @@
 # Bereken de staat en bijbehorende afbeelding voor deze zelfgemaakte sensor
 - sensor:
     - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
-      name: "Afvalwijzer afvalsoort"
+      name: "Volgende leging"
       icon: mdi:delete-restore
-      state: >-
-        {% set afvalsoorten = {
-                        'papier': 'Papier',
-                        'gft': 'GFT',
-                        'pmd': 'Plastic',
-                        'restafval': 'Restafval'
-                        } %}
-        {{ afvalsoorten.get(states('sensor.afvalwijzer_next_type'), 'Geen') }}
+      state: >
+        {{ iif(has_value('sensor.afvalwijzer_next_date'), states('sensor.afvalwijzer_next_date'), 'Geen') }}
       picture: >-
         {{ iif(has_value('sensor.afvalwijzer_next_type'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
-      availability: "{{ has_value('sensor.afvalwijzer_next_type') }}"
+      availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
