@@ -3,10 +3,10 @@
     - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
       name: "Volgende leging"
       icon: mdi:delete-restore
-      state: >
-        {{ iif(has_value('sensor.afvalwijzer_next_date'), states('sensor.afvalwijzer_next_date'), 'Geen') }}
+      state: >-
+        {{ states('sensor.afvalwijzer_next_date') }}
       picture: >-
-        {{ iif(has_value('sensor.afvalwijzer_next_type'),
+        {{ iif(has_value('sensor.afvalwijzer_next_type') and not is_state('sensor.afvalwijzer_next_type', 'Geen'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
       attributes:
