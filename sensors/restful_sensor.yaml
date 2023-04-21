@@ -129,10 +129,10 @@
     {%- for release in releases -%}
         {%- set version = release.split()[1] -%}
         {%- if version >= '8.0' and version < '9.0' -%}
-            {{ release }}
+            {{- release -}}
             {% break %}
-        {% endif %}
-    {% endfor %}
+        {%- endif -%}
+    {%- endfor -%}
   headers:
     content-type: application/json
     user-agent: *ua_string
