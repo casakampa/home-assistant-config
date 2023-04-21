@@ -118,3 +118,13 @@
         {% set old = states('sensor.z_stack_coordinator_firmware') -%}
         {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (old) -#}
         {{ version.split('_')[3] if version | length > 0 and not prerelease else old }}
+
+- platform: rest
+  unique_id: 916cb168-f289-4363-9ad3-d28e70f5a4e3
+  scan_interval: 86400
+  resource: https://www.virten.net/repo/esxiReleases.json
+  name: "ESXi Patch"
+  value_template: "{{ (value_json.data.esxiReleases[0].friendlyName).split('ESXi') | last }}"
+  headers:
+    content-type: application/json
+    user-agent: *ua_string
