@@ -124,7 +124,15 @@
   scan_interval: 86400
   resource: https://www.virten.net/repo/esxiReleases.json
   name: "ESXi Patch"
-  value_template: "{{ (value_json.data.esxiReleases[0].friendlyName).split('ESXi') | last }}"
+  value_template: >
+    {% set releases = value_json.data.esxiReleases[:8] | map(attribute='friendlyName') | list -%}
+    {%- for release in releases -%}
+        {%- set version = release.split()[1] -%}
+        {%- if version >= '8.0' and version < '9.0' -%}
+            {{ release }}
+            {% break %}
+        {% endif %}
+    {% endfor %}
   headers:
     content-type: application/json
     user-agent: *ua_string
