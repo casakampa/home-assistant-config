@@ -17,6 +17,8 @@
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
         - sensor.lg_webos
+      not_from:
+        - "unavailable"
   mode: queued
   condition:
     - "{{ has_value(trigger.entity_id) }}"
