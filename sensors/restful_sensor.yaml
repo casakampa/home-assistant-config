@@ -125,19 +125,14 @@
   resource: https://www.virten.net/repo/esxiReleases.json
   name: "ESXi Patch"
   icon: mdi:bandage
-  value_template: >
+  value_template: >-
     {% set releases = value_json.data.esxiReleases[:8] | map(attribute='friendlyName') | list -%}
     {%- for release in releases -%}
-        {%- set version = release.split()[1] -%}
-        {%- set match = version | regex_findall_index('\\d+\\.\\d+', index=0) -%}
-        {%- if match -%}
-            {%- set version = float(match) -%}
-            {# Change versions below if necessary for new major releases. #}
-            {# Versions like 10.0 and higher are supported. #}
-            {%- if 9.0 > version >= 8.0 -%}
+        {%- set version = release.split()[1] | regex_findall_index('\\d+\\.\\d+', index=0) -%}
+        {# Change version numbers below if necessary for new major releases. Version numbers like 10.0 and higher are supported. #}
+        {%- if 9.0 > float(version) >= 8.0 -%}
                 {{- release.split('ESXi ') | last -}}
                 {% break %}
-            {%- endif -%}
         {%- endif -%}
     {%- endfor -%}
   headers:
