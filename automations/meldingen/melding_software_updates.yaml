@@ -19,6 +19,7 @@
         - sensor.lg_webos
       not_from:
         - "unavailable"
+        - "unknown"
   mode: queued
   condition:
     - "{{ has_value(trigger.entity_id) }}"
