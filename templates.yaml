@@ -4,7 +4,19 @@
       name: "Volgende leging"
       icon: mdi:delete-restore
       state: >-
-        {{ states('sensor.afvalwijzer_next_date') }}
+        {%- set sensor = 'sensor.afvalwijzer_' + states('sensor.afvalwijzer_next_type') -%}
+        {%- set collection_date = as_local(as_datetime(state_attr(sensor, 'year_month_day_date'))).date() %}
+        {%- set days = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag' ] %}
+        {%- set days_until = state_attr(sensor, 'days_until_collection_date') %}
+        {%- if days_until <= 1 %}
+          {{ (['Vandaag', 'Morgen'])[days_until] }}
+        {%- elif days_until < 7 - now().isoweekday() %}
+          {{ days[collection_date.weekday()] | title }}
+        {%- elif days_until < 14 - now().isoweekday() %}
+            {{ 'Volgende week ' ~ days[collection_date.weekday()] }}
+        {%- else %}
+            {{ 'Over ' ~ (days_until / 7) | round(0, 'ceiling') ~ ' weken' }}
+        {%- endif %}
       picture: >-
         {{ iif(has_value('sensor.afvalwijzer_next_type') and not is_state('sensor.afvalwijzer_next_type', 'Geen'),
           'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
