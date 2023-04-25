@@ -55,7 +55,7 @@
       entity_id: binary_sensor.hue_motion_zolder_occupancy
   variables:
     delay: "{{ int(states('input_number.light_zolder_delay'), 15) }}"
-    transition: &transitie "0.5"
+    transition: &transitie "1"
     helderheid_dag: "{{ int(states('input_number.light_zolder_day_brightness_pct'), 80) }}"
     helderheid_nacht: "{{ int(states('input_number.light_zolder_night_brightness_pct'), 20) }}"
     lamp: "light.zolder_zha_group_0x0004"

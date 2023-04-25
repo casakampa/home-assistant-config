@@ -14,7 +14,7 @@
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.lg_oled"
     brightness: 50
-    transition: 0.75
+    transition: 1
     light: "light.lamp_bioscoopkamer"
     area: "light.alle_lampen_zha_group_0x0006"
     anchor:
@@ -58,7 +58,7 @@
                     - <<: *turn_on_entities
                       data:
                         brightness_pct: "{{ brightness }}"
-                        transition: "{{ transition }}"
+                        transition: "{{ transition * 2 }}"
                         color_temp_kelvin: 2700
                 - conditions:
                     - alias: "Tijdsspannes tussen ingestelde tijden"
@@ -73,7 +73,7 @@
                     - <<: *turn_on_entities
                       data:
                         brightness_pct: 10
-                        transition: "{{ transition }}"
+                        transition: "{{ transition / 2 }}"
                         color_temp_kelvin: 2500
                 - conditions:
                     - alias: "Nacht"
@@ -96,7 +96,7 @@
                 entity_id: "{{ area }}"
               data:
                 brightness_pct: 100
-                transition: 1
+                transition: "{{ transition }}"
         - conditions:
             - "{{ command == 'up_short_release' }}"
           sequence:
@@ -110,7 +110,7 @@
               data:
                 color_temp_kelvin: >-
                   {{ state_attr(light, 'color_temp_kelvin') + 150 }}
-                transition: 0.5
+                transition: "{{ transition / 2 }}"
         - conditions:
             - "{{ command == 'down_short_release' }}"
           sequence:
@@ -124,7 +124,7 @@
               data:
                 color_temp_kelvin: >-
                   {{ state_attr(light, 'color_temp_kelvin') - 150 }}
-                transition: 0.5
+                transition: "{{ transition / 2 }}"
         - conditions:
             - "{{ command == 'off_short_release' }}"
           sequence:
@@ -145,7 +145,7 @@
                       target:
                         entity_id: "{{ area }}"
                       data:
-                        transition: 1
+                        transition: "{{ transition }}"
                     - alias: "Zet de gekozen media_player uit"
                       service: media_player.turn_off
                       target:
@@ -170,7 +170,7 @@
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
     brightness: 75
-    transition: 0.75
+    transition: 1
     light: "light.keuken_zha_group_0x0002"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
   action: *hue_dimmer_logica
@@ -189,7 +189,7 @@
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
     brightness: 50
-    transition: 0.75
+    transition: 1
     light: "light.slaapkamer_zha_group_0x0005"
     area: "light.alle_lampen_zha_group_0x0006"
   action: *hue_dimmer_logica
@@ -208,7 +208,7 @@
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
     brightness: 50
-    transition: 0.75
+    transition: 1
     light: "light.woonkamer_zha_group_0x0003"
     area: "light.alle_lampen_zha_group_0x0006"
   action: *hue_dimmer_logica
@@ -227,7 +227,7 @@
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.woonkamer"
     brightness: 75
-    transition: 0.75
+    transition: 1
     light: "light.spot_eethoek"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
   action: *hue_dimmer_logica
