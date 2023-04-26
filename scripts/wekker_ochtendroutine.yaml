@@ -46,7 +46,7 @@ wekker_met_ochtendroutine:
       data:
         transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 10 }}" # -10 seconden vanwege de delay
         brightness_pct: "{{ int(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
-        color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 2500) }}"
+        color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 3000) }}"
     - alias: "Laat mij weten dat ik er nu uit zou moeten/kunnen gaan"
       service: notify.iphone_12
       data:

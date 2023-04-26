@@ -8,6 +8,8 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.hue_motion_woonkamer_occupancy
+    - platform: state
+      entity_id: binary_sensor.aqara_motion_keuken
   variables:
     lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
     anchors:
@@ -36,13 +38,15 @@
       data:
         brightness_pct: 1
         color_temp_kelvin: 3000
-    - alias: "Wacht tot er 15 seconden geen beweging is gedetecteerd in de woonkamer"
+    - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd in de woonkamer of keuken"
       wait_for_trigger:
         - platform: state
-          entity_id: binary_sensor.hue_motion_woonkamer_occupancy
+          entity_id:
+            - binary_sensor.hue_motion_woonkamer_occupancy
+            - binary_sensor.aqara_motion_keuken
           to: "off"
           for:
-            seconds: "{{ float(states('input_number.light_woonkamer_delay'), 15) }}"
+            seconds: 5
     - *lamp_uit
 
 - id: 090e2979-ea12-4c4e-83f2-bb442815fcb1
@@ -54,15 +58,14 @@
     - platform: state
       entity_id: binary_sensor.hue_motion_zolder_occupancy
   variables:
-    delay: "{{ int(states('input_number.light_zolder_delay'), 15) }}"
-    transition: &transitie "1"
-    helderheid_dag: "{{ int(states('input_number.light_zolder_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ int(states('input_number.light_zolder_night_brightness_pct'), 20) }}"
+    transition: &transitie 1
+    helderheid_dag: 80
+    helderheid_nacht: 20
     lamp: "light.zolder_zha_group_0x0004"
     anchors:
       - &vertraging
         delay:
-          seconds: "{{ delay }}"
+          seconds: 5
       - &disable_logic
         alias: "Controleer of de lamp nog brandt"
         if:
@@ -137,8 +140,6 @@
     - platform: state
       entity_id: binary_sensor.hue_motion_achtertuin_occupancy
   variables:
-    delay: "15"
-    transition: "1"
     lamp: "light.buitenlamp_achtertuin"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
@@ -154,13 +155,13 @@
             - alias: "Wordt uitgevoerd bij schemer"
               <<: *lamp_aan
               data:
-                transition: "{{ transition }}"
+                transition: *transitie
                 brightness_pct: 80
           else:
             - alias: "Wordt uitgevoerd bij nacht"
               <<: *lamp_aan
               data:
-                transition: "{{ transition }}"
+                transition: *transitie
                 brightness_pct: 30
       else:
         - *vertraging
@@ -175,9 +176,8 @@
     - platform: state
       entity_id: binary_sensor.gang_template_motion_sensor
   variables:
-    delay: "{{ int(states('input_number.light_gang_delay'), 15) }}"
-    helderheid_dag: "{{ int(states('input_number.light_gang_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ int(states('input_number.light_gang_night_brightness_pct'), 30) }}"
+    helderheid_dag: 80
+    helderheid_nacht: 30
     lamp: "light.lamp_gang"
     anchors:
       - &enable_logic_with_kelvin
@@ -264,18 +264,9 @@
   trigger:
     - platform: state
       entity_id: binary_sensor.hue_motion_overloop_occupancy
-      not_from:
-        - "unknown"
-        - "unavailable"
-        - "none"
-      not_to:
-        - "unknown"
-        - "unavailable"
-        - "none"
   variables:
-    delay: "{{ int(states('input_number.light_overloop_delay'), 15) }}"
-    helderheid_dag: "{{ int(states('input_number.light_overloop_day_brightness_pct'), 80) }}"
-    helderheid_nacht: "{{ int(states('input_number.light_overloop_night_brightness_pct'), 20) }}"
+    helderheid_dag: 80
+    helderheid_nacht: 20
     lamp: "light.lamp_overloop"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
@@ -284,6 +275,31 @@
       if:
         - *beweging_gedetecteerd
         - "{{ float(states('sensor.hue_motion_overloop_illuminance'), 20) <= 20 }}"
+      then:
+        - *enable_logic_with_kelvin
+      else:
+        - *disable_logic_with_kelvin
+
+- id: 59dfe4f3-9178-4023-812f-5420f833edb0
+  alias: "Verlichting: Keuken (beweging)"
+  description: "Activeer verlichting keuken op basis van Aqara Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_motion_keuken
+  variables:
+    helderheid_dag: 75
+    helderheid_nacht: 10
+    lamp: "light.keuken_zha_group_0x0002"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ is_state('script.wekker_met_ochtendroutine', 'off') }}"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+        - "{{ float(states('sensor.aqara_motion_keuken_illuminance'), 45) <= 45 }}"
       then:
         - *enable_logic_with_kelvin
       else:

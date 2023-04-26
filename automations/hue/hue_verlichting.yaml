@@ -49,8 +49,8 @@
       at: input_datetime.light_woonkamer_night_time
       id: "verlichting_uit"
   variables:
-    transition: "30"
-    color_temp_kelvin: "2400"
+    transition: 30
+    color_temp_kelvin: 2400
     brightness_pct: "{{ int(states('input_number.verlichting_woonkamer_lichtsterkte'), 30) }}"
     ochtendroutine: "script.wekker_met_ochtendroutine"
     verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
@@ -217,9 +217,9 @@
     - variables:
         stekker: "switch.stekker_bioscoopkamer"
         zon: "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
-        transitie: &transitie "5"
-        lichtsterkte_laag: "5"
-        lichtsterkte_hoog: "50"
+        transitie: &transitie 5
+        lichtsterkte_laag: 5
+        lichtsterkte_hoog: 50
         lamp: &lamp "light.lamp_bioscoopkamer"
         color_temp_kelvin: "2500"
         min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
