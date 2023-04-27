@@ -17,6 +17,7 @@
         - sensor.deursensor_voordeur_power
         - sensor.deursensor_achterdeur_power
         - sensor.hue_motion_achtertuin_power
+        - sensor.aqara_motion_keuken_power
       below: input_number.drempelwaarde_batterijniveau
   mode: queued
   condition:

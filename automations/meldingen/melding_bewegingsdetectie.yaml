@@ -9,6 +9,7 @@
         - binary_sensor.hue_motion_overloop_occupancy
         - binary_sensor.hue_motion_woonkamer_occupancy
         - binary_sensor.hue_motion_achtertuin_occupancy
+        - binary_sensor.aqara_motion_keuken
       from: "off"
       to: "on"
   mode: parallel
@@ -17,7 +18,7 @@
   action:
     - service: notify.iphone_12
       data:
-        message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[2] | capitalize }}"
+        message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ') | last }}"
         data:
           tag: "bewegingsdetectie"
           subtitle: "Beweging gedetecteerd!"
