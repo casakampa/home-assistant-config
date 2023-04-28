@@ -18,9 +18,9 @@
   action:
     - service: notify.iphone_12
       data:
-        message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ') | last }}"
+        message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[2] }}"
         data:
           tag: "bewegingsdetectie"
-          subtitle: "Beweging gedetecteerd!"
+          subtitle: "Bewegingsdetectie"
           push:
             interruption-level: passive
