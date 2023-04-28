@@ -32,18 +32,6 @@ recorder:
       - binary_sensor.woonkamer_schemer
       - binary_sensor.woonkamer_nacht
 
-history:
-  include:
-    domains:
-      - device_tracker
-      - light
-      - climate
-  exclude:
-    entities:
-      - sensor.dsmr_reading_timestamp
-      - sensor.time
-      - sensor.dsmr_consumption_gas_read_at
-
 logbook:
   include:
     domains:
