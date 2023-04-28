@@ -66,7 +66,7 @@
   condition:
     - "{{ is_state('binary_sensor.workday_sensor', 'on')}}"
     - "{{ is_state('input_boolean.thuiswerk_status', 'on')}}"
-  #    - "{{ is_state('device_tracker.laptop_aventus', 'home')}}" # Device_tracker werkt momenteel niet goed, daardoor zal deze check falen
+    - "{{ is_state('device_tracker.ave_5cd2156vvx', 'home')}}"
   action:
     - service: light.turn_off
       target:
