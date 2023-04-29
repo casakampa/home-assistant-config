@@ -40,8 +40,3 @@
   name: achtertuin_nacht
   entity_id: sensor.hue_motion_achtertuin_illuminance
   lower: 5
-
-# Holidays, weekends are not included in the added list
-- platform: workday
-  country: NL
-  add_holidays: !include holidays.yaml

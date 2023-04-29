@@ -57,7 +57,7 @@
 - id: fb44cfe4-dcf9-424d-ad3b-0505cebc82ec
   alias: "Thuiswerken: uitbreiding"
   description: "Controleer op twee momenten of thuiswerken actief is en de laptop van het werk is ingeschakeld, en voer de bijbehorende acties uit."
-  initial_state: false
+  initial_state: true
   trigger:
     - platform: time
       at:
