@@ -293,7 +293,7 @@
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - *beweging_gedetecteerd
-        - "{{ float(states('sensor.aqara_motion_keuken_illuminance'), 45) <= 45 }}"
+        - "{{ float(states('sensor.aqara_motion_keuken_illuminance'), 35) <= 35 }}"
       then:
         - *lights_on_with_color_temp_kelvin
       else:
