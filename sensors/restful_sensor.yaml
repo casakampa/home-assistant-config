@@ -114,10 +114,8 @@
         {% set version = states('sensor.z_stack_firmware_releases') -%}
         {# Vul de variabele 'prerelease' en controleer of de nieuwste versie een prerelease is (true) -#}
         {% set prerelease = is_state_attr('sensor.z_stack_firmware_releases', 'prerelease', true) -%}
-        {# Vul de variabele 'old' met de huidige staat van de sensor -#}
-        {% set old = states('sensor.z_stack_coordinator_firmware') -%}
-        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (old) -#}
-        {{ version.split('_')[3] if version | length > 0 and not prerelease else old }}
+        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (this.state) -#}
+        {{ version.split('_')[3] if version | length > 0 and not prerelease else this.state }}
 
 - platform: rest
   unique_id: 916cb168-f289-4363-9ad3-d28e70f5a4e3
