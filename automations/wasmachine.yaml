@@ -250,6 +250,7 @@
     wasprogramma: *select_wasprogramma
     wasprogramma_startuitstel: *boolean_wasprogramma_startuitstel
     wasprogramma_actief: *boolean_wasprogramma_actief
+    deursensor_wasmachine: "binary_sensor.deursensor_wasmachine"
   trace:
     stored_traces: 25
   condition:
@@ -273,7 +274,7 @@
     - *deactiveer_stekker_wasmachine
     - alias: "Herinner de wasmachine te legen"
       repeat:
-        while: "{{ is_state('binary_sensor.deursensor_wasmachine', 'off') }}"
+        while: "{{ is_state(deursensor_wasmachine, 'off') }}"
         sequence:
           - alias: "Herinner mij om de was uit de wasmachine te halen"
             service: notify.iphone_12
@@ -284,8 +285,9 @@
                 tag: *tag
                 push:
                   interruption-level: time-sensitive
-          - alias: "Herhaal de melding na de opgegeven wachttijd"
-            delay:
+          - alias: "Wacht totdat de deur van de wasmachine wordt geopend."
+            wait_template: "{{ is_state(deursensor_wasmachine, 'on') }}"
+            timeout:
               minutes: "{{ float(states('input_number.wasprogramma_interval_herinnering_programma_afgerond'), 10) }}"
     - *verwijder_notificatie_wasmachine
     - alias: "Zet deze automatisering uit"
