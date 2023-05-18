@@ -19,8 +19,9 @@
             {{ days[collection_date.weekday()] | title ~ ' over ' ~ weeks_until ~ (' weken' if (weeks_until > 1) else ' week') }}
         {% endif %}
       picture: >-
-        {{ iif(has_value('sensor.afvalwijzer_next_type') and not is_state('sensor.afvalwijzer_next_type', 'Geen'),
-          'https://static.mijnafvalwijzer.nl/default-icons/' +  states('sensor.afvalwijzer_next_type') + '_100.png',
+        {% set next_type = 'sensor.afvalwijzer_next_type'%}
+        {{ iif(has_value(next_type) and not is_state(next_type, 'Geen'),
+          'https://static.mijnafvalwijzer.nl/default-icons/' +  states(next_type) + '_100.png',
           'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
       attributes:
         afvalsoort: >-
