@@ -10,35 +10,36 @@ In 2018 ben ik begonnen met Home Assistant op een Raspberry Pi 3B. In de loop de
 Mijn Smart Home bestaat uit de volgende software en hardware:
 
  - ### Home Assistant
-	 - [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [VMware ESXi 8](https://customerconnect.vmware.com/en/evalcenter?p=vsphere-eval-8) (*Guest OS: Other 5.x Linux (64-bit)*)
-		 - vCPU: 2
-		 - RAM: 4GB
-		 - Disk: 32GB NVME
-		 - Netwerk: IPv4 & IPv6
-		 - Zigbee: [Electrolama ZZH!](https://electrolama.com/projects/zig-a-zig-ah/) (CC2652R), toegevoegd als USB device aan de virtuele machine
-			 - Reserve: [Slae.sh](https://slae.sh/projects/cc2652/) (CC2652RB)
+	- [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [VMware ESXi 8](https://customerconnect.vmware.com/en/evalcenter?p=vsphere-eval-8) (*Guest OS: Other 5.x Linux (64-bit)*)
+		- vCPU: 2
+		- RAM: 4GB
+		- Disk: 32GB NVME
+		- Netwerk: IPv4 & IPv6
+		- Zigbee: [Electrolama ZZH!](https://electrolama.com/projects/zig-a-zig-ah/) (CC2652R), toegevoegd als USB device aan de virtuele machine
+			- Reserve: [Slae.sh](https://slae.sh/projects/cc2652/) (CC2652RB)
 - ### Philips Hue
 	- [Hue White E27 - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---800/8719514329843) (Zigbee)
 	- [Hue White E27 - 1100lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---1100/8719514288232) (Zigbee & Bluetooth)
-	 - [Hue White Ambiance E27 - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-ambiance-a60---e27-slimme-lamp---800/8719514328167) (Zigbee & Bluetooth)
-	 - [Hue White Ambiance GU10 - 450lm](https://www.philips-hue.com/nl-nl/p/hue-white-ambiance-gu10---slimme-spot/8719514339903) (Zigbee & Bluetooth)
-	 - Hue White and Color ambiance LightStrip Plus (Zigbee)
-	 - [Hue White Welcome schijnwerper - 2300lm](https://www.philips-hue.com/nl-nl/p/hue-white-welcome-verstraler-voor-buiten/8719514382763) (Zigbee)
-	 - [Hue White Lucca - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-lucca-buitenwandlamp/1740193P0) (Zigbee)
-	 - [Hue Motion Buitensensor](https://www.philips-hue.com/nl-nl/p/hue-buitensensor/8719514342262) (Zigbee)
-	 - [Hue Motion Sensor](https://www.philips-hue.com/nl-nl/p/hue-bewegingssensor/8719514342125) (Zigbee)
-	 - [Hue Smart Stekker](https://www.philips-hue.com/nl-nl/p/hue-smart-stekker/8719514342309) (Zigbee) en (Zigbee & Bluetooth)
-	 - Hue Dimmer Switch V1 (Zigbee)
+	- [Hue White Ambiance E27 - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-ambiance-a60---e27-slimme-lamp---800/8719514328167) (Zigbee & Bluetooth)
+	- [Hue White Ambiance GU10 - 450lm](https://www.philips-hue.com/nl-nl/p/hue-white-ambiance-gu10---slimme-spot/8719514339903) (Zigbee & Bluetooth)
+	- Hue White and Color ambiance LightStrip Plus (Zigbee)
+	- [Hue White Welcome schijnwerper - 2300lm](https://www.philips-hue.com/nl-nl/p/hue-white-welcome-verstraler-voor-buiten/8719514382763) (Zigbee)
+	- [Hue White Lucca - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-lucca-buitenwandlamp/1740193P0) (Zigbee)
+	- [Hue Motion Buitensensor](https://www.philips-hue.com/nl-nl/p/hue-buitensensor/8719514342262) (Zigbee)
+	- [Hue Motion Sensor](https://www.philips-hue.com/nl-nl/p/hue-bewegingssensor/8719514342125) (Zigbee)
+	- [Hue Smart Stekker](https://www.philips-hue.com/nl-nl/p/hue-smart-stekker/8719514342309) (Zigbee) en (Zigbee & Bluetooth)
+	- Hue Dimmer Switch V1 (Zigbee)
 - ### Aquara
-	 - [Door & Windows sensor](https://www.aqara.com/en/door_and_window_sensor.html) (Zigbee)
+	- [Door & Windows sensor](https://www.aqara.com/eu/door_and_window_sensor.html) (Zigbee)
+	- [Aqara Motion Sensor P1](https://www.aqara.com/eu/product/motion-sensor-p1) (Zigbee)
  - ### Blitzwolf
-	 - [Blitzwolf BW-SHP13](https://www.blitzwolfeurope.com/BlitzWolf-BW-SHP13-ZigBee-WIFI-Smart-Socket) (Zigbee) - oude generatie met werkende energiemeting
+	- [Blitzwolf BW-SHP13](https://www.blitzwolfeurope.com/BlitzWolf-BW-SHP13-ZigBee-WIFI-Smart-Socket) (Zigbee) - oude generatie met werkende energiemeting
  - ### Chromecast
-	 - Google Chromecast (2018)
+	- Google Chromecast (2018)
  - ### Raspberry Pi 3B
-	 - [Raspberry Pi OS Bullseye 64-bit](https://www.raspberrypi.com/software/operating-systems/)
-	   - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
-	   - [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
+	- [Raspberry Pi OS Bullseye 64-bit](https://www.raspberrypi.com/software/operating-systems/)
+	  - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
+	  - [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
 
 ## Integraties
 De volgende integraties worden gebruikt:
