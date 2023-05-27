@@ -1,10 +1,10 @@
 # Bereken de staat en bijbehorende afbeelding voor deze zelfgemaakte sensor
 - sensor:
     - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
-      name: "Volgende leging"
+      name: "{{ this.attributes.afvalsoort }}"
       icon: mdi:delete-restore
       state: >-
-        {% set sensor = 'sensor.afvalwijzer_' + states('sensor.afvalwijzer_next_type') %}
+        {% set sensor = 'sensor.afvalwijzer_' ~ this.attributes.next_type %}
         {% set collection_date = as_local(as_datetime(state_attr(sensor, 'year_month_day_date'))).date() %}
         {% set days = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag' ] %}
         {% set days_until = state_attr(sensor, 'days_until_collection_date') %}
@@ -19,19 +19,18 @@
             {{ days[collection_date.weekday()] | title ~ ' over ' ~ weeks_until ~ (' weken' if (weeks_until > 1) else ' week') }}
         {% endif %}
       picture: >-
-        {% set next_type = 'sensor.afvalwijzer_next_type'%}
-        {{ iif(has_value(next_type) and not is_state(next_type, 'Geen'),
-          'https://static.mijnafvalwijzer.nl/default-icons/' +  states(next_type) + '_100.png',
-          'https://www.maartenvandekamp.nl/afvalwijzer/kliko.jpg') }}
+        {% set next_type = this.attributes.next_type %}
+        {{ 'https://www.maartenvandekamp.nl/afvalwijzer/' ~ ( next_type ~ '_100.png' if (has_value('sensor.afvalwijzer_' ~ next_type) and not is_state('sensor.afvalwijzer_' ~ next_type, 'Geen')) else 'kliko.jpg' ) }}
       attributes:
         afvalsoort: >-
           {% set afvalsoorten = {
-                          'papier': 'Papier',
-                          'gft': 'GFT',
-                          'pmd': 'Plastic',
-                          'restafval': 'Restafval'
-                          } %}
-          {{ afvalsoorten.get(states('sensor.afvalwijzer_next_type'), 'Geen') }}
+            'papier': 'Papier',
+            'gft': 'GFT',
+            'pmd': 'Plastic',
+            'restafval': 'Restafval'
+            } %}
+          {{ afvalsoorten.get(this.attributes.next_type, 'Geen') }}
+        next_type: "{{ states('sensor.afvalwijzer_next_type') }}"
       availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
