@@ -6,7 +6,6 @@ http:
 
 # mariadb database (add-on)
 recorder:
-  db_url: !secret mariadb_db_url
   purge_keep_days: 5
   include:
     domains:
