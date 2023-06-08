@@ -81,7 +81,7 @@
 - binary_sensor:
     - unique_id: c5bc96be-8d86-4a41-94f1-1f594427f912
       name: "Beschikbaarheid lampen"
-      state: "{{ this.attributes.get('onbereikbaar') | default(0) >= 1 }}"
+      state: "{{ this.attributes.onbereikbaar | default(0) >= 1 }}"
       attributes:
         onbereikbaar: "{{ states.light | rejectattr('entity_id', 'contains', 'zha') | rejectattr('state', 'in', ['on', 'off']) | list | count }}"
 # Knoppen om scripts te activeren
