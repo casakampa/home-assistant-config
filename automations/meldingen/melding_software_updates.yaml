@@ -16,7 +16,6 @@
         - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
-        - sensor.lg_webos
       not_from:
         - "unavailable"
         - "unknown"
