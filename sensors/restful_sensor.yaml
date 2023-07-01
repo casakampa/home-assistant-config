@@ -8,6 +8,7 @@
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -26,6 +27,7 @@
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -44,6 +46,7 @@
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -62,6 +65,7 @@
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -80,6 +84,7 @@
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -97,6 +102,7 @@
   value_template: "{{ value_json | map(attribute='tag_name') | select('contains', 'coordinator') | first }}"
   json_attributes:
     - prerelease
+    - html_url
   username: !secret github_username
   password: !secret github_personal_access_token
   authentication: basic
@@ -104,18 +110,6 @@
     accept: application/vnd.github.v3+json
     content-type: application/json
     user-agent: *ua_string
-- platform: template
-  sensors:
-    z_stack_coordinator_firmware:
-      unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
-      friendly_name: "Z-Stack coordinator firmware"
-      value_template: >
-        {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
-        {% set version = states('sensor.z_stack_firmware_releases') -%}
-        {# Vul de variabele 'prerelease' en controleer of de nieuwste versie een prerelease is (true) -#}
-        {% set prerelease = is_state_attr('sensor.z_stack_firmware_releases', 'prerelease', true) -%}
-        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (this.state) -#}
-        {{ version.split('_')[3] if version | length > 0 and not prerelease else this.state }}
 
 - platform: rest
   unique_id: 916cb168-f289-4363-9ad3-d28e70f5a4e3

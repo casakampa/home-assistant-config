@@ -42,3 +42,4 @@
         data:
           subtitle: "Update beschikbaar!"
           tag: "{{ trigger.entity_id }}"
+          url: "{{ state_attr(trigger.entity_id, 'html_url') }}"

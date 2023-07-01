@@ -1,4 +1,4 @@
-# Bereken de staat en bijbehorende afbeelding voor deze zelfgemaakte sensor
+# Template based sensors and buttons
 - sensor:
     - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
       name: "{{ this.attributes.get('afvalsoort') }}"
@@ -32,6 +32,18 @@
           {{ afvalsoorten.get(this.attributes.get('next_type'), 'Geen') }}
         next_type: "{{ states('sensor.afvalwijzer_next_type') }}"
       availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
+    - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
+      name: "Z-Stack coordinator firmware"
+      state: >-
+        {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
+        {% set version = states('sensor.z_stack_firmware_releases') -%}
+        {# Vul de variabele 'prerelease' en controleer of de nieuwste versie een prerelease is (true) -#}
+        {% set prerelease = is_state_attr('sensor.z_stack_firmware_releases', 'prerelease', true) -%}
+        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (this.state) -#}
+        {{ version.split('_')[3] if version | length > 0 and not prerelease else this.state }}
+      attributes:
+        html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
+
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
