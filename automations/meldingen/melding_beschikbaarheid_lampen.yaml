@@ -1,6 +1,7 @@
 - id: fe91e5c2-cd20-4dce-833d-ae2b61cac6f6
   alias: "Melding: Beschikbaarheid lampen"
   description: "Stuur een melding wanneer een lamp (on)bereikbaar is"
+  mode: queued
   trigger:
     - platform: state
       entity_id: binary_sensor.beschikbaarheid_lampen
