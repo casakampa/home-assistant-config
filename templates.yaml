@@ -32,6 +32,22 @@
           {{ afvalsoorten.get(this.attributes.get('next_type'), 'Geen') }}
         next_type: "{{ states('sensor.afvalwijzer_next_type') }}"
       availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
+    - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
+      name: "Kleurtemperatuur verlichting"
+      state: >-
+        {% set elevation = state_attr('sun.sun', 'elevation') %}
+        {% set min_elevation = -10 %}
+        {% set max_elevation = 50 %}
+        {% set min_color_temp = 2500 %}
+        {% set max_color_temp = 5000 %}
+        {% if elevation <= min_elevation %}
+          {{ min_color_temp }}
+        {% elif elevation >= max_elevation %}
+          {{ max_color_temp }}
+        {% else %}
+          {{ int((((elevation - min_elevation) / (max_elevation - min_elevation)) * (max_color_temp - min_color_temp) + min_color_temp ) | round(-2)) }}
+        {% endif %}
+      unit_of_measurement: "K"
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       name: "Z-Stack coordinator firmware"
       state: >-

@@ -181,6 +181,7 @@
     helderheid_nacht: 30
     lamp: "light.lamp_gang"
     anchors:
+      - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       - &lights_on_with_color_temp_kelvin
         alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
         choose:
@@ -194,7 +195,7 @@
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
                   transition: *transitie
-                  color_temp_kelvin: 3500
+                  color_temp_kelvin: *color_temp
           - conditions:
               - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
                 or:
@@ -213,7 +214,7 @@
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
                   transition: *transitie
-                  color_temp_kelvin: 2500
+                  color_temp_kelvin: *color_temp
           - conditions:
               - *vroege_ochtend_late_avond
             sequence:
@@ -221,7 +222,7 @@
                 data:
                   brightness_pct: "{{ helderheid_nacht }}"
                   transition: *transitie
-                  color_temp_kelvin: 2500
+                  color_temp_kelvin: *color_temp
           - conditions:
               - *nacht
             sequence:

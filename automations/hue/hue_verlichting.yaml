@@ -48,13 +48,18 @@
     - platform: time
       at: input_datetime.light_woonkamer_night_time
       id: "verlichting_uit"
+    - platform: state
+      entity_id: sensor.kleurtemperatuur_verlichting
+      id: "kleurtemp_update"
   variables:
     transition: 30
-    color_temp_kelvin: 2400
+    color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
     brightness_pct: "{{ int(states('input_number.verlichting_woonkamer_lichtsterkte'), 30) }}"
     ochtendroutine: "script.wekker_met_ochtendroutine"
     verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
     visite: "input_boolean.visite"
+    anchor:
+      - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
   condition:
     - "{{ is_state(visite, 'off') }}"
   action:
@@ -111,11 +116,19 @@
                           data:
                             transition: "{{ transition }}"
                             brightness_pct: "{{ brightness_pct + 10 }}"
-                            color_temp_kelvin: "{{ color_temp_kelvin }}"
+                            color_temp_kelvin: *color_temp
                     - conditions:
                         - "{{ is_state(verlichting, 'on') }}"
                       sequence:
                         - choose:
+                            - conditions:
+                                - "{{ trigger.id == 'kleurtemp_update' }}"
+                              sequence:
+                                - service: light.turn_on
+                                  target:
+                                    entity_id: *verlichting
+                                  data:
+                                    color_temp_kelvin: *color_temp
                             - conditions:
                                 - "{{ trigger.id == 'verlichting_dimmen' }}"
                               sequence:
@@ -126,7 +139,7 @@
                                   data:
                                     transition: "{{ int(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
                                     brightness_pct: "1"
-                                    color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
+                                    # color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
                             - conditions:
                                 - "{{ trigger.id == 'verlichting_uit' }}"
                               sequence:
@@ -145,7 +158,7 @@
                   data:
                     transition: "{{ transition | multiply(10, 300) }}"
                     brightness_pct: "{{ brightness_pct }}"
-                    color_temp_kelvin: "{{ color_temp_kelvin }}"
+                    color_temp_kelvin: *color_temp
           default:
             - stop: "Er was geen passend scenario voor deze trigger"
 
