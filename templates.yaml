@@ -11,7 +11,7 @@
         {% set weeks_until = (days_until / 7) | round(0, 'ceil') %}
         {% if days_until <= 1 %}
           {{ (['Vandaag', 'Morgen'])[days_until] }}
-        {% elif (days_until < 7 - now().isoweekday()) or (now().isoweekday() == 7 and days_until < 7) %}
+        {% elif (days_until < 7 - now().isoweekday()) or (now().isoweekday() in [6, 7] and days_until < 7) %}
           {{ days[collection_date.weekday()] | title }}
         {% elif days_until < 14 - now().isoweekday() %}
             {{ 'Volgende week ' ~ days[collection_date.weekday()] }}
@@ -48,18 +48,21 @@
           {{ int((((elevation - min_elevation) / (max_elevation - min_elevation)) * (max_color_temp - min_color_temp) + min_color_temp ) | round(-2)) }}
         {% endif %}
       unit_of_measurement: "K"
+- trigger:
+    - platform: state
+      entity_id: sensor.z_stack_firmware_releases
+  sensor:
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       name: "Z-Stack coordinator firmware"
       state: >-
         {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
-        {% set version = states('sensor.z_stack_firmware_releases') -%}
+        {% set version = states(trigger.entity_id) -%}
         {# Vul de variabele 'prerelease' en controleer of de nieuwste versie een prerelease is (true) -#}
-        {% set prerelease = is_state_attr('sensor.z_stack_firmware_releases', 'prerelease', true) -%}
+        {% set prerelease = is_state_attr(trigger.entity_id, 'prerelease', true) -%}
         {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (this.state) -#}
         {{ version.split('_')[3] if version | length > 0 and not prerelease else this.state }}
       attributes:
-        html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
-
+        html_url: "{{ state_attr(trigger.entity_id, 'html_url') }}"
 # Bereken de buitentemperatuur op basis van de twee bronnen, mits beschikbaar
 - sensor:
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
