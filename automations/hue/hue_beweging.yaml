@@ -299,3 +299,26 @@
         - *lights_on_with_color_temp_kelvin
       else:
         - *lights_off
+
+- id: 02fa3101-591d-4eb5-811e-a64278af099e
+  alias: "Verlichting: Toilet (beweging)"
+  description: "Activeer verlichting toilet op basis van Aqara Motion"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.aqara_motion_toilet
+  variables:
+    helderheid_dag: 80
+    helderheid_nacht: 30
+    lamp: "light.lamp_toilet"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
+  action:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - *beweging_gedetecteerd
+      then:
+        - *lights_on_with_color_temp_kelvin
+      else:
+        - *lights_off
