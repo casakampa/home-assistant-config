@@ -66,6 +66,9 @@
     - if:
         - "{{ trigger.id == 'helderheid_verlagen' }}"
         - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders is er niets te dimmen en wordt de verlichting juist ingeschakeld.
+        - alias: "Voorkom dat deze automatisering andere triggers overschrijft, door deze alleen uit te voeren voordat het nacht wordt."
+          condition: time
+          before: input_datetime.light_home_night_time
       then:
         - service: light.turn_on
           target:
@@ -139,7 +142,7 @@
                                   data:
                                     transition: "{{ int(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
                                     brightness_pct: "1"
-                                    # color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
+                                    color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
                             - conditions:
                                 - "{{ trigger.id == 'verlichting_uit' }}"
                               sequence:
