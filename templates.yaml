@@ -82,6 +82,19 @@
       state: "{{ is_state('binary_sensor.hue_motion_gang_occupancy', 'on') or is_state('binary_sensor.hue_motion_trap_occupancy', 'on') }}"
       device_class: motion
       availability: "{{ (has_value('binary_sensor.hue_motion_gang_occupancy') and has_value('binary_sensor.hue_motion_trap_occupancy')) }}"
+# Maak een nieuwe template sensor voor beweging in de woonkamer en keuken
+- trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.aqara_motion_keuken
+        - binary_sensor.hue_motion_woonkamer_occupancy
+  binary_sensor:
+    - unique_id: 6e4c8f17-9d6c-4972-815e-3e82eea161ee
+      name: "Woonkamer template motion sensor"
+      icon: mdi:motion-sensor
+      state: "{{ is_state('binary_sensor.aqara_motion_keuken', 'on') or is_state('binary_sensor.hue_motion_woonkamer_occupancy', 'on') }}"
+      device_class: motion
+      availability: "{{ (has_value('binary_sensor.aqara_motion_keuken') and has_value('binary_sensor.hue_motion_woonkamer_occupancy')) }}"
 # Maakt een sensor die wordt ingeschakeld wanneer de thermostaat de ingestelde maximumtemperatuur overschrijdt
 - trigger:
     - platform: state

@@ -7,9 +7,7 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.hue_motion_woonkamer_occupancy
-    - platform: state
-      entity_id: binary_sensor.aqara_motion_keuken
+      entity_id: binary_sensor.woonkamer_template_motion_sensor
   variables:
     lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
     anchors:
@@ -34,6 +32,10 @@
             - condition: time
               after: input_datetime.light_woonkamer_night_time
   action:
+    - alias: "Zet de automatisering Verlichting Keuken (beweging) tijdens deze automatisering uit"
+      service: automation.turn_off
+      target:
+        entity_id: automation.verlichting_keuken_beweging
     - <<: *lamp_aan
       data:
         brightness_pct: 1
@@ -42,12 +44,15 @@
       wait_for_trigger:
         - platform: state
           entity_id:
-            - binary_sensor.hue_motion_woonkamer_occupancy
-            - binary_sensor.aqara_motion_keuken
+            - binary_sensor.woonkamer_template_motion_sensor
           to: "off"
           for:
             seconds: 5
     - *lamp_uit
+    - alias: "Zet de automatisering Verlichting Keuken (beweging) na deze automatisering aan"
+      service: automation.turn_on
+      target:
+        entity_id: automation.verlichting_keuken_beweging
 
 - id: 090e2979-ea12-4c4e-83f2-bb442815fcb1
   alias: "Verlichting: Zolder (beweging)"
