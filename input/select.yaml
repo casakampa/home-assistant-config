@@ -8,7 +8,7 @@ wasprogramma:
     - Startuitstel
     - Overig
   initial: Geen
-  icon: mdi:format-list-bulleted-square
+  icon: mdi:washing-machine
 werklocatie_maandag:
   name: "Werklocatie maandag"
   options:

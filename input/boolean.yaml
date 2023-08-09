@@ -55,7 +55,7 @@ wasprogramma_actief:
   icon: mdi:progress-clock
 wasprogramma_startuitstel:
   name: Startuitstel
-  icon: mdi:clock-end
+  icon: mdi:clock-start
 # Kliko herinnering
 kliko_aan_de_weg:
   name: Kliko aan de weg

@@ -36,7 +36,7 @@
       name: "Kleurtemperatuur verlichting"
       state: >-
         {% set elevation = state_attr('sun.sun', 'elevation') %}
-        {% set min_elevation = -10 %}
+        {% set min_elevation = 0 %}
         {% set max_elevation = 50 %}
         {% set min_color_temp = 2500 %}
         {% set max_color_temp = 5000 %}
