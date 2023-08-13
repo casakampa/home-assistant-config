@@ -9,7 +9,7 @@ In 2018 ben ik begonnen met Home Assistant op een Raspberry Pi 3B. In de loop de
 # Smart Home
 Mijn Smart Home bestaat uit de volgende software en hardware:
 
- - ### Home Assistant
+- ### Home Assistant
 	- [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [VMware ESXi 8](https://customerconnect.vmware.com/en/evalcenter?p=vsphere-eval-8) (*Guest OS: Other 5.x Linux (64-bit)*)
 		- vCPU: 2
 		- RAM: 4GB
@@ -32,14 +32,19 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 - ### Aquara
 	- [Door & Windows sensor](https://www.aqara.com/eu/door_and_window_sensor.html) (Zigbee)
 	- [Aqara Motion Sensor P1](https://www.aqara.com/eu/product/motion-sensor-p1) (Zigbee)
- - ### Blitzwolf
+- ### Blitzwolf
 	- [Blitzwolf BW-SHP13](https://www.blitzwolfeurope.com/BlitzWolf-BW-SHP13-ZigBee-WIFI-Smart-Socket) (Zigbee) - oude generatie met werkende energiemeting
- - ### Chromecast
+- ### Chromecast
 	- Google Chromecast (2018)
- - ### Raspberry Pi 3B
-	- [Raspberry Pi OS Bullseye 64-bit](https://www.raspberrypi.com/software/operating-systems/)
-	  - [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) - voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
-	  - [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
+- ### Raspberry Pi 4 4GB
+	- [Raspberry Pi OS Bookworm 64-bit](https://www.raspberrypi.com/software/operating-systems/)
+		- [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
+		- Docker
+			- [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) > [DSMR-reader image](ghcr.io/xirixiz/dsmr-reader-docker:latest): Voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
+			- [PostgreSQL](https://www.postgresql.org/) -> [PostgreSQL image](https://hub.docker.com/_/postgres): Voor de DSMR-reader database
+			- [Unifi Controller](https://ui.com/download/releases/network-server) -> [LinuxServer Unifi image](https://github.com/linuxserver/docker-unifi-controller/): Voor het configureren en beheren van Unifi access points.
+			- [Wireguard](https://www.wireguard.com/) -> [LinuxServer Wireguard image](https://github.com/linuxserver/docker-wireguard): Voor het maken van een VPN-verbinding
+			- [Authelia](https://www.authelia.com/) -> [Authelia image](https://hub.docker.com/r/authelia/authelia): Voor MFA op verschillende subdomeinen
 
 ## Integraties
 De volgende integraties worden gebruikt:
@@ -62,7 +67,6 @@ De volgende integraties worden gebruikt:
 ## Add-ons
 De volgende add-ons worden gebruikt:
 
-- [MariaDB](https://github.com/home-assistant/addons/blob/master/mariadb/DOCS.md)
 - [Mosquitto broker](https://github.com/home-assistant/addons/blob/master/mosquitto/DOCS.md)
 - [Studio Code Server](https://github.com/hassio-addons/addon-vscode)
 - [Terminal & SSH](https://github.com/home-assistant/addons/blob/master/ssh/DOCS.md)
@@ -72,6 +76,8 @@ Als uitbreiding op de Home Assistant front-end worden de volgende scripts gebrui
 
 - [Mini Graph Card](https://github.com/kalkih/mini-graph-card)
 - [Hass Hue Icons](https://github.com/arallsopp/hass-hue-icons)
+- [ApexCharts Card](https://github.com/RomRider/apexcharts-card/)
+- [Mushroom Card](https://github.com/piitaya/lovelace-mushroom)
 
 ## Custom Components
 Het volgende custom component wordt gebruikt:
