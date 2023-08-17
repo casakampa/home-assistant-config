@@ -30,7 +30,13 @@
       value_template: >-
         {{ iif(trigger.to_state.attributes.prerelease is defined,
         is_state_attr(trigger.entity_id, 'prerelease', false),
-        'True') }}
+        True) }}
+    - alias: "Stuur alleen een notificatie wanneer de nieuwe waarde van sensor.nextcloud boven het gedefinieerde versienummer komt"
+      condition: template
+      value_template: >-
+        {{ iif(trigger.entity_id == 'sensor.nextcloud',
+        states('sensor.nextcloud') | version > 27,
+        True) }}
   action:
     - alias: "Stuur een notificatie over de software update"
       service: notify.iphone_12
