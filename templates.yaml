@@ -54,10 +54,10 @@
         {% set source = 'sensor.z_stack_firmware_releases' -%}
         {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
         {% set version = states(source) -%}
-        {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) -#}
-        {% set prerelease = is_state_attr(source, 'prerelease', true) -%}
-        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en er geen sprake is van een prerelease (not), behoud anders de huidige staat (this.state) -#}
-        {{ version.split('_')[3] if version | length > 0 and has_value(source) and not prerelease else this.state }}
+        {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) of niet (false) -#}
+        {% set no_prerelease = is_state_attr(source, 'prerelease', false) -%}
+        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
+        {{ version.split('_')[3] if version | length > 0 and has_value(source) and no_prerelease else this.state }}
       attributes:
         html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
     # Bereken de buitentemperatuur op basis van de twee bronnen, wanneer beide beschikbaar zijn
