@@ -40,7 +40,7 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 	- [Raspberry Pi OS Bookworm 64-bit](https://www.raspberrypi.com/software/operating-systems/)
 		- [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
 		- Docker
-			- [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) > [DSMR-reader image](ghcr.io/xirixiz/dsmr-reader-docker:latest): Voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
+			- [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) > [DSMR-reader image](https://github.com/xirixiz/dsmr-reader-docker): Voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
 			- [PostgreSQL](https://www.postgresql.org/) -> [PostgreSQL image](https://hub.docker.com/_/postgres): Voor de DSMR-reader database
 			- [Unifi Controller](https://ui.com/download/releases/network-server) -> [LinuxServer Unifi image](https://github.com/linuxserver/docker-unifi-controller/): Voor het configureren en beheren van Unifi access points.
 			- [Wireguard](https://www.wireguard.com/) -> [LinuxServer Wireguard image](https://github.com/linuxserver/docker-wireguard): Voor het maken van een VPN-verbinding
