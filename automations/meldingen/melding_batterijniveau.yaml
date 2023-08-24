@@ -14,9 +14,10 @@
         - sensor.hue_motion_gang_power
         - sensor.hue_motion_trap_power
         - sensor.hue_motion_woonkamer_power
+        - sensor.hue_motion_achtertuin_power
         - sensor.deursensor_voordeur_power
         - sensor.deursensor_achterdeur_power
-        - sensor.hue_motion_achtertuin_power
+        - sensor.deursensor_trapkast_power
         - sensor.aqara_motion_keuken_power
         - sensor.aqara_motion_toilet_power
       below: input_number.drempelwaarde_batterijniveau

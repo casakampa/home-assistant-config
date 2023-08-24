@@ -344,3 +344,34 @@
         - service: light.turn_off
           target:
             entity_id: "{{ lamp }}"
+
+- id: 7614bce6-ac20-43f0-b767-5ad2e2773ec9
+  alias: "Verlichting: Trapkast"
+  description: "Deze automatisering regelt de verlichting in de trapkast"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.deursensor_trapkast
+    - platform: state
+      entity_id: light.lamp_trapkast
+      to: "on"
+      for:
+        minutes: 10
+  variables:
+    lamp: "light.lamp_trapkast"
+    sensor: "binary_sensor.deursensor_trapkast"
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
+  action:
+    - if:
+        - "{{ trigger.entity_id == sensor and is_state(sensor, 'on') }}"
+      then:
+        - service: light.turn_on
+          target:
+            entity_id: "{{ lamp }}"
+          data:
+            brightness_pct: 80
+            color_temp_kelvin: 4000
+      else:
+        - service: light.turn_off
+          target:
+            entity_id: "{{ lamp }}"
