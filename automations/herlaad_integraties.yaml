@@ -8,7 +8,7 @@
   action:
     - service: homeassistant.reload_config_entry
       data:
-        entry_id: e53e8fcc3831eb08c6a62dda011484be
+        entry_id: ee42fd3768b70ddbc78c6d5ad9559e05
 
 - id: 8e513b89-3a00-4393-8eaa-04f8405b63f7
   alias: "Herlaad WebOS integratie"
