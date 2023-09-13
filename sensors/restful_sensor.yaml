@@ -110,23 +110,3 @@
     accept: application/vnd.github.v3+json
     content-type: application/json
     user-agent: *ua_string
-
-- platform: rest
-  unique_id: 916cb168-f289-4363-9ad3-d28e70f5a4e3
-  scan_interval: 86400
-  resource: https://www.virten.net/repo/esxiReleases.json
-  name: "ESXi Patch"
-  icon: mdi:bandage
-  value_template: >-
-    {% set releases = value_json.data.esxiReleases[:8] | map(attribute='friendlyName') | list -%}
-    {%- for release in releases -%}
-        {%- set version = release.split()[1] | regex_findall_index('\\d+\\.\\d+', index=0) -%}
-        {# Change version numbers below if necessary for new major releases. Version numbers like 10.0 and higher are supported. #}
-        {%- if 9.0 > float(version) >= 8.0 -%}
-            {{- release.split('ESXi ') | last -}}
-            {% break %}
-        {%- endif -%}
-    {%- endfor -%}
-  headers:
-    content-type: application/json
-    user-agent: *ua_string
