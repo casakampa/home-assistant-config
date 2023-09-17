@@ -236,6 +236,7 @@
         - "Netflix"
         - "Photo & Video"
         - "YouTube"
+        - "NPO"
       id: "streaming_aan"
   action:
     - variables:
@@ -340,27 +341,29 @@
   variables:
     lamp: "light.buitenlamp_voortuin"
   action:
-    - if:
-        - or:
+    - alias: "Kies het juiste scenario om de lamp te schakelen"
+      choose:
+        - conditions:
+            - "{{ trigger.id in ['ochtend', 'zon'] }}"
             - "{{ is_state('sun.sun', 'below_horizon') }}"
-            - "{{ trigger.id == 'ochtend' }}"
-        - "{{ is_state(lamp, 'off') }}"
-      then:
-        - service: light.turn_on
-          target:
-            entity_id: "{{ lamp }}"
-          data:
-            brightness_pct: 30
-        - stop: "Stop hier met de automatisering"
-    - if:
-        - or:
-            - "{{ is_state('sun.sun', 'above_horizon') }}"
-            - "{{ trigger.id == 'nacht' }}"
-        - "{{ is_state(lamp, 'on') }}"
-      then:
-        - service: light.turn_off
-          target:
-            entity_id: "{{ lamp }}"
+            - "{{ is_state(lamp, 'off') }}"
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: "{{ lamp }}"
+              data:
+                brightness_pct: 30
+        - conditions:
+            - or:
+                - "{{ is_state('sun.sun', 'above_horizon') }}"
+                - "{{ trigger.id == 'nacht' }}"
+            - "{{ is_state(lamp, 'on') }}"
+          sequence:
+            - service: light.turn_off
+              target:
+                entity_id: "{{ lamp }}"
+      default:
+        - stop: "Geen passend scenario voor deze trigger"
 
 - id: 7614bce6-ac20-43f0-b767-5ad2e2773ec9
   alias: "Verlichting: Trapkast"
