@@ -114,7 +114,7 @@
 # Check GitHub repository Authelia/Authelia via https://api.github.com/repos/authelia/authelia/releases
 - platform: rest
   unique_id: 5fa39f4c-4562-4f57-89c8-6d16644068e9
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/authelia/authelia/releases
   name: "Authelia"
   icon: mdi:two-factor-authentication
