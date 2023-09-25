@@ -15,6 +15,9 @@
         - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
+        - sensor.authelia
+        - sensor.apexcharts_card
+        - sensor.lovelace_mushroom
       not_from:
         - "unavailable"
         - "unknown"

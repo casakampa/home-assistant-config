@@ -1,7 +1,7 @@
 # Check GitHub repository dsmrreader/dsmr-reader via https://api.github.com/repos/dsmrreader/dsmr-reader/releases
 - platform: rest
   unique_id: 06df5ab3-70e8-48b2-b83c-da5acc620624
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/dsmrreader/dsmr-reader/releases
   name: "DSMR Reader"
   icon: mdi:gauge
@@ -20,7 +20,7 @@
 # Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
 - platform: rest
   unique_id: 0ecd889e-2679-44d1-ac34-30531c35ddcb
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
   name: "Afvalwijzer"
   icon: mdi:delete-restore
@@ -39,7 +39,7 @@
 # Check GitHub repository nextcloud/server via https://api.github.com/repos/nextcloud/server/releases
 - platform: rest
   unique_id: a8c86d93-b746-44f9-88d6-03901cfc5319
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/nextcloud/server/releases
   name: "Nextcloud"
   icon: mdi:folder-sync
@@ -58,10 +58,10 @@
 # Check GitHub repository kalkih/mini-graph-card via https://api.github.com/repos/kalkih/mini-graph-card/releases
 - platform: rest
   unique_id: 8ad8b831-6662-40e9-abb3-e5bae0f8da52
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/kalkih/mini-graph-card/releases
   name: "Mini Graph"
-  icon: mdi:chart-line-variant
+  icon: mdi:chart-timeline-variant
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -77,7 +77,7 @@
 # Check GitHub repository caddyserver/caddy via https://api.github.com/repos/caddyserver/caddy/releases
 - platform: rest
   unique_id: 9d3effaf-f8b5-4e97-a57f-59c93503d936
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/caddyserver/caddy/releases
   name: "Caddy"
   icon: mdi:web-box
@@ -96,10 +96,67 @@
 # Check GitHub repository Koenkk/Z-Stack-firmware via https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
 - platform: rest
   unique_id: 8a6fafe0-f14a-4dd9-9a80-71396b9e522e
-  scan_interval: 3600
+  scan_interval: 86400
   resource: https://api.github.com/repos/Koenkk/Z-Stack-firmware/releases
   name: "Z-Stack firmware releases"
   value_template: "{{ value_json | map(attribute='tag_name') | select('contains', 'coordinator') | first }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository Authelia/Authelia via https://api.github.com/repos/authelia/authelia/releases
+- platform: rest
+  unique_id: 5fa39f4c-4562-4f57-89c8-6d16644068e9
+  scan_interval: 3600
+  resource: https://api.github.com/repos/authelia/authelia/releases
+  name: "Authelia"
+  icon: mdi:two-factor-authentication
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository piitaya/lovelace-mushroom via https://api.github.com/repos/piitaya/lovelace-mushroom/releases
+- platform: rest
+  unique_id: 4d604fc3-6443-47f9-9d5f-51c468b09c59
+  scan_interval: 86400
+  resource: https://api.github.com/repos/piitaya/lovelace-mushroom/releases
+  name: "Lovelace Mushroom"
+  icon: mdi:mushroom
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository RomRider/apexcharts-card via https://api.github.com/repos/romrider/apexcharts-card/releases
+- platform: rest
+  unique_id: c4ab2f5e-721c-4f21-9d40-46a3f2e4d96c
+  scan_interval: 86400
+  resource: https://api.github.com/repos/romrider/apexcharts-card/releases
+  name: "Apexcharts Card"
+  icon: mdi:chart-areaspline
+  value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
     - html_url
