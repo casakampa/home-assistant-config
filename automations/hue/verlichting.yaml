@@ -59,6 +59,7 @@
     anchor:
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       - &geen_match "Er is geen passende actie voor deze trigger."
+      - &chromecast_geen_netflix "{{ not is_state_attr('media_player.woonkamer', 'app_name', 'Netflix') }}"
   condition:
     - "{{ is_state('input_boolean.visite', 'off') }}"
   action:
@@ -151,6 +152,7 @@
                     - choose:
                         - conditions:
                             - "{{ trigger.id == 'verlichting_dimmen' }}"
+                            - *chromecast_geen_netflix
                           sequence:
                             - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximale waarde"
                               service: light.turn_on
@@ -162,6 +164,7 @@
                                 color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
                         - conditions:
                             - "{{ trigger.id == 'verlichting_uit' }}"
+                            - *chromecast_geen_netflix
                           sequence:
                             - service: light.turn_off
                               target:
