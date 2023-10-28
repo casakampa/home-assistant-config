@@ -67,7 +67,6 @@
     helderheid_nacht: 20
     lamp: "light.zolder_zha_group_0x0004"
     anchors:
-      - &transitie 1
       - &lights_off
         alias: "Controleer of de lamp nog brandt"
         if:
@@ -76,7 +75,6 @@
           - <<: *lamp_aan
             data:
               brightness_pct: 10
-              transition: *transitie
           - delay:
               seconds: 5
           - *lamp_uit
@@ -114,14 +112,12 @@
                 - <<: *lamp_aan
                   data:
                     brightness_pct: "{{ helderheid_dag }}"
-                    transition: *transitie
             - conditions:
                 - *vroege_ochtend_late_avond
               sequence:
                 - <<: *lamp_aan
                   data:
                     brightness_pct: "{{ helderheid_nacht }}"
-                    transition: *transitie
             - conditions:
                 - *nacht
               sequence:
@@ -162,13 +158,11 @@
             - alias: "Wordt uitgevoerd bij schemer"
               <<: *lamp_aan
               data:
-                transition: *transitie
                 brightness_pct: 80
           else:
             - alias: "Wordt uitgevoerd bij nacht"
               <<: *lamp_aan
               data:
-                transition: *transitie
                 brightness_pct: 30
       else:
         - *lights_off
@@ -199,7 +193,6 @@
               - <<: *lamp_aan
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
-                  transition: *transitie
                   color_temp_kelvin: *color_temp
           - conditions:
               - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
@@ -218,7 +211,6 @@
               - <<: *lamp_aan
                 data:
                   brightness_pct: "{{ helderheid_dag }}"
-                  transition: *transitie
                   color_temp_kelvin: *color_temp
           - conditions:
               - *vroege_ochtend_late_avond
@@ -226,7 +218,6 @@
               - <<: *lamp_aan
                 data:
                   brightness_pct: "{{ helderheid_nacht }}"
-                  transition: *transitie
                   color_temp_kelvin: *color_temp
           - conditions:
               - *nacht
