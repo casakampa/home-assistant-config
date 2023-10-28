@@ -1,0 +1,17 @@
+# Houdt bij of de vorige dag de brander ingeschakeld is geweest voor registratie op MinderGas.nl
+- platform: history_stats
+  name: CV gebruik gisteren
+  entity_id: binary_sensor.central_heating_activity
+  state: "on"
+  type: count
+  start: "{{ today_at() - timedelta(days=1) }}"
+  end: "{{ today_at() }}"
+
+# Houdt bij of in de afgelopen 24 uur de brander ingeschakeld is geweest
+- platform: history_stats
+  name: CV gebruik vandaag
+  entity_id: binary_sensor.central_heating_activity
+  state: "on"
+  type: count
+  start: "{{ today_at() }}"
+  end: "{{ now() }}"

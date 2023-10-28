@@ -30,6 +30,7 @@ recorder:
       - binary_sensor.woonkamer_dag
       - binary_sensor.woonkamer_schemer
       - binary_sensor.woonkamer_nacht
+      - binary_sensor.central_heating_activity
 
 logbook:
   include:

@@ -76,6 +76,16 @@
       state: "{{ this.attributes.lampen | count }}"
       attributes:
         lampen: "{{ states.light | rejectattr('entity_id', 'contains', 'zha') | rejectattr('state', 'in', ['on', 'off']) | map(attribute='name') | list }}"
+# Monitor hvac_action van de thermostaat voor veranderingen
+- trigger:
+    - platform: state
+      entity_id: climate.otgw
+      attribute: hvac_action
+  binary_sensor:
+    - unique_id: 1d317115-6120-4a80-92b9-ebda3042bc80
+      name: "Central heating activity"
+      icon: mdi:counter
+      state: "{{ is_state_attr('climate.otgw', 'hvac_action', 'heating') }}"
 # Maak een nieuwe template sensor voor beweging in de gang
 - trigger:
     - platform: state
