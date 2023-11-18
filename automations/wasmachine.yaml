@@ -271,7 +271,7 @@
         - *deactiveer_wasprogramma_actief
         - *reset_wasprogramma_geen
     - delay:
-        minutes: "{{ float(states('input_number.wasprogramma_interval_herinnering_programma_afgerond'), 10) }}"
+        minutes: "{{ float(states('input_number.wasprogramma_interval_herinnering_programma_afgerond'), 5) }}"
     - *deactiveer_stekker_wasmachine
     - alias: "Herinner de wasmachine te legen"
       repeat:
