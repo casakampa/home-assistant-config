@@ -149,7 +149,7 @@ deurbel_melding_chromecast_woonkamer:
     # Check if the media player is available, otherwhise bail
     - &check_media_player
       condition: template
-      value_template: "{{ states(media_player) is not in ['off', 'unavailable', 'unknown', 'none'] }}"
+      value_template: "{{ has_value(media_player) and not is_state(media_player, 'off') }}"
     - choose:
         - conditions:
             - "{{ is_state(media_player,'playing') }}"

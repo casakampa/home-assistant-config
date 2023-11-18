@@ -62,7 +62,7 @@
         destructive: true
   condition:
     - "{{ is_state(boolean_herinnering, 'on') }}"
-    - "{{ states(sensor_morgen) not in ['unknown','unavailable','none', 'Geen'] }}"
+    - "{{ has_value(sensor_morgen) and not is_state(sensor_morgen, 'Geen') }}"
   action:
     - choose:
         - conditions:
@@ -174,7 +174,7 @@
   condition:
     - "{{ is_state(kliko_aan_de_weg, 'on') }}"
     - "{{ is_state(boolean_herinnering, 'on') }}"
-    - "{{ states(sensor_vandaag) not in ['unknown','unavailable','none', 'Geen'] }}"
+    - "{{ has_value(sensor_morgen) and not is_state(sensor_morgen, 'Geen') }}"
   action:
     - alias: "Controleer eerst of aan de set voorwaarden wordt voldaan, ga anders naar"
       if:
