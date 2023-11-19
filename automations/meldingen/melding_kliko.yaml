@@ -174,7 +174,7 @@
   condition:
     - "{{ is_state(kliko_aan_de_weg, 'on') }}"
     - "{{ is_state(boolean_herinnering, 'on') }}"
-    - "{{ has_value(sensor_morgen) and not is_state(sensor_morgen, 'Geen') }}"
+    - "{{ has_value(sensor_vandaag) and not is_state(sensor_vandaag, 'Geen') }}"
   action:
     - alias: "Controleer eerst of aan de set voorwaarden wordt voldaan, ga anders naar"
       if:
