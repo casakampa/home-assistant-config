@@ -167,3 +167,16 @@
     accept: application/vnd.github.v3+json
     content-type: application/json
     user-agent: *ua_string
+
+# Request maximum sun elevation for today via https://api.met.no/weatherapi/sunrise/3.0/sun
+- platform: rest
+  unique_id: b8ad79f9-6e2e-41aa-8c84-1fe35ccf3a3c
+  scan_interval: 43200
+  resource_template: https://api.met.no/weatherapi/sunrise/3.0/sun?lat=52.15&lon=5.6&date={{ now().strftime('%Y-%m-%d') }}&offset=+0{{ (now().utcoffset() | string).split(':') | first }}:00
+  name: "Max Sun Elevation"
+  icon: mdi:sun-angle
+  unit_of_measurement: °
+  value_template: "{{ value_json.properties.solarnoon.disc_centre_elevation }}"
+  headers:
+    content-type: application/json
+    user-agent: *ua_string

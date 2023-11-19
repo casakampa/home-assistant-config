@@ -35,17 +35,17 @@
     - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
       name: "Kleurtemperatuur verlichting"
       state: >-
-        {% set elevation = state_attr('sun.sun', 'elevation') %}
-        {% set min_elevation = -5 %}
-        {% set max_elevation = 50 %}
-        {% set min_color_temp = 2500 %}
-        {% set max_color_temp = 5000 %}
+        {% set elevation = float(state_attr('sun.sun', 'elevation')) %}
+        {% set min_elevation = -5.0 %}
+        {% set max_elevation = float(states('sensor.max_sun_elevation')) %}
+        {% set min_color_temp = 2500.0 %}
+        {% set max_color_temp = 4000.0 %}
         {% if elevation <= min_elevation %}
           {{ min_color_temp }}
         {% elif elevation >= max_elevation %}
           {{ max_color_temp }}
         {% else %}
-          {{ int((((elevation - min_elevation) / (max_elevation - min_elevation)) * (max_color_temp - min_color_temp) + min_color_temp ) | round(-2)) }}
+          {{ (((elevation - min_elevation) / (max_elevation - min_elevation)) * (max_color_temp - min_color_temp) + min_color_temp ) | round(-2) | int }}
         {% endif %}
       unit_of_measurement: "K"
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
