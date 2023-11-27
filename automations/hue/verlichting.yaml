@@ -59,7 +59,7 @@
     anchor:
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       - &geen_match "Er is geen passende actie voor deze trigger."
-      - &chromecast_geen_netflix "{{ not is_state_attr('media_player.woonkamer', 'app_name', 'Netflix') }}"
+      - &chromecast_geen_netflix "{{ not is_state_attr('media_player.chromecast_woonkamer', 'app_name', 'Netflix') }}"
   condition:
     - "{{ is_state('input_boolean.visite', 'off') }}"
   action:

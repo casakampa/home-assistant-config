@@ -114,7 +114,7 @@ deurbel_vals_alarm:
   description: "Script wordt geactiveerd bij een vals alarm, zodoende worden de ingeschakelde lampen en actieve mediaspelers teruggezet naar de oorspronkelijke stand."
   icon: "mdi:restart"
   variables:
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
   sequence:
     - *verwijder_notificaties
     # Deactiveer scripts voor gedrag verlichting gang
@@ -140,7 +140,7 @@ deurbel_melding_chromecast_woonkamer:
   variables:
     bezetting: "binary_sensor.hue_motion_woonkamer_occupancy"
     voordeur: "binary_sensor.deursensor_voordeur"
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
   sequence:
     # Check if i'm home, otherwise bail
     - &check_aanwezigheid

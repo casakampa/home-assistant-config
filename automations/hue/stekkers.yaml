@@ -39,7 +39,7 @@
         - and:
             - "{{ trigger.id == 'turn_off'}}"
             - "{{ is_state(stekker, 'on') }}"
-            - "{{ not is_state('media_player.woonkamer', 'playing') }}"
+            - "{{ not is_state('media_player.chromecast_woonkamer', 'playing') }}"
     - service: switch.{{ trigger.id }}
       target:
         entity_id: "{{ stekker }}"

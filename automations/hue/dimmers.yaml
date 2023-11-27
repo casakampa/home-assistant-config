@@ -167,7 +167,7 @@
         device_id: 13eea38ac9f669fba8af67a6bcb10ba5
   variables:
     command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
     brightness: 75
     transition: 1
     light: "light.keuken_zha_group_0x0002"
@@ -223,7 +223,7 @@
         device_id: 091f815c74eb50b132fcca673d5afac8
   variables:
     command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
     brightness: 50
     transition: 1
     light: "light.slaapkamer_zha_group_0x0005"
@@ -242,7 +242,7 @@
         device_id: 391b89c7a470fd7526bdaf1aece07030
   variables:
     command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
     brightness: 50
     transition: 1
     light: "light.woonkamer_zha_group_0x0003"
@@ -261,7 +261,7 @@
         device_id: 23290843fd07fcf9dccf2f447737d85a
   variables:
     command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.woonkamer"
+    media_player: "media_player.chromecast_woonkamer"
     brightness: 75
     transition: 1
     light: "light.spot_eettafel"

@@ -73,4 +73,4 @@
         entity_id: light.woonkamer_en_keuken_zha_group_0x0007
     - service: media_player.turn_off
       target:
-        entity_id: media_player.woonkamer
+        entity_id: media_player.chromecast_woonkamer
