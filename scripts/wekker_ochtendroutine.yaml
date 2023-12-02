@@ -63,14 +63,22 @@ wekker_met_ochtendroutine:
       target:
         entity_id: script.controle_daglicht_woonkamer # Controleert of er genoeg daglicht in de woonkamer is, anders wordt de verlichting ingeschakeld
     # Het is zover, je moet eruit
-    - service: notify.iphone_12
-      data:
-        message: "Tijd om uit bed te stappen."
-        data:
-          push:
-            interruption-level: time-sensitive
-            sound: "US-EN-Morgan-Freeman-Good-Morning.wav"
-          tag: *tag
+    - parallel:
+        - alias: "Geef een statusupdate voor vanochtend"
+          service: script.turn_on
+          target:
+            entity_id: script.tts_statusupdate_ochtend
+          data:
+            variables:
+              werklocatie: "{{ werklocatie }}"
+        - service: notify.iphone_12
+          data:
+            message: "Tijd om uit bed te stappen."
+            data:
+              push:
+                interruption-level: time-sensitive
+                sound: "US-EN-Morgan-Freeman-Good-Morning.wav"
+              tag: *tag
     - delay:
         minutes: 5
     # Schakel lamp uit
@@ -87,30 +95,23 @@ wekker_met_ochtendroutine:
         # Eem wachten...
         - delay:
             minutes: 35
-        # Stuur een melding van de reistijd naar de werklocatie
-        - *melding_reistijd_huis_naar_werk
-        # Stuur herinnering
-        - service: notify.iphone_12
-          data:
-            message: "Over 5 minuten moet je vertrekken"
-            data:
-              push:
-                interruption-level: time-sensitive
-              tag: *tag
+        - parallel:
+            # Stuur een melding van de reistijd naar de werklocatie
+            - *melding_reistijd_huis_naar_werk
+            # Stuur herinnering
+            - service: notify.iphone_12
+              data:
+                message: "Over 5 minuten moet je vertrekken"
+                data:
+                  push:
+                    interruption-level: time-sensitive
+                  tag: *tag
         # Nog even tijdrekken
         - delay:
             minutes: 5
-        # Stuur een laatste melding van de reistijd naar werklocatie
-        - *melding_reistijd_huis_naar_werk
-        # Stuur herinnering
-        - service: notify.iphone_12
-          data:
-            message: "Tijd om te vertrekken!"
-            data:
-              push:
-                interruption-level: time-sensitive
-              tag: *tag
         - parallel:
+            # Stuur een laatste melding van de reistijd naar werklocatie
+            - *melding_reistijd_huis_naar_werk
             # Schakel Chromecast uit
             - service: media_player.turn_off
               target:

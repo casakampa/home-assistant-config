@@ -60,6 +60,16 @@
         action: "{{ overslaan }}"
         title: "De leging van deze kliko overslaan"
         destructive: true
+      - &tts_kliko_wegzetten
+        alias: "Stuur een TTS melding om de kliko weg te zetten"
+        service: script.turn_on
+        target:
+          entity_id: script.tts_kliko_wegzetten
+      - &tts_kliko_ophalen
+        alias: "Stuur een TTS melding om de kliko op te halen"
+        service: script.turn_on
+        target:
+          entity_id: script.tts_kliko_ophalen
   condition:
     - "{{ is_state(boolean_herinnering, 'on') }}"
     - "{{ has_value(sensor_morgen) and not is_state(sensor_morgen, 'Geen') }}"
@@ -70,33 +80,37 @@
               id: "tijdstip"
           sequence:
             - *boolean_herhaal_herinnering
-            - service: notify.iphone_12
-              data:
-                message: "Het {{ afvalsoort }} wordt morgen geleegd."
-                data:
-                  subtitle: "{{ subtitle }}"
-                  tag: "{{ tag }}"
-                  actions:
-                    - *action_stop_herinnering
-                    - *action_kliko_overslaan
-                  push:
-                    interruption-level: time-sensitive
+            - parallel:
+                - *tts_kliko_wegzetten
+                - service: notify.iphone_12
+                  data:
+                    message: "Het {{ afvalsoort }} wordt morgen geleegd."
+                    data:
+                      subtitle: "{{ subtitle }}"
+                      tag: "{{ tag }}"
+                      actions:
+                        - *action_stop_herinnering
+                        - *action_kliko_overslaan
+                      push:
+                        interruption-level: time-sensitive
             - delay:
                 minutes: "{{ int(states('input_number.kliko_interval_herinnering'), 15) }}"
             - alias: "Blijf herinneren om de kliko aan de weg te zetten"
               repeat:
                 while: "{{ is_state(boolean_herhaal_herinnering, 'on') }}"
                 sequence:
-                  - alias: "Herinner mij regelmatig de kliko aan de weg te zetten"
-                    service: notify.iphone_12
-                    data:
-                      message: "Zet het {{ afvalsoort }} aan de weg."
-                      data:
-                        subtitle: "{{ subtitle }}"
-                        tag: "{{ tag }}"
-                        actions:
-                          - *action_stop_herinnering
-                          - *action_kliko_overslaan
+                  - parallel:
+                      - *tts_kliko_wegzetten
+                      - alias: "Herinner mij regelmatig de kliko aan de weg te zetten"
+                        service: notify.iphone_12
+                        data:
+                          message: "Zet het {{ afvalsoort }} aan de weg."
+                          data:
+                            subtitle: "{{ subtitle }}"
+                            tag: "{{ tag }}"
+                            actions:
+                              - *action_stop_herinnering
+                              - *action_kliko_overslaan
                   - *interval_herinnering
         - conditions:
             - alias: "De voordeur of notificatie mogen de trigger zijn nadat de achterdeur open is geweest, of via de app de herinnering is gestopt"
@@ -203,18 +217,20 @@
           repeat:
             while: "{{ is_state(boolean_herhaal_herinnering, 'on') }}"
             sequence:
-              - alias: "Herinner mij de kliko op te halen"
-                service: notify.iphone_12
-                data:
-                  message: "De kliko staat nog aan de weg"
-                  data:
-                    push:
-                      interruption-level: time-sensitive
-                    subtitle: "{{ subtitle }}"
-                    tag: "{{ tag }}"
-                    actions:
-                      - action: "KLIKO_OPGEHAALD"
-                        title: "Kliko is opgehaald"
+              - parallel:
+                  - *tts_kliko_ophalen
+                  - alias: "Herinner mij de kliko op te halen"
+                    service: notify.iphone_12
+                    data:
+                      message: "De kliko staat nog aan de weg"
+                      data:
+                        push:
+                          interruption-level: time-sensitive
+                        subtitle: "{{ subtitle }}"
+                        tag: "{{ tag }}"
+                        actions:
+                          - action: "KLIKO_OPGEHAALD"
+                            title: "Kliko is opgehaald"
               - *interval_herinnering
       else:
         - or:

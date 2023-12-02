@@ -252,6 +252,7 @@
     wasprogramma_actief: *boolean_wasprogramma_actief
     deursensor_wasmachine: "binary_sensor.deursensor_wasmachine"
     tijdstip: "{{ now().strftime('%H:%M') }}"
+    mededeling: "De was is klaar sinds {{ tijdstip }} en zit nog in de wasmachine."
   trace:
     stored_traces: 25
   condition:
@@ -261,6 +262,16 @@
     - "{{ is_state(wasprogramma_startuitstel, 'off') }}"
   action:
     - parallel:
+        - if:
+            - "{{ is_state('person.maarten_van_de_kamp', 'home') }}"
+          then:
+            - alias: "Stuur een TTS melding om te melden dat het wasprogramma is afgelopen"
+              service: script.turn_on
+              target:
+                entity_id: script.tts_wasprogramma_afgelopen
+              data:
+                variables:
+                  tijdstip: "{{ tijdstip }}"
         - alias: "Stuur een eerste melding dat het wasprogramma is afgerond"
           service: notify.iphone_12
           data:
@@ -277,15 +288,26 @@
       repeat:
         while: "{{ is_state(deursensor_wasmachine, 'off') }}"
         sequence:
-          - alias: "Herinner mij om de was uit de wasmachine te halen"
-            service: notify.iphone_12
-            data:
-              message: "De was is klaar sinds {{ tijdstip }} en zit nog in de wasmachine."
-              data:
-                subtitle: *subtitle
-                tag: *tag
-                push:
-                  interruption-level: time-sensitive
+          - parallel:
+              - if:
+                  - "{{ is_state('person.maarten_van_de_kamp', 'home') }}"
+                then:
+                  - alias: "Stuur een TTS melding om te herinneren aan de was in de wasmachine"
+                    service: script.turn_on
+                    target:
+                      entity_id: script.tts_wasprogramma_afgelopen
+                    data:
+                      variables:
+                        tijdstip: "{{ tijdstip }}"
+              - alias: "Herinner mij om de was uit de wasmachine te halen"
+                service: notify.iphone_12
+                data:
+                  message: "{{ mededeling }} "
+                  data:
+                    subtitle: *subtitle
+                    tag: *tag
+                    push:
+                      interruption-level: time-sensitive
           - alias: "Wacht totdat de deur van de wasmachine wordt geopend."
             wait_template: "{{ is_state(deursensor_wasmachine, 'on') }}"
             timeout:
