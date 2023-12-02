@@ -67,7 +67,7 @@ wekker_met_ochtendroutine:
         - alias: "Geef een statusupdate voor vanochtend"
           service: script.turn_on
           target:
-            entity_id: script.tts_statusupdate_ochtend
+            entity_id: script.tts_statusupdate
           data:
             variables:
               werklocatie: "{{ werklocatie }}"
