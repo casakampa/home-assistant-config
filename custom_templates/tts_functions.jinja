@@ -1,0 +1,26 @@
+{% macro dutch_time_announcement(time_string) %}
+  {% set uren, minuten = time_string.split(':') | map('int') | list %}
+  {% set volgend_klokuur = (uren % 24) + 1 %}
+  {% set uitgesproken_klokuur = uren if uren <= 12 else uren-12 %}
+  {% set uitgesproken_klokuur = 12 if uitgesproken_klokuur == 0 else uitgesproken_klokuur %}
+  {% set uitgesproken_volgend_uur = volgend_klokuur if volgend_klokuur <= 12 else volgend_klokuur-12 %}
+  {% if minuten == 0 %}
+    {{ uitgesproken_klokuur }} uur
+  {% elif minuten == 1 %}
+    1 minuut over {{ uitgesproken_klokuur }}
+  {% elif minuten < 15 %}
+    {{ minuten }} minuten over {{ uitgesproken_klokuur }}
+  {% elif minuten == 15 %}
+    kwart over {{ uitgesproken_klokuur }}
+  {% elif minuten < 30 %}
+    {{ 30-minuten == 1 and '1 minuut' or (30-minuten)|string + ' minuten' }} voor half {{ uitgesproken_volgend_uur }}
+  {% elif minuten == 30 %}
+    half {{ uitgesproken_volgend_uur }}
+  {% elif minuten < 45 %}
+    {{ minuten-30 == 1 and '1 minuut' or (minuten-30)|string + ' minuten' }} over half {{ uitgesproken_volgend_uur }}
+  {% elif minuten == 45 %}
+    kwart voor {{ uitgesproken_volgend_uur }}
+  {% else %}
+    {{ 60-minuten == 1 and '1 minuut' or (60-minuten)|string + ' minuten' }} voor {{ uitgesproken_volgend_uur }}
+  {% endif %}
+{% endmacro %}
