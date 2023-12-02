@@ -1,0 +1,24 @@
+tts_wasprogramma_afgelopen:
+  alias: "TTS: Wasprogramma afgelopen"
+  icon: "mdi:washing-machine-alert"
+  variables:
+    mededeling: >-
+      {% from 'tts_functions.jinja' import dutch_time_announcement %}
+      De was is klaar sinds {{ dutch_time_announcement(tijdstip) }} en zit nog in de wasmachine.
+  sequence:
+    - service: media_player.volume_set
+      target:
+        entity_id:
+          - media_player.sonos_woonkamer
+          - media_player.sonos_slaapkamer
+      data:
+        volume_level: 0.5
+    - service: tts.speak
+      target:
+        entity_id: tts.piper
+      data:
+        cache: false
+        media_player_entity_id:
+          - media_player.sonos_woonkamer
+          - media_player.sonos_slaapkamer
+        message: "{{ mededeling }}"

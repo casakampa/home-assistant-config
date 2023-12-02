@@ -1,0 +1,25 @@
+tts_test_statusupdate:
+  alias: "TTS: Test - Statusupdate"
+  icon: "mdi:speaker-message"
+  sequence:
+    - alias: "Geef een statusupdate voor vanochtend"
+      service: script.turn_on
+      target:
+        entity_id: script.tts_statusupdate
+      data:
+        variables:
+          werklocatie: "Apeldoorn"
+
+tts_test_wasmachine_mededeling:
+  alias: "TTS: Test - Wasmachine mededeling"
+  icon: "mdi:speaker-message"
+  variables:
+    tijdstip: "08:16"
+  sequence:
+    - alias: "Test de notificatie voor de wasmachine"
+      service: script.turn_on
+      target:
+        entity_id: script.tts_wasprogramma_afgelopen
+      data:
+        variables:
+          tijdstip: "{{ tijdstip }}"

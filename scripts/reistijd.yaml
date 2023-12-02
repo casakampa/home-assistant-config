@@ -6,7 +6,7 @@ update_travel_time_to_aventus_apeldoorn:
     sensor: "sensor.reistijd_huis_naar_aventus_apeldoorn"
     sensor_reistijd: "{{ sensor }}_duration_in_traffic"
     subtitle: "Reistijd naar Aventus Apeldoorn"
-    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+    reistijd: "{{ states(sensor_reistijd) }}"
     werklocatie: "{{ werklocatie }}" # wordt doorgegeven door script.wekker_ochtendroutine
     anchors:
       - &notificatie_berekening_reistijd
@@ -22,23 +22,45 @@ update_travel_time_to_aventus_apeldoorn:
         target:
           entity_id:
             - "{{ sensor_reistijd }}"
-      - &notificatie_reistijd
+      - &notificatie_reistijd_telefoon
         alias: "Meld de reistijd en route"
         service: notify.iphone_12
         data:
-          message: >-
+          message: &bericht >-
             {{ iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
-            'Let op: de reistijd is (veel) langer dan gewoonlijk, namelijk '~ reistijd ~' minuten',
-            'Reistijd '~ reistijd ~' minuten') }}
+            'Let op: de reistijd naar '~ werklocatie ~' is (veel) langer dan gewoonlijk, namelijk '~ iif(is_number(reistijd), reistijd ~' minuten', 'niet beschikbaar'),
+            'De reistijd naar ' ~ werklocatie  ~ ' is momenteel ' ~ iif(is_number(reistijd), reistijd ~' minuten', 'niet beschikbaar')
+            ) }}
           data:
             subtitle: "{{ subtitle }}"
             tag: "{{ tag }}"
+      - &set_volume
+        service: media_player.volume_set
+        target:
+          entity_id:
+            - media_player.sonos_woonkamer
+            - media_player.sonos_slaapkamer
+        data:
+          volume_level: 0.8
+      - &notificatie_reistijd_sonos
+        alias: "Meld de reistijd en route"
+        service: tts.speak
+        target:
+          entity_id: tts.piper
+        data:
+          cache: false
+          media_player_entity_id:
+            - media_player.sonos_woonkamer
+            - media_player.sonos_slaapkamer
+          message: *bericht
   sequence:
     - *notificatie_berekening_reistijd
     - *sensor_update
     - delay:
         seconds: 1
-    - *notificatie_reistijd
+    - *set_volume
+    - *notificatie_reistijd_sonos
+    - *notificatie_reistijd_telefoon
 
 update_travel_time_to_aventus_deventer:
   alias: "Melding: bereken reistijd naar Aventus Deventer"
@@ -48,13 +70,15 @@ update_travel_time_to_aventus_deventer:
     sensor: "sensor.reistijd_huis_naar_aventus_deventer"
     sensor_reistijd: "{{ sensor }}_duration_in_traffic"
     subtitle: "Reistijd naar Aventus Deventer"
-    reistijd: "{{ states(sensor_reistijd) | default('Onbekend aantal', true) }}"
+    reistijd: "{{ states(sensor_reistijd) }}"
   sequence:
     - *notificatie_berekening_reistijd
     - *sensor_update
     - delay:
         seconds: 1
-    - *notificatie_reistijd
+    - *set_volume
+    - *notificatie_reistijd_sonos
+    - *notificatie_reistijd_telefoon
 
 calculate_travel_time_zone_apeldoorn:
   alias: "Bereken reistijd naar zone Apeldoorn"
