@@ -7,7 +7,6 @@ update_travel_time_to_aventus_apeldoorn:
     sensor_reistijd: "{{ sensor }}_duration_in_traffic"
     subtitle: "Reistijd naar Aventus Apeldoorn"
     reistijd: "{{ states(sensor_reistijd) }}"
-    werklocatie: "{{ werklocatie }}" # wordt doorgegeven door script.wekker_ochtendroutine
     anchors:
       - &notificatie_berekening_reistijd
         service: notify.iphone_12
@@ -23,14 +22,16 @@ update_travel_time_to_aventus_apeldoorn:
           entity_id:
             - "{{ sensor_reistijd }}"
       - &notificatie_reistijd_telefoon
-        alias: "Meld de reistijd en route"
+        alias: "Meld de verwachte reistijd"
         service: notify.iphone_12
         data:
           message: &bericht >-
-            {{ iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
-            'Let op: de reistijd naar '~ werklocatie ~' is (veel) langer dan gewoonlijk, namelijk '~ iif(is_number(reistijd), reistijd ~' minuten', 'niet beschikbaar'),
-            'De reistijd naar ' ~ werklocatie  ~ ' is momenteel ' ~ iif(is_number(reistijd), reistijd ~' minuten', 'niet beschikbaar')
-            ) }}
+            {{ 'De verwachte reistijd naar ' ~ werklocatie ~ ' is ' ~ 
+            iif(is_number(reistijd), reistijd ~ ' minuten.' ~ 
+              iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
+              ' Dit is langer dan gewoonlijk.',
+              ''),
+            'niet beschikbaar') }}
           data:
             subtitle: "{{ subtitle }}"
             tag: "{{ tag }}"
@@ -43,7 +44,7 @@ update_travel_time_to_aventus_apeldoorn:
         data:
           volume_level: 0.8
       - &notificatie_reistijd_sonos
-        alias: "Meld de reistijd en route"
+        alias: "Meld de verwachte reistijd"
         service: tts.speak
         target:
           entity_id: tts.piper
