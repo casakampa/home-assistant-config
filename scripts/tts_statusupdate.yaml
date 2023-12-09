@@ -16,24 +16,23 @@ tts_statusupdate:
     tijd: >
       {% from 'tts_functions.jinja' import dutch_time_announcement %}
       {% set nu = now().strftime('%H:%M') %}
-      Het is {{ dutch_time_announcement(nu) }}
+      en het is {{ dutch_time_announcement(nu) }}
     buitentemperatuur: >
-      De buitentemperatuur is momenteel
       {{ iif(has_value('sensor.buitentemperatuur'),
-      states('sensor.buitentemperatuur').replace('.', ' komma ') ~ ' graden',
-      'niet beschikbaar')
+      'Buiten is het momenteel ' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ ' graden',
+      'De buitentemperatuur is momenteel niet beschikbaar')
       }}
     afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
     container: >-
       {% if not is_state('sensor.afvalwijzer_tomorrow', 'Geen') %}
-        Vanavond moet de {{ afvalsoort }}container aan de weg worden gezet.
+        Ter herinnering: zet vanavond de {{ afvalsoort }}container aan de weg.
       {% elif is_state('input_boolean.kliko_aan_de_weg', 'on') %}
         Vandaag wordt de {{ afvalsoort }}container geleegd.
       {% endif %}
     werk: >-
       {% if now().isoweekday() in range(6) %}
         {{ iif(is_state('binary_sensor.workday_sensor', 'on'),
-        'Vandaag werk je ' ~ iif(is_state('input_boolean.thuiswerk_status', 'off'), 'in ' + werklocatie, 'thuis'),
+        'Je werkt vandaag' ~ iif(is_state('input_boolean.thuiswerk_status', 'off'), 'in ' + werklocatie, 'thuis'),
         'Je hoeft vandaag niet te werken')
         }}
       {% endif %}
@@ -56,4 +55,5 @@ tts_statusupdate:
           {{ dag }}, {{ tijd }}.
           {{ buitentemperatuur }}.
           {{ container }}.
-          {{ werk }}.
+
+#          {{ werk }}.
