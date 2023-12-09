@@ -89,3 +89,9 @@ thermostaat_test_temperatuur:
   step: 0.5
   icon: mdi:thermometer-alert
   unit_of_measurement: "°C"
+sonos_media_volume:
+  name: "Afspeelvolume"
+  min: 0
+  max: 80
+  step: 1
+  icon: mdi:knob

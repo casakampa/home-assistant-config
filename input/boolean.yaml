@@ -72,3 +72,12 @@ kliko_ophalen_herinnering:
 kliko_ophalen_herhaal_herinnering:
   name: Herhaal kliko ophalen
   icon: mdi:repeat-variant
+play_media_sonos_woonkamer:
+  name: Sonos Woonkamer
+  icon: mdi:speaker
+play_media_sonos_slaapkamer:
+  name: Sonos Slaapkamer
+  icon: mdi:speaker
+play_streaming_radio:
+  name: Speel streaming radio
+  icon: mdi:radio

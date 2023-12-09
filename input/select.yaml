@@ -39,3 +39,11 @@ werklocatie_vrijdag:
     - Apeldoorn
     - Deventer
   icon: *icon_work_location
+internet_radio_streams:
+  name: "Radio Streams"
+  options:
+    - "Qmusic Foute uur nonstop"
+    - "BNR Nieuwsradio"
+    - "Radio Veronica"
+    - "NPO Radio 2"
+  icon: mdi:radio-tower

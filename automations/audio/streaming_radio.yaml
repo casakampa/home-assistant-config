@@ -1,0 +1,71 @@
+- id: 0bb4ce9e-cb8d-41e7-9da7-01a69d280518
+  alias: Streaming Radio
+  variables:
+    boolean_woonkamer: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
+    boolean_slaapkamer: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
+  trigger:
+    - platform: state
+      entity_id: input_boolean.play_streaming_radio
+  action:
+    - choose:
+        - conditions:
+            - "{{ trigger.to_state.state == 'on' }}"
+          sequence:
+            - alias: "Controleer de actieve luidsprekers"
+              if:
+                - "{{ boolean_slaapkamer }}"
+                - "{{ boolean_woonkamer }}"
+              then:
+                - service: media_player.join
+                  target:
+                    entity_id: media_player.sonos_woonkamer
+                  data:
+                    group_members: media_player.sonos_slaapkamer
+            - if:
+                - or:
+                    - and:
+                        - "{{ boolean_slaapkamer }}"
+                        - "{{ boolean_woonkamer }}"
+                    - "{{ boolean_slaapkamer }}"
+                    - "{{ boolean_woonkamer }}"
+              then:
+                - service: script.turn_on
+                  target:
+                    entity_id: script.start_streaming_radio
+                  data:
+                    variables:
+                      media_player: >-
+                        {%
+                        if
+                          (
+                          boolean_slaapkamer
+                          and
+                          boolean_woonkamer
+                          )
+                        or
+                        boolean_woonkamer
+                        %}
+                        media_player.sonos_woonkamer
+                        {% elif boolean_slaapkamer %}
+                        media_player.sonos_slaapkamer
+                        {% endif %}
+              else:
+                - stop: "Er is geen luidspreker geselecteerd om op af te spelen. De automatisering stopt hier."
+        - conditions:
+            - "{{ trigger.to_state.state == 'off' }}"
+          sequence:
+            - alias: "Stop met streaming"
+              service: media_player.media_stop
+              target:
+                entity_id:
+                  - media_player.sonos_woonkamer
+                  - media_player.sonos_slaapkamer
+            - if:
+                - "{{ boolean_slaapkamer }}"
+                - "{{ boolean_woonkamer }}"
+              then:
+                - service: media_player.unjoin
+                  target:
+                    entity_id:
+                      - media_player.sonos_woonkamer
+                      - media_player.sonos_slaapkamer
