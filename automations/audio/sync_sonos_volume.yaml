@@ -1,0 +1,13 @@
+- id: bb7d4420-e350-41af-9e1f-4c5e69ce878e
+  alias: Sync Sonos Volume
+  trigger:
+    platform: state
+    entity_id: input_number.sonos_media_volume
+  action:
+    - service: media_player.volume_set
+      target:
+        entity_id:
+          - media_player.sonos_slaapkamer
+          - media_player.sonos_woonkamer
+      data:
+        volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
