@@ -36,6 +36,8 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 	- [Blitzwolf BW-SHP13](https://www.blitzwolfeurope.com/BlitzWolf-BW-SHP13-ZigBee-WIFI-Smart-Socket) (Zigbee) - oude generatie met werkende energiemeting
 - ### Chromecast
 	- Google Chromecast (2018)
+- ### Sonos
+	- [Sonos One SL](https://www.sonos.com/nl-nl/shop/one-sl)
 - ### Raspberry Pi 4 4GB
 	- [Raspberry Pi OS Bookworm 64-bit](https://www.raspberrypi.com/software/operating-systems/)
 		- [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
