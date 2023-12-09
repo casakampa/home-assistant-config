@@ -10,7 +10,7 @@ In 2018 ben ik begonnen met Home Assistant op een Raspberry Pi 3B. In de loop de
 Mijn Smart Home bestaat uit de volgende software en hardware:
 
 - ### Home Assistant
-	- [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [VMware ESXi 8](https://customerconnect.vmware.com/en/evalcenter?p=vsphere-eval-8) (*Guest OS: Other 5.x Linux (64-bit)*)
+	- [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [Proxmox VE 8](https://www.proxmox.com/en/proxmox-virtual-environment/overview) VM via [deze stappen op Reddit](https://www.reddit.com/r/homeassistant/comments/ua6ri5/install_home_assistant_os_in_proxmox_manually_its/)
 		- vCPU: 2
 		- RAM: 4GB
 		- Disk: 32GB NVME
