@@ -1,20 +1,35 @@
 - id: 0bb4ce9e-cb8d-41e7-9da7-01a69d280518
   alias: Streaming Radio
   variables:
-    boolean_woonkamer: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
-    boolean_slaapkamer: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
+    boolean_woonkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
+    boolean_slaapkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
   trigger:
     - platform: state
       entity_id: input_boolean.play_streaming_radio
+      id: boolean_streaming_radio
+    - platform: state
+      entity_id: input_select.internet_radio_streams
+      id: select_streaming_radio
+    - platform: state
+      entity_id:
+        - input_boolean.play_media_sonos_slaapkamer
+        - input_boolean.play_media_sonos_woonkamer
+      id: boolean_play_media
   action:
     - choose:
         - conditions:
-            - "{{ trigger.to_state.state == 'on' }}"
+            - or:
+                - "{{ trigger.id == 'boolean_streaming_radio' and trigger.to_state.state == 'on' }}"
+                - and:
+                    - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                    - or:
+                        - "{{ trigger.id == 'select_streaming_radio' }}"
+                        - "{{ trigger.id == 'boolean_play_media' and trigger.to_state.state == 'on' }}"
           sequence:
             - alias: "Controleer de actieve luidsprekers"
               if:
-                - "{{ boolean_slaapkamer }}"
-                - "{{ boolean_woonkamer }}"
+                - "{{ boolean_slaapkamer_is_on }}"
+                - "{{ boolean_woonkamer_is_on }}"
               then:
                 - service: media_player.join
                   target:
@@ -23,11 +38,8 @@
                     group_members: media_player.sonos_slaapkamer
             - if:
                 - or:
-                    - and:
-                        - "{{ boolean_slaapkamer }}"
-                        - "{{ boolean_woonkamer }}"
-                    - "{{ boolean_slaapkamer }}"
-                    - "{{ boolean_woonkamer }}"
+                    - "{{ boolean_slaapkamer_is_on }}"
+                    - "{{ boolean_woonkamer_is_on }}"
               then:
                 - service: script.turn_on
                   target:
@@ -38,15 +50,15 @@
                         {%
                         if
                           (
-                          boolean_slaapkamer
+                          boolean_slaapkamer_is_on
                           and
-                          boolean_woonkamer
+                          boolean_woonkamer_is_on
                           )
                         or
-                        boolean_woonkamer
+                        boolean_woonkamer_is_on
                         %}
                         media_player.sonos_woonkamer
-                        {% elif boolean_slaapkamer %}
+                        {% elif boolean_slaapkamer_is_on %}
                         media_player.sonos_slaapkamer
                         {% endif %}
               else:
@@ -54,18 +66,39 @@
         - conditions:
             - "{{ trigger.to_state.state == 'off' }}"
           sequence:
-            - alias: "Stop met streaming"
-              service: media_player.media_stop
-              target:
-                entity_id:
-                  - media_player.sonos_woonkamer
-                  - media_player.sonos_slaapkamer
             - if:
-                - "{{ boolean_slaapkamer }}"
-                - "{{ boolean_woonkamer }}"
+                - "{{ trigger.id == 'boolean_play_media' and trigger.to_state.state == 'off' }}"
               then:
-                - service: media_player.unjoin
+                - if:
+                    - or:
+                        - "{{ boolean_slaapkamer_is_on }}"
+                        - "{{ boolean_woonkamer_is_on }}"
+                  then:
+                    - service: media_player.unjoin
+                      target:
+                        entity_id: >
+                          {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
+                    - alias: "Stop met streaming van specifieke luidspreker"
+                      service: media_player.media_stop
+                      target:
+                        entity_id: >
+                          {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
+                    - stop: "Ga niet verder."
+              else:
+                - alias: "Stop met streaming van specifieke luidspreker"
+                  service: media_player.media_stop
                   target:
                     entity_id:
-                      - media_player.sonos_woonkamer
                       - media_player.sonos_slaapkamer
+                      - media_player.sonos_woonkamer
+                - if:
+                    - "{{ boolean_slaapkamer_is_on }}"
+                    - "{{ boolean_woonkamer_is_on }}"
+                  then:
+                    - service: media_player.unjoin
+                      target:
+                        entity_id:
+                          - media_player.sonos_woonkamer
+                          - media_player.sonos_slaapkamer
+      default:
+        - stop: "Er zit een fout in de logica van deze automatisering "
