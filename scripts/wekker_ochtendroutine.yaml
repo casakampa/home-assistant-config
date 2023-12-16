@@ -126,11 +126,6 @@ wekker_met_ochtendroutine:
                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
               then:
                 # Stop de muziek op Sonos luidsprekers
-                - service: media_player.media_stop
-                  target:
-                    entity_id:
-                      - media_player.sonos_slaapkamer
-                      - media_player.sonos_woonkamer
                 - service: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.play_streaming_radio
