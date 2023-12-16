@@ -153,31 +153,22 @@
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       then:
                         # Stop de muziek op Sonos luidsprekers
-                        - service: media_player.media_stop
-                          target:
-                            entity_id:
-                              - media_player.sonos_slaapkamer
-                              - media_player.sonos_woonkamer
                         - service: input_boolean.turn_off
                           target:
                             entity_id: input_boolean.play_streaming_radio
               else:
-                - alias: "Zet de gekozen media_player uit"
-                  service: media_player.turn_off
-                  target:
-                    entity_id: "{{ media_player }}"
-                - if:
-                    - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
-                  then:
-                    # Stop de muziek op Sonos luidsprekers
-                    - service: media_player.media_stop
+                - parallel:
+                    - alias: "Zet de gekozen media_player uit"
+                      service: media_player.turn_off
                       target:
-                        entity_id:
-                          - media_player.sonos_slaapkamer
-                          - media_player.sonos_woonkamer
-                    - service: input_boolean.turn_off
-                      target:
-                        entity_id: input_boolean.play_streaming_radio
+                        entity_id: "{{ media_player }}"
+                    - if:
+                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                      then:
+                        # Stop de muziek op Sonos luidsprekers
+                        - service: input_boolean.turn_off
+                          target:
+                            entity_id: input_boolean.play_streaming_radio
 
 - id: 56bc495a-439f-46d1-8f11-749f9286a238
   alias: "Verlichting: Keuken (dimmer)"
