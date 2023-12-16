@@ -29,20 +29,13 @@ tts_statusupdate:
       {% elif is_state('input_boolean.kliko_aan_de_weg', 'on') %}
         Vandaag wordt de {{ afvalsoort }}container geleegd.
       {% endif %}
-    werk: >-
-      {% if now().isoweekday() in range(6) %}
-        {{ iif(is_state('binary_sensor.workday_sensor', 'on'),
-        'Je werkt vandaag' ~ iif(is_state('input_boolean.thuiswerk_status', 'off'), 'in ' + werklocatie, 'thuis'),
-        'Je hoeft vandaag niet te werken')
-        }}
-      {% endif %}
   sequence:
     - service: media_player.volume_set
       target:
         entity_id:
           - media_player.sonos_slaapkamer
       data:
-        volume_level: 0.5
+        volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
     - service: tts.speak
       target:
         entity_id: tts.piper
@@ -55,5 +48,3 @@ tts_statusupdate:
           {{ dag }}, {{ tijd }}.
           {{ buitentemperatuur }}.
           {{ container }}.
-
-#          {{ werk }}.

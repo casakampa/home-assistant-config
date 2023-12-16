@@ -10,7 +10,7 @@ tts_kliko_wegzetten:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
       data:
-        volume_level: 0.5
+        volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
     - service: tts.speak
       target:
         entity_id: tts.piper
@@ -24,8 +24,6 @@ tts_kliko_wegzetten:
 tts_kliko_ophalen:
   alias: "TTS: Kliko ophalen"
   icon: "mdi:delete-empty"
-  variables:
-    afvalsoort: *afvalsoort
   sequence:
     - service: media_player.volume_set
       target:
@@ -33,7 +31,7 @@ tts_kliko_ophalen:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
       data:
-        volume_level: 0.5
+        volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
     - service: tts.speak
       target:
         entity_id: tts.piper
@@ -42,4 +40,4 @@ tts_kliko_ophalen:
         media_player_entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
-        message: "De {{ afvalsoort }}container staat nog aan de weg."
+        message: "De afvalcontainer staat nog aan de weg. Vergeet deze niet op te halen."

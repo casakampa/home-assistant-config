@@ -42,7 +42,7 @@ update_travel_time_to_aventus_apeldoorn:
             - media_player.sonos_woonkamer
             - media_player.sonos_slaapkamer
         data:
-          volume_level: 0.8
+          volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
       - &notificatie_reistijd_sonos
         alias: "Meld de verwachte reistijd"
         service: tts.speak
