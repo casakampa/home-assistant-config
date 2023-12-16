@@ -1,3 +1,29 @@
+- id: 81754060-8694-489c-8366-4a1262adc388
+  alias: "Verlichting: Kleurupdate"
+  description: "Verander de kleurtemperatuur van actieve lampen"
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: sensor.kleurtemperatuur_verlichting
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
+  action:
+    - repeat:
+        for_each:
+          - "light.keuken_zha_group_0x0002"
+          - "light.woonkamer_zha_group_0x0003"
+          - "light.slaapkamer_zha_group_0x0005"
+          - "light.lamp_bioscoopkamer"
+        sequence:
+          - if:
+              - "{{ is_state(repeat.item, 'on') }}" # verlichting moet ingeschakeld zijn, anders zetten onderstaande acties onbedoeld de verlichting aan.
+            then:
+              - service: light.turn_on
+                target:
+                  entity_id: "{{ repeat.item }}"
+                data:
+                  color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
+
 - id: 4f96b956-cc4f-4ac7-b046-4b6bc073e417
   alias: "Verlichting: Woonkamer"
   description: >-
@@ -49,9 +75,6 @@
     - platform: time
       at: input_datetime.light_woonkamer_night_time
       id: "verlichting_uit"
-    - platform: state
-      entity_id: sensor.kleurtemperatuur_verlichting
-      id: "kleurtemp_update"
   variables:
     transitie: &transitietijd 30
     brightness_pct: &helderheid "{{ int(states('input_number.verlichting_woonkamer_lichtsterkte'), 30) }}"
@@ -66,17 +89,9 @@
     - choose:
         - conditions:
             - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders zetten onderstaande acties onbedoeld de verlichting aan.
-            - "{{ trigger.id in ['kleurtemp_update', 'helderheid_verlagen', 'woonkamer_dag'] }}"
+            - "{{ trigger.id in ['helderheid_verlagen', 'woonkamer_dag'] }}"
           sequence:
             - choose:
-                - conditions:
-                    - "{{ trigger.id == 'kleurtemp_update' }}"
-                  sequence:
-                    - service: light.turn_on
-                      target:
-                        entity_id: *verlichting
-                      data:
-                        color_temp_kelvin: *color_temp
                 - conditions:
                     - "{{ trigger.id == 'helderheid_verlagen' }}"
                   #  - alias: "Voorkom dat deze automatisering andere triggers overschrijft, door deze alleen uit te voeren voordat het nacht wordt."
