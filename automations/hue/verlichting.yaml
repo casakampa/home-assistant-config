@@ -13,6 +13,7 @@
           - "light.keuken_zha_group_0x0002"
           - "light.woonkamer_zha_group_0x0003"
           - "light.slaapkamer_zha_group_0x0005"
+          - "light.spot_eettafel"
           - "light.lamp_bioscoopkamer"
         sequence:
           - if:
