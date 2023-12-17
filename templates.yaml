@@ -34,6 +34,7 @@
       availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
     - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
       name: "Kleurtemperatuur verlichting"
+      icon: mdi:palette
       state: >-
         {% set elevation = float(state_attr('sun.sun', 'elevation')) %}
         {% set min_elevation = -5.0 %}

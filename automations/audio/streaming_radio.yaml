@@ -15,6 +15,12 @@
         - input_boolean.play_media_sonos_slaapkamer
         - input_boolean.play_media_sonos_woonkamer
       id: boolean_play_media
+    - platform: state
+      entity_id: zone.home
+      to: "0"
+      for:
+        minutes: 15
+      id: "not_home"
   action:
     - choose:
         - conditions:
@@ -100,5 +106,17 @@
                         entity_id:
                           - media_player.sonos_woonkamer
                           - media_player.sonos_slaapkamer
+        - conditions:
+            - "{{ trigger.id == 'not_home' }}"
+          sequence:
+            - if:
+                - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+              then:
+                - alias: "Stop met streaming radio"
+                  service: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.play_streaming_radio
+              else:
+                - stop: "Streaming radio was niet actief."
       default:
-        - stop: "Er zit een fout in de logica van deze automatisering "
+        - stop: "De automatisering word gestopt, want deze trigger kan nu niet worden uitgevoerd."

@@ -27,7 +27,7 @@
       after: input_datetime.light_home_day_time
     # De logica hieronder controleert elke minuut of het tijdstip groter of gelijk is aan de waarde die de input_datetimes bevatten.
     # Met deze logica valt het opgegeven moment van uitschakelen altijd binnen deze controle, omdat hier 5 minuten bij opgeteld worden.
-    - "{{ states('sensor.time') <= (today_at(states('input_datetime.plug_woonkamer_night_time')) + timedelta(minutes=5)).strftime('%H:%M') }}"
+    - "{{ now() <= (today_at(states('input_datetime.plug_woonkamer_night_time')) + timedelta(minutes=5)) }}"
   variables:
     stekker: "switch.stekker_woonkamer"
   action:
