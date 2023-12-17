@@ -1,13 +1,32 @@
 - id: bb7d4420-e350-41af-9e1f-4c5e69ce878e
   alias: Sync Sonos Volume
   trigger:
-    platform: state
-    entity_id: input_number.sonos_media_volume
+    - platform: state
+      entity_id: input_number.sonos_media_volume
+      id: ha_volume
+    - platform: state
+      entity_id:
+        - media_player.sonos_slaapkamer
+        - media_player.sonos_woonkamer
+      attribute: volume_level
+  mode: restart
   action:
-    - service: media_player.volume_set
-      target:
-        entity_id:
-          - media_player.sonos_slaapkamer
-          - media_player.sonos_woonkamer
-      data:
-        volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
+    - if:
+        - "{{ trigger.id == 'ha_volume' }}"
+        - "{{ this.attributes.current == 0 }}"
+      then:
+        - alias: "Synchroniseer het Home Assistant volume met de Sonos luidsprekers."
+          service: media_player.volume_set
+          target:
+            entity_id:
+              - media_player.sonos_slaapkamer
+              - media_player.sonos_woonkamer
+          data:
+            volume_level: "{{ min(int(states('input_number.sonos_media_volume')) / 100, 80) }}"
+      else:
+        - alias: "Synchroniseer het Sonos luidspreker volume met het Home Assistant volume."
+          service: input_number.set_value
+          target:
+            entity_id: input_number.sonos_media_volume
+          data:
+            value: "{{ min(int(float(state_attr('media_player.sonos_slaapkamer', 'volume_level'), 0.5) | multiply(100)), 80) }}"
