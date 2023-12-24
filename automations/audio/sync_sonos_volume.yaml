@@ -9,24 +9,39 @@
         - media_player.sonos_slaapkamer
         - media_player.sonos_woonkamer
       attribute: volume_level
-  mode: restart
+  mode: single
+  variables:
+    volume_home_assistant: "{{ min(int(states('input_number.sonos_media_volume'), 80) / 100, 0.8) }}"
+    volume_sonos: >
+      {{ states.media_player
+        | selectattr('entity_id', 'contains', 'sonos')
+        | selectattr('state', 'eq', 'playing')
+        | map(attribute='attributes.volume_level')
+        | list
+        | first
+        | default(0.5) }}
+  condition:
+    - "{{ volume_home_assistant != volume_sonos }}"
+    - "{{ this.attributes.current == 0 }}"
   action:
     - if:
         - "{{ trigger.id == 'ha_volume' }}"
-        - "{{ this.attributes.current == 0 }}"
       then:
-        - alias: "Synchroniseer het Home Assistant volume met de Sonos luidsprekers."
+        - alias: "Synchroniseer het Home Assistant volume met de Sonos luidspreker(s)."
           service: media_player.volume_set
           target:
-            entity_id:
-              - media_player.sonos_slaapkamer
-              - media_player.sonos_woonkamer
+            entity_id: >
+              {{ states.media_player
+                | selectattr('entity_id', 'contains', 'sonos')
+                | selectattr('state', 'eq', 'playing')
+                | map(attribute='entity_id')
+                | list }}
           data:
-            volume_level: "{{ min(int(states('input_number.sonos_media_volume')) / 100, 80) }}"
+            volume_level: "{{ volume_home_assistant }}"
       else:
         - alias: "Synchroniseer het Sonos luidspreker volume met het Home Assistant volume."
           service: input_number.set_value
           target:
             entity_id: input_number.sonos_media_volume
           data:
-            value: "{{ min(int(float(state_attr('media_player.sonos_slaapkamer', 'volume_level'), 0.5) | multiply(100)), 80) }}"
+            value: "{{ min(int(volume_sonos | multiply(100)), 80) }}"
