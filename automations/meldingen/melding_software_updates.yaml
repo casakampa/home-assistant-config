@@ -6,7 +6,6 @@
         - sensor.home_assistant_core
         - sensor.home_assistant_supervisor
         - sensor.home_assistant_os
-        - sensor.zimbra_8_8_patch
         - sensor.afvalwijzer
         - sensor.dsmr_reader
         - sensor.nextcloud
