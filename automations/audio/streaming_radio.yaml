@@ -1,8 +1,5 @@
 - id: 0bb4ce9e-cb8d-41e7-9da7-01a69d280518
   alias: Streaming Radio
-  variables:
-    boolean_woonkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
-    boolean_slaapkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
   trigger:
     - platform: state
       entity_id: input_boolean.play_streaming_radio
@@ -21,6 +18,9 @@
       for:
         minutes: 15
       id: "not_home"
+  variables:
+    boolean_woonkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
+    boolean_slaapkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
   action:
     - choose:
         - conditions:
@@ -32,7 +32,7 @@
                         - "{{ trigger.id == 'select_streaming_radio' }}"
                         - "{{ trigger.id == 'boolean_play_media' and trigger.to_state.state == 'on' }}"
           sequence:
-            - alias: "Controleer de actieve luidsprekers"
+            - alias: "Controleer of er groep gemaakt moet worden van de geselecteerde luidspreker(s)"
               if:
                 - "{{ boolean_slaapkamer_is_on }}"
                 - "{{ boolean_woonkamer_is_on }}"
@@ -42,12 +42,22 @@
                     entity_id: media_player.sonos_woonkamer
                   data:
                     group_members: media_player.sonos_slaapkamer
-            - if:
+              else:
+                - service: media_player.unjoin
+                  target:
+                    entity_id: >
+                      {{ states.media_player
+                        | selectattr('entity_id', 'contains', 'sonos')
+                        | map(attribute='entity_id')
+                        | list }}
+            - alias: "Controleer op welke geselecteerde luidspreker(s) gestreamd moet worden"
+              if:
                 - or:
                     - "{{ boolean_slaapkamer_is_on }}"
                     - "{{ boolean_woonkamer_is_on }}"
               then:
-                - service: script.turn_on
+                - alias: "Start streaming radio op de geselecteerde luidspreker(s)"
+                  service: script.turn_on
                   target:
                     entity_id: script.start_streaming_radio
                   data:
@@ -74,38 +84,30 @@
           sequence:
             - if:
                 - "{{ trigger.id == 'boolean_play_media' and trigger.to_state.state == 'off' }}"
-              then:
-                - if:
-                    - or:
-                        - "{{ boolean_slaapkamer_is_on }}"
-                        - "{{ boolean_woonkamer_is_on }}"
-                  then:
-                    - service: media_player.unjoin
-                      target:
-                        entity_id: >
-                          {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
-                    - alias: "Stop met streaming van specifieke luidspreker"
-                      service: media_player.media_stop
-                      target:
-                        entity_id: >
-                          {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
-                    - stop: "Ga niet verder."
-              else:
-                - alias: "Stop met streaming van specifieke luidspreker"
-                  service: media_player.media_stop
-                  target:
-                    entity_id:
-                      - media_player.sonos_slaapkamer
-                      - media_player.sonos_woonkamer
-                - if:
+                - or:
                     - "{{ boolean_slaapkamer_is_on }}"
                     - "{{ boolean_woonkamer_is_on }}"
-                  then:
-                    - service: media_player.unjoin
-                      target:
-                        entity_id:
-                          - media_player.sonos_woonkamer
-                          - media_player.sonos_slaapkamer
+              then:
+                - alias: "Verwijder deze luidspreker uit de groep van luidsprekers"
+                  service: media_player.unjoin
+                  target:
+                    entity_id: >
+                      {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
+                - alias: "Stop met streaming naar deze luidspreker"
+                  service: media_player.media_stop
+                  target:
+                    entity_id: >
+                      {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
+              else:
+                - alias: "Stop met streaming naar alle actieve luidsprekers"
+                  service: media_player.media_stop
+                  target:
+                    entity_id: >
+                      {{ states.media_player
+                        | selectattr('entity_id', 'contains', 'sonos')
+                        | selectattr('state', 'eq', 'playing')
+                        | map(attribute='entity_id')
+                        | list }}
         - conditions:
             - "{{ trigger.id == 'not_home' }}"
           sequence:
