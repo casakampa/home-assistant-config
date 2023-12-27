@@ -5,43 +5,55 @@
       entity_id: input_number.sonos_media_volume
       id: ha_volume
     - platform: state
-      entity_id:
-        - media_player.sonos_slaapkamer
-        - media_player.sonos_woonkamer
-      attribute: volume_level
+      entity_id: input_boolean.mute_streaming_radio
+      id: mute_volume
   mode: restart
-  variables:
-    volume_home_assistant: "{{ min(int(states('input_number.sonos_media_volume'), 80) / 100, 0.8) }}"
-    volume_sonos: >
-      {{ states.media_player
-        | selectattr('entity_id', 'contains', 'sonos')
-        | selectattr('state', 'eq', 'playing')
-        | map(attribute='attributes.volume_level')
-        | list
-        | first
-        | default(int(states('input_number.sonos_media_volume'), 40) / 100) }}
   condition:
-    - "{{ volume_home_assistant != volume_sonos }}"
     - "{{ this.attributes.current == 0 }}"
   action:
-    - if:
-        - "{{ trigger.id == 'ha_volume' }}"
-      then:
-        - alias: "Synchroniseer het Home Assistant volume met de Sonos luidspreker(s)."
-          service: media_player.volume_set
-          target:
-            entity_id: >
-              {{ states.media_player
-                | selectattr('entity_id', 'contains', 'sonos')
-                | selectattr('state', 'eq', 'playing')
-                | map(attribute='entity_id')
-                | list }}
-          data:
-            volume_level: "{{ volume_home_assistant }}"
-      else:
-        - alias: "Synchroniseer het Sonos luidspreker volume met het Home Assistant volume."
-          service: input_number.set_value
-          target:
-            entity_id: input_number.sonos_media_volume
-          data:
-            value: "{{ min(int(volume_sonos | multiply(100)), 80) }}"
+    - choose:
+        - conditions:
+            - "{{ trigger.id == 'mute_volume' }}"
+          sequence:
+            - alias: "Check of het volume wordt gedempt of dat het dempen wordt opgeheven."
+              if:
+                - "{{ trigger.to_state.state == 'on' }}"
+              then:
+                - alias: "Demp actieve luidspreker(s)."
+                  service: media_player.volume_mute
+                  target:
+                    entity_id: >
+                      {{ states.media_player
+                        | selectattr('entity_id', 'contains', 'sonos')
+                        | selectattr('state', 'eq', 'playing')
+                        | map(attribute='entity_id')
+                        | list }}
+                  data:
+                    is_volume_muted: true
+              else:
+                - alias: "Heft demping actieve luidspreker(s) op."
+                  service: media_player.volume_mute
+                  target:
+                    entity_id: >
+                      {{ states.media_player
+                        | selectattr('entity_id', 'contains', 'sonos')
+                        | selectattr('state', 'eq', 'playing')
+                        | selectattr('attributes.is_volume_muted', 'eq', True)
+                        | map(attribute='entity_id')
+                        | list }}
+                  data:
+                    is_volume_muted: false
+        - conditions:
+            - "{{ trigger.id == 'ha_volume' }}"
+          sequence:
+            - alias: "Synchroniseer het Home Assistant volume met de Sonos luidspreker(s)."
+              service: media_player.volume_set
+              target:
+                entity_id: >
+                  {{ states.media_player
+                    | selectattr('entity_id', 'contains', 'sonos')
+                    | selectattr('state', 'eq', 'playing')
+                    | map(attribute='entity_id')
+                    | list }}
+              data:
+                volume_level: "{{ min(int(states('input_number.sonos_media_volume'), 80) / 100, 0.8) }}"

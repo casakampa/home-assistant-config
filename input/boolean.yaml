@@ -81,3 +81,6 @@ play_media_sonos_slaapkamer:
 play_streaming_radio:
   name: Speel streaming radio
   icon: mdi:radio
+mute_streaming_radio:
+  name: Demp streaming radio
+  icon: mdi:volume-mute
