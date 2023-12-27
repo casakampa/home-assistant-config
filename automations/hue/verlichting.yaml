@@ -414,3 +414,25 @@
         - service: light.turn_off
           target:
             entity_id: "{{ lamp }}"
+
+- id: 3aace0f0-00a2-4c66-96f4-958d873cf660
+  alias: "Verlichting: Slaapkamer (computer)"
+  description: "Deze automatisering regelt de verlichting in de slaapkamer bij het inschakelen van de computer"
+  trigger:
+    - platform: state
+      entity_id: device_tracker.gamepc_ryzen5
+      to: "home"
+    - platform: state
+      entity_id: binary_sensor.woonkamer_dag
+      to: "off"
+  condition:
+    - "{{ is_state('binary_sensor.woonkamer_dag', 'off') }}"
+    - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
+  action:
+    - alias: "Activeer de verlichting in de slaapkamer via automation.verlichting_slaapkamer_dimmer"
+      service: automation.trigger
+      target:
+        entity_id: automation.verlichting_slaapkamer_dimmer
+      data:
+        variables:
+          command: "on_short_release"
