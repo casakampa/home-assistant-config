@@ -422,9 +422,15 @@
     - platform: state
       entity_id: device_tracker.gamepc_ryzen5
       to: "home"
+      id: "on"
     - platform: state
       entity_id: binary_sensor.woonkamer_dag
       to: "off"
+      id: "on"
+    - platform: state
+      entity_id: binary_sensor.woonkamer_dag
+      to: "on"
+      id: "off"
   condition:
     - "{{ is_state('binary_sensor.woonkamer_dag', 'off') }}"
     - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
@@ -435,4 +441,4 @@
         entity_id: automation.verlichting_slaapkamer_dimmer
       data:
         variables:
-          command: "on_short_release"
+          command: "{{ trigger.id }}_short_release"
