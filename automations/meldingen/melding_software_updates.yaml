@@ -17,6 +17,7 @@
         - sensor.authelia
         - sensor.apexcharts_card
         - sensor.lovelace_mushroom
+        - sensor.docker_mailserver
       not_from:
         - "unavailable"
         - "unknown"

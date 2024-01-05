@@ -15,7 +15,7 @@
   headers:
     accept: application/vnd.github.v3+json
     content-type: application/json
-    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/120.0"
+    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"
 
 # Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
 - platform: rest
@@ -58,7 +58,7 @@
 # Check GitHub repository kalkih/mini-graph-card via https://api.github.com/repos/kalkih/mini-graph-card/releases
 - platform: rest
   unique_id: 8ad8b831-6662-40e9-abb3-e5bae0f8da52
-  scan_interval: 86400
+  scan_interval: 172800
   resource: https://api.github.com/repos/kalkih/mini-graph-card/releases
   name: "Mini Graph"
   icon: mdi:chart-timeline-variant
@@ -133,7 +133,7 @@
 # Check GitHub repository piitaya/lovelace-mushroom via https://api.github.com/repos/piitaya/lovelace-mushroom/releases
 - platform: rest
   unique_id: 4d604fc3-6443-47f9-9d5f-51c468b09c59
-  scan_interval: 86400
+  scan_interval: 172800
   resource: https://api.github.com/repos/piitaya/lovelace-mushroom/releases
   name: "Lovelace Mushroom"
   icon: mdi:mushroom
@@ -152,10 +152,29 @@
 # Check GitHub repository RomRider/apexcharts-card via https://api.github.com/repos/romrider/apexcharts-card/releases
 - platform: rest
   unique_id: c4ab2f5e-721c-4f21-9d40-46a3f2e4d96c
-  scan_interval: 86400
+  scan_interval: 172800
   resource: https://api.github.com/repos/romrider/apexcharts-card/releases
   name: "Apexcharts Card"
   icon: mdi:chart-areaspline
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository docker-mailserver/docker-mailserver via https://api.github.com/repos/docker-mailserver/docker-mailserver/releases
+- platform: rest
+  unique_id: a1bb24aa-cb85-43c2-b9c8-67e16837981a
+  scan_interval: 86400
+  resource: https://api.github.com/repos/docker-mailserver/docker-mailserver/releases
+  name: "Docker Mailserver"
+  icon: mdi:email-outline
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
