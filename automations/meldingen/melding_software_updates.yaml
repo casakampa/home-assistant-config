@@ -18,6 +18,7 @@
         - sensor.apexcharts_card
         - sensor.lovelace_mushroom
         - sensor.docker_mailserver
+        - sensor.roundcube_webmail
       not_from:
         - "unavailable"
         - "unknown"
@@ -37,7 +38,7 @@
       condition: template
       value_template: >-
         {{ iif(trigger.entity_id == 'sensor.nextcloud',
-        states('sensor.nextcloud') | version > 27,
+        states('sensor.nextcloud') | version > 28,
         True) }}
   action:
     - alias: "Stuur een notificatie over de software update"
