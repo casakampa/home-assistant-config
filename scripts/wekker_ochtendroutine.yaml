@@ -144,7 +144,7 @@ controle_daglicht_woonkamer:
   sequence:
     - alias: "Schakel de verlichting van woonkamer en keuken in bij onvoldoende daglicht"
       if:
-        - "{{ is_state('binary_sensor.woonkamer_dag', 'off') }}"
+        - "{{ not is_state('sensor.drempelwaarde_woonkamer', 'dag') }}"
       then:
         - parallel:
             - service: light.turn_on

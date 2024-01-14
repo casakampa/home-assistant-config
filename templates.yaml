@@ -135,6 +135,54 @@
       state: "{{ iif(is_state(trigger.entity_id, 'on'), 'Actief', 'Vakantie') }}"
       icon: "{{ iif(is_state(trigger.entity_id, 'on'), 'mdi:alarm', 'mdi:beach') }}"
       availability: "{{ has_value(trigger.entity_id) }}"
+- trigger:
+    - platform: state
+      entity_id: sensor.hue_motion_woonkamer_illuminance
+  sensor:
+    - unique_id: c591b645-8202-429e-96ec-628529e9958a
+      name: "Drempelwaarde Woonkamer"
+      state: >-
+        {% set sensor = int(states(trigger.entity_id)) %}
+        {% if sensor > 8 %}
+        dag
+        {% elif 2 <= sensor <= 8 %}
+        schemer
+        {% else %}
+        nacht
+        {% endif %}
+      availability: "{{ has_value('sensor.hue_motion_woonkamer_illuminance') }}"
+- trigger:
+    - platform: state
+      entity_id: sensor.hue_motion_gang_illuminance
+  sensor:
+    - unique_id: 8963c6da-0bc3-4082-9085-cb65fa936fcc
+      name: "Drempelwaarde Gang"
+      state: >-
+        {% set sensor = int(states(trigger.entity_id)) %}
+        {% if sensor > 6 %}
+        dag
+        {% elif 2 <= sensor <= 6 %}
+        schemer
+        {% else %}
+        nacht
+        {% endif %}
+      availability: "{{ has_value('sensor.hue_motion_gang_illuminance') }}"
+- trigger:
+    - platform: state
+      entity_id: sensor.hue_motion_achtertuin_illuminance
+  sensor:
+    - unique_id: 07999eb9-08b8-4cb6-a098-349e2414fab2
+      name: "Drempelwaarde Achtertuin"
+      state: >-
+        {% set sensor = int(states(trigger.entity_id)) %}
+        {% if sensor > 25 %}
+        dag
+        {% elif 5 <= sensor <= 25 %}
+        schemer
+        {% else %}
+        nacht
+        {% endif %}
+      availability: "{{ has_value('sensor.hue_motion_achtertuin_illuminance') }}"
 # Knoppen om scripts te activeren
 - button:
     - unique_id: b4ad4b16-567e-4ba4-a7c4-4a9d47650493

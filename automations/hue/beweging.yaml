@@ -24,7 +24,7 @@
     - "{{ has_value(trigger.entity_id) }}"
     - *beweging_gedetecteerd
     - and:
-        - "{{ is_state('binary_sensor.woonkamer_nacht', 'on') }}"
+        - "{{ is_state('sensor.drempelwaarde_woonkamer', 'nacht') }}"
         - "{{ is_state('input_boolean.visite', 'off') }}"
         - or:
             - condition: time
@@ -146,14 +146,14 @@
     lamp: "light.buitenlamp_achtertuin"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
-    - "{{ is_state('binary_sensor.achtertuin_dag', 'off') }}"
+    - "{{ not is_state('sensor.drempelwaarde_achtertuin', 'dag') }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - *beweging_gedetecteerd
       then:
         - if:
-            - "{{ is_state('binary_sensor.achtertuin_schemer', 'on')}}"
+            - "{{ is_state('sensor.drempelwaarde_achtertuin', 'schemer') }}"
           then:
             - alias: "Wordt uitgevoerd bij schemer"
               <<: *lamp_aan

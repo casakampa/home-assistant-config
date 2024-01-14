@@ -190,7 +190,7 @@ deurbel_verander_helderheid_lamp_gang_bij_aanbellen:
   description: "Verandert de helderheid van de Hue lamp in de gang wanneer het schemert of nacht is volgens een binaire sensor, wanneer de lamp is ingeschakeld en Maarten thuis is"
   sequence:
     - condition: template
-      value_template: "{{ is_state('binary_sensor.gang_dag', 'off' ) }}"
+      value_template: "{{ not is_state('sensor.drempelwaarde_gang', 'dag' ) }}"
     - alias: "Zet de automatisering uit voor de verlichting in de gang"
       service: automation.turn_off
       target:

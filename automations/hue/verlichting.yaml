@@ -46,8 +46,8 @@
     stored_traces: 40
   trigger:
     - platform: state
-      entity_id: binary_sensor.woonkamer_dag
-      to: "on"
+      entity_id: sensor.drempelwaarde_woonkamer
+      to: "dag"
       for:
         minutes: 2
       id: "woonkamer_dag"
@@ -56,8 +56,8 @@
       from: "0"
       id: "thuiskomst"
     - platform: state
-      entity_id: binary_sensor.woonkamer_schemer
-      to: "on"
+      entity_id: sensor.drempelwaarde_woonkamer
+      to: "schemer"
       for:
         minutes: 2
       id: "woonkamer_schemer"
@@ -144,7 +144,7 @@
                             - "{{ trigger.id == 'woonkamer_schemer' }}"
                             - and:
                                 - "{{ trigger.id == 'thuiskomst' }}"
-                                - "{{ is_state('binary_sensor.woonkamer_schemer', 'on') }}"
+                                - "{{ is_state('sensor.drempelwaarde_woonkamer', 'schemer') }}"
                         - alias: "Alleen wanneer het script van de ochtendroutine inactief is"
                           condition: state
                           entity_id: script.wekker_met_ochtendroutine
@@ -228,8 +228,8 @@
   mode: restart
   trigger:
     - platform: state
-      entity_id: binary_sensor.achtertuin_schemer
-      to: "on"
+      entity_id: sensor.drempelwaarde_achtertuin
+      to: "schemer"
       id: "schemer"
     - platform: state
       entity_id: switch.stekker_bioscoopkamer
@@ -417,22 +417,15 @@
 
 - id: 3aace0f0-00a2-4c66-96f4-958d873cf660
   alias: "Verlichting: Slaapkamer (computer)"
-  description: "Deze automatisering regelt de verlichting in de slaapkamer bij het inschakelen van de computer"
+  description: "Deze automatisering regelt de verlichting in de slaapkamer bij gebruik van de computer"
   trigger:
     - platform: state
       entity_id: device_tracker.gamepc_ryzen5
       to: "home"
-      id: "on"
     - platform: state
-      entity_id: binary_sensor.woonkamer_dag
-      to: "off"
-      id: "on"
-    - platform: state
-      entity_id: binary_sensor.woonkamer_dag
-      to: "on"
-      id: "off"
+      entity_id: sensor.drempelwaarde_woonkamer
   condition:
-    - "{{ is_state('binary_sensor.woonkamer_dag', 'off') }}"
+    - "{{ has_value(trigger.entity_id) }}"
     - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
   action:
     - alias: "Activeer de verlichting in de slaapkamer via automation.verlichting_slaapkamer_dimmer"
@@ -441,4 +434,5 @@
         entity_id: automation.verlichting_slaapkamer_dimmer
       data:
         variables:
-          command: "{{ trigger.id }}_short_release"
+          command: >
+            {{ iif( is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on' }}_short_release
