@@ -279,6 +279,6 @@
     media_player: "media_player.chromecast_woonkamer"
     brightness: 75
     transition: 1
-    light: "light.spot_eettafel"
+    light: "light.eethoek_zha_group_0x0009"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
   action: *hue_dimmer_logica

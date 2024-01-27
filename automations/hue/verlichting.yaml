@@ -13,7 +13,7 @@
           - "light.keuken_zha_group_0x0002"
           - "light.woonkamer_zha_group_0x0003"
           - "light.slaapkamer_zha_group_0x0005"
-          - "light.spot_eettafel"
+          - "light.eethoek_zha_group_0x0009"
           - "light.lamp_bioscoopkamer"
         sequence:
           - if:
@@ -435,4 +435,4 @@
       data:
         variables:
           command: >
-            {{ iif( is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on' }}_short_release
+            {{ iif( is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
