@@ -26,7 +26,7 @@ update_travel_time_to_aventus_apeldoorn:
         service: notify.iphone_12
         data:
           message: &bericht >-
-            {{ 'De verwachte reistijd naar ' ~ werklocatie ~ ' is ' ~ 
+            {{ 'Verkeersinformatie: De verwachte reistijd naar ' ~ werklocatie ~ ' is ' ~ 
             iif(is_number(reistijd), reistijd ~ ' minuten.' ~ 
               iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
               ' Dit is langer dan gewoonlijk.',
