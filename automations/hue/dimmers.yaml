@@ -10,6 +10,7 @@
       event_type: zha_event
       event_data:
         device_id: ffa7a6d89a911af5c5c96267dd5491fd
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.lg_oled"
@@ -180,6 +181,7 @@
       event_type: zha_event
       event_data:
         device_id: 13eea38ac9f669fba8af67a6bcb10ba5
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.chromecast_woonkamer"
@@ -199,6 +201,7 @@
       event_type: zha_event
       event_data:
         device_id: 13eea38ac9f669fba8af67a6bcb10ba5
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     automation: "automation.verlichting_keuken_beweging"
@@ -235,7 +238,13 @@
     - platform: event
       event_type: zha_event
       event_data:
-        device_id: 091f815c74eb50b132fcca673d5afac8
+        device_id: 091f815c74eb50b132fcca673d5afac8 # Hue Dimmer V1
+        cluster_id: 64512
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 7c7a67688e3e2118b866cb472fd357e7 # Hue Dimmer V2
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.chromecast_woonkamer"
@@ -255,6 +264,7 @@
       event_type: zha_event
       event_data:
         device_id: 391b89c7a470fd7526bdaf1aece07030
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.chromecast_woonkamer"
@@ -274,10 +284,11 @@
       event_type: zha_event
       event_data:
         device_id: 23290843fd07fcf9dccf2f447737d85a
+        cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.chromecast_woonkamer"
-    brightness: 75
+    brightness: 60
     transition: 1
     light: "light.eethoek_zha_group_0x0009"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"

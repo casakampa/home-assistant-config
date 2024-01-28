@@ -20,6 +20,7 @@
         - sensor.deursensor_trapkast_power
         - sensor.aqara_motion_keuken_power
         - sensor.aqara_motion_toilet_power
+        - sensor.hue_dimmer_v2_slaapkamer_power
       below: input_number.drempelwaarde_batterijniveau
   mode: queued
   condition:
