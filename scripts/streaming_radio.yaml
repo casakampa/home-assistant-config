@@ -22,3 +22,35 @@ start_streaming_radio:
       target:
         entity_id: >
           {{ media_player }}
+
+prepare_streaming_radio:
+  alias: "Prepare streaming radio"
+  icon: mdi:play-circle
+  variables:
+    speaker: "{{ kamer }}"
+    station: "{{ radio_station }}"
+    volume: "{{ volume_level }}"
+  sequence:
+    - service: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.play_media_sonos_woonkamer
+          - input_boolean.play_media_sonos_slaapkamer
+    - delay:
+        milliseconds: 100
+    - service: input_boolean.turn_on
+      target:
+        entity_id: "input_boolean.play_media_sonos_{{ speaker }}"
+    - service: input_select.select_option
+      target:
+        entity_id: input_select.internet_radio_streams
+      data:
+        option: "{{ station }}"
+    - service: input_number.set_value
+      target:
+        entity_id: input_number.sonos_media_volume
+      data:
+        value: "{{ min(volume, 80) }}"
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.play_streaming_radio

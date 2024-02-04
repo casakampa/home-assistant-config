@@ -87,9 +87,15 @@ wekker_met_ochtendroutine:
           target:
             entity_id: *slaapkamer
         # Zet de radio aan
-        - service: input_boolean.turn_on
+        - alias: "Zet de radio aan met deze instellingen"
+          service: script.turn_on
           target:
-            entity_id: input_boolean.play_streaming_radio
+            entity_id: script.prepare_streaming_radio
+          data:
+            variables:
+              kamer: "woonkamer"
+              radio_station: "BNR Nieuwsradio"
+              volume_level: 50
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
       if:
