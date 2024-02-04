@@ -427,6 +427,7 @@
   condition:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
+    - "{{ is_state('sun.sun', 'below_horizon') }}"
   action:
     - alias: "Activeer de verlichting in de slaapkamer via automation.verlichting_slaapkamer_dimmer"
       service: automation.trigger
