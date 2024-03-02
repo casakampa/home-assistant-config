@@ -11,7 +11,6 @@
         - sensor.nextcloud
         - sensor.caddy
         - sensor.z_stack_coordinator_firmware
-        - sensor.hue_lampen_software_versie
         - sensor.nuc12_uefi
         - sensor.b550i_aorus_pro_ax_bios
         - sensor.authelia
