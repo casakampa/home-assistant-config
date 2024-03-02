@@ -64,3 +64,8 @@ timer: !include timer.yaml
 template: !include templates.yaml
 mqtt: !include mqtt.yaml
 rest: !include rest.yaml
+
+zha:
+  zigpy_config:
+    ota:
+      z2m_remote_index: https://raw.githubusercontent.com/Koenkk/zigbee-OTA/master/index.json
