@@ -2,7 +2,7 @@ tts_kliko_wegzetten:
   alias: "TTS: Kliko aan de weg"
   icon: "mdi:delete"
   variables:
-    afvalsoort: &afvalsoort "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
+    afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
   sequence:
     - service: media_player.volume_set
       target:
