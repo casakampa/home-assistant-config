@@ -68,9 +68,6 @@ wekker_met_ochtendroutine:
           service: script.turn_on
           target:
             entity_id: script.tts_statusupdate
-          data:
-            variables:
-              werklocatie: "{{ werklocatie }}"
         - service: notify.iphone_12
           data:
             message: "Tijd om uit bed te stappen."
@@ -88,14 +85,11 @@ wekker_met_ochtendroutine:
             entity_id: *slaapkamer
         # Zet de radio aan
         - alias: "Zet de radio aan met deze instellingen"
-          service: script.turn_on
-          target:
-            entity_id: script.prepare_streaming_radio
+          service: script.prepare_streaming_radio
           data:
-            variables:
-              kamer: "woonkamer"
-              radio_station: "BNR Nieuwsradio"
-              volume_level: 50
+            kamer: "woonkamer"
+            station: "BNR Nieuwsradio"
+            volume: 50
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
       if:

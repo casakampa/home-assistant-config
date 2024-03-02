@@ -26,10 +26,16 @@ start_streaming_radio:
 prepare_streaming_radio:
   alias: "Prepare streaming radio"
   icon: mdi:play-circle
-  variables:
-    speaker: "{{ kamer }}"
-    station: "{{ radio_station }}"
-    volume: "{{ volume_level }}"
+  fields:
+    kamer:
+      description: "The room where the speaker is located"
+      example: "woonkamer"
+    station:
+      description: "The radio station to play"
+      example: "BNR Nieuwsradio"
+    volume:
+      description: "The volume level for the radio"
+      example: "50"
   sequence:
     - service: input_boolean.turn_off
       target:
@@ -40,7 +46,7 @@ prepare_streaming_radio:
         milliseconds: 100
     - service: input_boolean.turn_on
       target:
-        entity_id: "input_boolean.play_media_sonos_{{ speaker }}"
+        entity_id: "input_boolean.play_media_sonos_{{ kamer }}"
     - service: input_select.select_option
       target:
         entity_id: input_select.internet_radio_streams
