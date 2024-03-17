@@ -14,7 +14,7 @@ tts_test_wasmachine_mededeling:
   alias: "TTS: Test - Wasmachine mededeling"
   icon: "mdi:speaker-message"
   variables:
-    tijdstip: "08:16"
+    tijdstip: "{{states('input_datetime.time_for_testing')}}"
   sequence:
     - alias: "Test de notificatie voor de wasmachine"
       service: script.turn_on

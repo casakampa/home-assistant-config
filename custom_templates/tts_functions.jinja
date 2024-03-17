@@ -30,8 +30,10 @@
   {%- set uren = verschil // 3600 -%}
   {%- set minuten = (verschil % 3600) // 60 -%}
   {%- if uren > 0 -%}
-  {{ uren }} uur en {{ minuten }} {{ 'minuten' if minuten > 1 else 'minuut'}}
+  {{ uren }} uur en {{ minuten }} {{ 'minuut' if minuten == 1 else 'minuten'}} geleden
+  {%- elif minuten > 0 -%}
+  {{ minuten }} {{ 'minuut' if minuten == 1 else 'minuten'}} geleden
   {%- else -%}
-  {{ minuten }} {{ 'minuten' if minuten > 1 else 'minuut'}}
+  zojuist
   {%- endif -%}
 {%- endmacro -%}
