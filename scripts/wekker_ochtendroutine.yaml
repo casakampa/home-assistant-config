@@ -89,7 +89,7 @@ wekker_met_ochtendroutine:
           data:
             kamer: "woonkamer"
             station: "BNR Nieuwsradio"
-            volume: 50
+            volume: 30
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
       if:
