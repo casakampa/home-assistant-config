@@ -18,5 +18,5 @@ tts_wasprogramma_afgelopen:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
         message: >-
-          {% from 'tts_functions.jinja' import dutch_time_announcement %}
-          De was is klaar sinds {{ dutch_time_announcement(tijdstip) }} en zit nog in de wasmachine.
+          {% from 'tts_functions.jinja' import tijdverschil %}
+          Het wasprogramma is al {{ tijdverschil(tijdstip) }} geleden afgerond.
