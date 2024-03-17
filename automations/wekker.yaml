@@ -4,17 +4,10 @@
   initial_state: true
   mode: parallel
   trigger:
-    - platform: template
-      value_template: >-
-        {% set today = {'Monday': 'maandag', 'Tuesday': 'dinsdag', 'Wednesday': 'woensdag', 'Thursday': 'donderdag', 'Friday': 'vrijdag'}[now().strftime('%A')] %}
-        {% if now().isoweekday() in range(6) and is_state('input_boolean.wekker_' ~ today, 'on') and now() > today_at( states('input_datetime.wektijd_' ~ today) ) - timedelta( minutes = int(states('input_number.wekker_wake_up_tijdsspanne'), 15) ) %}
-          true
-        {% else %}
-          false
-        {% endif %}
-  condition:
-    - "{{ is_state('binary_sensor.workday_sensor', 'on') }}"
-    - "{{ is_state('sensor.wekkermodus', 'Actief') }}"
+    - platform: state
+      entity_id: "binary_sensor.wekker"
+      from: "off"
+      to: "on"
   action:
     - alias: "Genereer de juiste werkdag en geef de variabele werklocatie door aan script.wekker_met_ochtendroutine"
       service: script.turn_on
