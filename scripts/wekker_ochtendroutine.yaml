@@ -152,12 +152,12 @@ controle_daglicht_woonkamer:
                 entity_id: light.woonkamer_zha_group_0x0003
               data:
                 brightness_pct: 40
-                color_temp_kelvin: 2250
+                color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
             - service: light.turn_on
               target:
                 entity_id: light.keuken_zha_group_0x0002
               data:
-                brightness_pct: 25
-                color_temp_kelvin: 2500
+                brightness_pct: 30
+                color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       else:
         stop: "Er is voldoende daglicht aanwezig, de verlichting blijft uitgeschakeld."
