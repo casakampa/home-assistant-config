@@ -15,7 +15,7 @@
   headers:
     accept: application/vnd.github.v3+json
     content-type: application/json
-    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0"
+    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0"
 
 # Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
 - platform: rest
