@@ -37,19 +37,16 @@
       icon: mdi:palette
       state: >-
         {% set elevation = float(state_attr('sun.sun', 'elevation')) %}
-        {% set min_elevation = -5.0 %}
-        {% set max_elevation =  min(float(states('sensor.max_sun_elevation'), 60), 40) %}
-        {% set min_color_temp = 2500 %}
-        {% set max_color_temp = 4000 %}
-        {% set angle_factor = ((elevation / max_elevation) + 1.5) %}
-        {% if elevation <= min_elevation %}
-          {{ min_color_temp }}
-        {% elif elevation >= max_elevation %}
-          {{ max_color_temp }}
-        {% else %}
-          {% set temp = (((elevation - min_elevation) / (max_elevation - min_elevation)) * (max_color_temp - min_color_temp) * angle_factor + min_color_temp ) | round(-2) %}
-          {{ int(min(max_color_temp, temp)) }}
-        {% endif %}
+        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 40) %}
+          {% if elevation <= -5.0 %}
+            {{ 2500 }}
+          {% elif elevation >= max_elevation %}
+            {{ 4000 }}
+          {% else %}
+            {% set angle_factor = ((elevation / max_elevation) + 1.5) %}
+            {% set temp = (((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 ) | round(-2) %}
+            {{ int(min(4000, temp)) }}
+          {% endif %}
       unit_of_measurement: "K"
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       name: "Z-Stack coordinator firmware"
