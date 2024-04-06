@@ -265,7 +265,6 @@
         lichtsterkte_laag: 5
         lichtsterkte_hoog: 50
         lamp: &lamp "light.lamp_bioscoopkamer"
-        color_temp_kelvin: "2500"
         min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
     - alias: "Wat moet er gebeuren?"
       choose:
@@ -298,7 +297,7 @@
                       data:
                         transition: *transitie
                         brightness_pct: "{{ lichtsterkte_hoog }}"
-                        color_temp_kelvin: "{{ color_temp_kelvin }}"
+                        color_temp_kelvin: *color_temp
         - conditions:
             - "{{ is_state(lamp, 'on') }}"
           sequence:
@@ -323,7 +322,7 @@
                       data:
                         transition: *transitie
                         brightness_pct: "{{ lichtsterkte_hoog }}"
-                        color_temp_kelvin: "{{ color_temp_kelvin }}"
+                        color_temp_kelvin: *color_temp
                 - conditions:
                     - condition: trigger
                       id: "streaming_aan"
