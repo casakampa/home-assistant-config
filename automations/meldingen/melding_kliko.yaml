@@ -55,10 +55,10 @@
             tag: "{{ tag }}"
       - &action_stop_herinnering
         action: "{{ stop_herinnering }}"
-        title: "De kliko staat reeds aan de weg"
+        title: "Staat aan de weg"
       - &action_kliko_overslaan
         action: "{{ overslaan }}"
-        title: "De leging van deze kliko overslaan"
+        title: "Overslaan"
         destructive: true
       - &tts_kliko_wegzetten
         alias: "Stuur een TTS melding om de kliko weg te zetten"

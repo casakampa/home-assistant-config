@@ -19,4 +19,4 @@ tts_wasprogramma_afgelopen:
           - media_player.sonos_slaapkamer
         message: >-
           {% from 'tts_functions.jinja' import tijdverschil %}
-          Het wasprogramma is {{ tijdverschil(tijdstip) }} afgerond. Vergeet niet de was er op tijd uit te halen.
+          Het wasprogramma is {{ tijdverschil(tijdstip) }} afgerond.
