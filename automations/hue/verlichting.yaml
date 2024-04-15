@@ -228,6 +228,12 @@
   mode: restart
   trigger:
     - platform: state
+      entity_id: input_button.lg_pixel_refresh_kort
+      id: "pixel_refresh_kort"
+    - platform: state
+      entity_id: input_button.lg_pixel_refresh_lang
+      id: "pixel_refresh_lang"
+    - platform: state
       entity_id: sensor.drempelwaarde_achtertuin
       to: "schemer"
       id: "schemer"
@@ -257,17 +263,52 @@
         - "YouTube"
         - "NPO"
       id: "streaming_aan"
+  variables:
+    stekker: "switch.stekker_bioscoopkamer"
+    zon: "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
+    transitie: &transitie 5
+    lichtsterkte_laag: 5
+    lichtsterkte_hoog: 50
+    lamp: &lamp "light.lamp_bioscoopkamer"
+    min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
+    pixel_refresh_kort: 15
+    pixel_refresh_lang: 1
+    anchors:
+      - &deactiveer_lamp_bioscoopkamer
+        service: light.turn_off
+        target:
+          entity_id: light.lamp_bioscoopkamer
+      - &deactiveer_stekker_bioscoopkamer
+        service: switch.turn_off
+        target:
+          entity_id: switch.stekker_bioscoopkamer
   action:
-    - variables:
-        stekker: "switch.stekker_bioscoopkamer"
-        zon: "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
-        transitie: &transitie 5
-        lichtsterkte_laag: 5
-        lichtsterkte_hoog: 50
-        lamp: &lamp "light.lamp_bioscoopkamer"
-        min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
     - alias: "Wat moet er gebeuren?"
       choose:
+        - conditions:
+            - "{{ trigger.id in ['pixel_refresh_kort', 'pixel_refresh_lang'] }}"
+          sequence:
+            choose:
+              - conditions:
+                  - condition: trigger
+                    id: "pixel_refresh_kort"
+                sequence:
+                  - delay:
+                      seconds: 30
+                  - *deactiveer_lamp_bioscoopkamer
+                  - delay:
+                      minutes: "{{ pixel_refresh_kort }}"
+                  - *deactiveer_stekker_bioscoopkamer
+              - conditions:
+                  - condition: trigger
+                    id: "pixel_refresh_lang"
+                sequence:
+                  - delay:
+                      seconds: 30
+                  - *deactiveer_lamp_bioscoopkamer
+                  - delay:
+                      hours: "{{ pixel_refresh_lang }}"
+                  - *deactiveer_stekker_bioscoopkamer
         - conditions:
             - "{{ is_state(lamp, 'off') }}"
           sequence:

@@ -1,0 +1,7 @@
+lg_pixel_refresh_kort:
+  name: "Pixel Refresh: 15 min"
+  icon: "mdi:television-shimmer"
+
+lg_pixel_refresh_lang:
+  name: "Pixel Refresh: 1 uur"
+  icon: "mdi:television-shimmer"

@@ -229,22 +229,6 @@
           target:
             entity_id: script.backup_script
 - button:
-    - unique_id: 40d0a386-fe2a-4501-b315-0c400b9fd838
-      name: "Korte pixel refresh"
-      icon: mdi:television-shimmer
-      press:
-        - service: script.turn_on
-          target:
-            entity_id: script.lg_pixel_refresh_kort
-- button:
-    - unique_id: a6d6c20d-4569-4a52-a3ec-60d128f56eec
-      name: "Lange pixel refresh"
-      icon: mdi:television-shimmer
-      press:
-        - service: script.turn_on
-          target:
-            entity_id: script.lg_pixel_refresh_lang
-- button:
     - unique_id: 8c50d327-0425-43a5-82c3-2531d24357ec
       name: "Reset DNSWL timer"
       icon: mdi:calendar-refresh
