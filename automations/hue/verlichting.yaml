@@ -264,51 +264,30 @@
         - "NPO"
       id: "streaming_aan"
   variables:
-    stekker: "switch.stekker_bioscoopkamer"
-    zon: "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
-    transitie: &transitie 5
-    lichtsterkte_laag: 5
-    lichtsterkte_hoog: 50
     lamp: &lamp "light.lamp_bioscoopkamer"
-    min_color_temp_kelvin: "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
-    pixel_refresh_kort: 15
-    pixel_refresh_lang: 1
-    anchors:
-      - &deactiveer_lamp_bioscoopkamer
-        service: light.turn_off
-        target:
-          entity_id: light.lamp_bioscoopkamer
-      - &deactiveer_stekker_bioscoopkamer
-        service: switch.turn_off
-        target:
-          entity_id: switch.stekker_bioscoopkamer
+    anchor:
+      - &transitie 5
+      - &lichtsterkte_laag 5
+      - &lichtsterkte_hoog 50
+      - &min_color_temp_kelvin "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
+      - &zon "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
   action:
     - alias: "Wat moet er gebeuren?"
       choose:
         - conditions:
             - "{{ trigger.id in ['pixel_refresh_kort', 'pixel_refresh_lang'] }}"
           sequence:
-            choose:
-              - conditions:
-                  - condition: trigger
-                    id: "pixel_refresh_kort"
-                sequence:
-                  - delay:
-                      seconds: 30
-                  - *deactiveer_lamp_bioscoopkamer
-                  - delay:
-                      minutes: "{{ pixel_refresh_kort }}"
-                  - *deactiveer_stekker_bioscoopkamer
-              - conditions:
-                  - condition: trigger
-                    id: "pixel_refresh_lang"
-                sequence:
-                  - delay:
-                      seconds: 30
-                  - *deactiveer_lamp_bioscoopkamer
-                  - delay:
-                      hours: "{{ pixel_refresh_lang }}"
-                  - *deactiveer_stekker_bioscoopkamer
+            - delay:
+                seconds: 30
+            - alias: "Zet de lamp in de bioscoopkamer uit"
+              service: light.turn_off
+              target:
+                entity_id: *lamp
+            - delay: "{{ 900 if trigger.id == 'pixel_refresh_kort' else 3600 }}"
+            - alias: "Zet de stekker in de bioscoopkamer uit"
+              service: switch.turn_off
+              target:
+                entity_id: "switch.stekker_bioscoopkamer"
         - conditions:
             - "{{ is_state(lamp, 'off') }}"
           sequence:
@@ -317,19 +296,19 @@
                 - conditions:
                     - condition: trigger
                       id: "schemer"
-                    - "{{ is_state(stekker, 'on') }}"
+                    - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
                   sequence:
                     - alias: "Zet bij schemer de verlichting in de bioscoopkamer zachtjes aan"
                       service: light.turn_on
                       target:
                         entity_id: *lamp
                       data:
-                        brightness_pct: "{{ lichtsterkte_laag }}"
-                        color_temp_kelvin: "{{ min_color_temp_kelvin }}"
+                        brightness_pct: *lichtsterkte_laag
+                        color_temp_kelvin: *min_color_temp_kelvin
                 - conditions:
                     - condition: trigger
                       id: "stekker_aan"
-                    - "{{ zon }}"
+                    - *zon
                   sequence:
                     - alias: "Zet na zonsondergang de verlichting in de bioscoopkamer aan"
                       service: light.turn_on
@@ -337,7 +316,7 @@
                         entity_id: *lamp
                       data:
                         transition: *transitie
-                        brightness_pct: "{{ lichtsterkte_hoog }}"
+                        brightness_pct: *lichtsterkte_hoog
                         color_temp_kelvin: *color_temp
         - conditions:
             - "{{ is_state(lamp, 'on') }}"
@@ -362,12 +341,12 @@
                         entity_id: *lamp
                       data:
                         transition: *transitie
-                        brightness_pct: "{{ lichtsterkte_hoog }}"
+                        brightness_pct: *lichtsterkte_hoog
                         color_temp_kelvin: *color_temp
                 - conditions:
                     - condition: trigger
                       id: "streaming_aan"
-                    - "{{ zon }}"
+                    - *zon
                   sequence:
                     - alias: "Verlaag de lichtsterkte wanneer een streamingapp wordt gestart op de LG OLED"
                       service: light.turn_on
@@ -375,8 +354,8 @@
                         entity_id: *lamp
                       data:
                         transition: *transitie
-                        brightness_pct: "{{ lichtsterkte_laag }}"
-                        color_temp_kelvin: "{{ min_color_temp_kelvin }}"
+                        brightness_pct: *lichtsterkte_laag
+                        color_temp_kelvin: *min_color_temp_kelvin
       default:
         - stop: "Er is iets misgegaan in de automatisering voor de verlichting van de bioscoopkamer"
           error: true
