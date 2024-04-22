@@ -37,7 +37,7 @@
       icon: mdi:palette
       state: >-
         {% set elevation = float(state_attr('sun.sun', 'elevation')) %}
-        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 40) %}
+        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 25) %}
           {% if elevation <= -5.0 %}
             {{ 2500 }}
           {% elif elevation >= max_elevation %}
