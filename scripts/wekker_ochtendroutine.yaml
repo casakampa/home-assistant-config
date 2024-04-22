@@ -88,7 +88,7 @@ wekker_met_ochtendroutine:
           service: script.prepare_streaming_radio
           data:
             kamer: "woonkamer"
-            station: "BNR Nieuwsradio"
+            station: "NPO Radio 2"
             volume: 30
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
