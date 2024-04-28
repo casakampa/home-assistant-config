@@ -18,6 +18,7 @@
         - sensor.lovelace_mushroom
         - sensor.docker_mailserver
         - sensor.roundcube_webmail
+        - sensor.fritz_box_5530_firmware
       not_from:
         - "unavailable"
         - "unknown"
