@@ -9,14 +9,21 @@ In 2018 ben ik begonnen met Home Assistant op een Raspberry Pi 3B. In de loop de
 # Smart Home
 Mijn Smart Home bestaat uit de volgende software en hardware:
 
-- ### Home Assistant
-	- [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in [Proxmox VE 8](https://www.proxmox.com/en/proxmox-virtual-environment/overview) VM via [deze stappen op Reddit](https://www.reddit.com/r/homeassistant/comments/ua6ri5/install_home_assistant_os_in_proxmox_manually_its/)
+- ### [Proxmox VE 8](https://www.proxmox.com/en/proxmox-virtual-environment/overview)
+	- VM: [Home Assistant OS](https://www.home-assistant.io/installation/alternative) in VM via [deze stappen op Reddit](https://www.reddit.com/r/homeassistant/comments/ua6ri5/install_home_assistant_os_in_proxmox_manually_its/)
 		- vCPU: 2
 		- RAM: 4GB
 		- Disk: 32GB NVME
 		- Netwerk: IPv4 & IPv6
 		- Zigbee: [Electrolama ZZH!](https://electrolama.com/projects/zig-a-zig-ah/) (CC2652R), toegevoegd als USB device aan de virtuele machine
 			- Reserve: [Slae.sh](https://slae.sh/projects/cc2652/) (CC2652RB)
+	- VM: [Docker](https://www.docker.com/)
+		- [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) > [DSMR-reader image](https://github.com/xirixiz/dsmr-reader-docker): Voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
+		- [PostgreSQL](https://www.postgresql.org/) -> [PostgreSQL image](https://hub.docker.com/_/postgres): Voor de DSMR-reader database
+		- [Unifi Network Application](https://ui.com/download/releases/network-server) -> [LinuxServer Unifi image](https://github.com/linuxserver/docker-unifi-network-application): Voor het configureren en beheren van Unifi access points.
+		- [MongoDB](https://www.mongodb.com/) -> [MongoDB image](https://hub.docker.com/_/mongo): Database voor de Unifi Network Application
+		- [Wireguard](https://www.wireguard.com/) -> [LinuxServer Wireguard image](https://github.com/linuxserver/docker-wireguard): Voor het maken van een VPN-verbinding
+		- [Authelia](https://www.authelia.com/) -> [Authelia image](https://hub.docker.com/r/authelia/authelia): Voor MFA op verschillende subdomeinen
 - ### Philips Hue
 	- [Hue White E27 - 800lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---800/8719514329843) (Zigbee)
 	- [Hue White E27 - 1100lm](https://www.philips-hue.com/nl-nl/p/hue-white-a60---e27-slimme-lamp---1100/8719514288232) (Zigbee & Bluetooth)
@@ -29,6 +36,7 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 	- [Hue Motion Sensor](https://www.philips-hue.com/nl-nl/p/hue-bewegingssensor/8719514342125) (Zigbee)
 	- [Hue Smart Stekker](https://www.philips-hue.com/nl-nl/p/hue-smart-stekker/8719514342309) (Zigbee) en (Zigbee & Bluetooth)
 	- Hue Dimmer Switch V1 (Zigbee)
+	- [Hue Dimmer Switch V2](https://www.philips-hue.com/nl-nl/p/hue-dimmer-switch--nieuwste-model-/8719514274617) (Zigbee)
 - ### Aquara
 	- [Door & Windows sensor](https://www.aqara.com/eu/door_and_window_sensor.html) (Zigbee)
 	- [Aqara Motion Sensor P1](https://www.aqara.com/eu/product/motion-sensor-p1) (Zigbee)
@@ -41,12 +49,7 @@ Mijn Smart Home bestaat uit de volgende software en hardware:
 - ### Raspberry Pi 4 4GB
 	- [Raspberry Pi OS Bookworm 64-bit](https://www.raspberrypi.com/software/operating-systems/)
 		- [Doorbell](https://github.com/casakampa/doorbell) - mijn Python script dat de functionaliteit van een deurbel verzorgd om mijn domme deurbel 'slim' te maken.
-		- Docker
-			- [DSMR-reader](https://github.com/dsmrreader/dsmr-reader) > [DSMR-reader image](https://github.com/xirixiz/dsmr-reader-docker): Voor het registreren van mijn energie- en gasverbruik door het uitlezen van mijn 'slimme' DSMR5 energiemeter.
-			- [PostgreSQL](https://www.postgresql.org/) -> [PostgreSQL image](https://hub.docker.com/_/postgres): Voor de DSMR-reader database
-			- [Unifi Controller](https://ui.com/download/releases/network-server) -> [LinuxServer Unifi image](https://github.com/linuxserver/docker-unifi-controller/): Voor het configureren en beheren van Unifi access points.
-			- [Wireguard](https://www.wireguard.com/) -> [LinuxServer Wireguard image](https://github.com/linuxserver/docker-wireguard): Voor het maken van een VPN-verbinding
-			- [Authelia](https://www.authelia.com/) -> [Authelia image](https://hub.docker.com/r/authelia/authelia): Voor MFA op verschillende subdomeinen
+
 
 ## Integraties
 De volgende integraties worden gebruikt:
