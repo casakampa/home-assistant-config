@@ -73,6 +73,7 @@ De volgende integraties worden gebruikt:
 De volgende add-ons worden gebruikt:
 
 - [Mosquitto broker](https://github.com/home-assistant/addons/blob/master/mosquitto/DOCS.md)
+- [Piper](https://www.home-assistant.io/integrations/piper/)
 - [Studio Code Server](https://github.com/hassio-addons/addon-vscode)
 - [Terminal & SSH](https://github.com/home-assistant/addons/blob/master/ssh/DOCS.md)
 
