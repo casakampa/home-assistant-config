@@ -263,7 +263,7 @@
     - platform: event
       event_type: zha_event
       event_data:
-        device_id: 391b89c7a470fd7526bdaf1aece07030
+        device_id: 012d4979feb78a9bbe126a6c141e8d45
         cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
@@ -283,7 +283,7 @@
     - platform: event
       event_type: zha_event
       event_data:
-        device_id: 23290843fd07fcf9dccf2f447737d85a
+        device_id: 8f208f07bd94e1f17fcd5ec049f6af0c
         cluster_id: 64512
   variables:
     command: "{{ trigger.event.data.command }}"
