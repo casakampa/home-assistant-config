@@ -38,7 +38,7 @@
       condition: template
       value_template: >-
         {{ iif(trigger.entity_id == 'sensor.nextcloud',
-        states('sensor.nextcloud') | version > 28,
+        version(states('sensor.nextcloud') >= 'v29.0.0'),
         True) }}
   action:
     - alias: "Stuur een notificatie over de software update"
