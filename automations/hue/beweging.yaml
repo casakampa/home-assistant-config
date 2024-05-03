@@ -176,8 +176,8 @@
     - platform: state
       entity_id: binary_sensor.gang_template_motion_sensor
   variables:
-    helderheid_dag: 80
-    helderheid_nacht: 30
+    helderheid_dag: 65
+    helderheid_nacht: 20
     lamp: "light.lamp_gang"
     anchors:
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
@@ -256,8 +256,8 @@
     - platform: state
       entity_id: binary_sensor.hue_motion_overloop_occupancy
   variables:
-    helderheid_dag: 80
-    helderheid_nacht: 20
+    helderheid_dag: 65
+    helderheid_nacht: 15
     lamp: "light.lamp_overloop"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
