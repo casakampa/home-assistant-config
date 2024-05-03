@@ -24,15 +24,26 @@
         Alle lampen zijn bereikbaar
       {% endif %}
   action:
-    - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
-      service: notify.iphone_12
-      data:
-        message: "{{ bericht }}"
-        data:
-          tag: *tag
-          push:
-            interruption-level: passive
-    - service: persistent_notification.create
-      data:
-        message: "{{ bericht }}"
-        notification_id: *tag
+    - parallel:
+        - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
+          service: notify.iphone_12
+          data:
+            message: "{{ bericht }}"
+            data:
+              tag: *tag
+              push:
+                interruption-level: passive
+        - service: persistent_notification.create
+          data:
+            message: "{{ bericht }}"
+            notification_id: *tag
+        - alias: "Vertel welke lampen (on)bereikbaar zijn"
+          service: tts.speak
+          target:
+            entity_id: tts.piper
+          data:
+            cache: false
+            media_player_entity_id:
+              - media_player.sonos_woonkamer
+              - media_player.sonos_slaapkamer
+            message: "{{ bericht }}"
