@@ -44,7 +44,7 @@
     - alias: "Stuur een notificatie over de software update"
       service: notify.iphone_12
       data:
-        message: >-
+        message: |-
           Software: {{ state_attr(trigger.entity_id, 'friendly_name') }}.
           Nieuw: {{ trigger.to_state.state }}.
           Oud: {{ trigger.from_state.state }}.
