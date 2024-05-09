@@ -185,28 +185,12 @@
         alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
         choose:
           - conditions:
-              - alias: "Tijd tussen de zonsopkomst en zonsondergang geldt als dag"
-                condition: sun
-                before: sunset
+              - condition: time
+                after: input_datetime.light_home_day_time
+              - condition: sun
                 after: sunrise
-            sequence:
-              - <<: *lamp_aan
-                data:
-                  brightness_pct: "{{ helderheid_dag }}"
-                  color_temp_kelvin: *color_temp
-          - conditions:
-              - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
-                or:
-                  - and:
-                      - condition: time
-                        after: input_datetime.light_home_day_time
-                      - condition: sun
-                        before: sunrise
-                  - and:
-                      - condition: time
-                        before: input_datetime.light_home_night_time
-                      - condition: sun
-                        after: sunset
+              - condition: time
+                before: input_datetime.light_home_night_time
             sequence:
               - <<: *lamp_aan
                 data:
