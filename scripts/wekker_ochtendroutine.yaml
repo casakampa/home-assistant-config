@@ -100,28 +100,21 @@ wekker_met_ochtendroutine:
         # Eem wachten...
         - delay:
             minutes: 35
-        - parallel:
-            # Stuur een melding van de reistijd naar de werklocatie
-            - *melding_reistijd_huis_naar_werk
-            # Stuur herinnering
-            - service: notify.iphone_12
-              data:
-                message: "Over 5 minuten moet je vertrekken"
-                data:
-                  push:
-                    interruption-level: time-sensitive
-                  tag: *tag
+        # Stuur een melding van de reistijd naar de werklocatie
+        - *melding_reistijd_huis_naar_werk
         # Nog even tijdrekken
         - delay:
             minutes: 5
         - parallel:
-            # Stuur een laatste melding van de reistijd naar werklocatie
-            - *melding_reistijd_huis_naar_werk
-            # Schakel Chromecast uit
-            - service: media_player.turn_off
-              target:
-                entity_id: media_player.chromecast_woonkamer
-            # Stop de muziek op Sonos luidsprekers
+            # Controle op spelende chromecast in woonkamer
+            - if:
+                - "{{ is_state('media_player.chromecast_woonkamer', 'playing') }}"
+              then:
+                # Schakel Chromecast uit
+                - service: media_player.turn_off
+                  target:
+                    entity_id: media_player.chromecast_woonkamer
+            # Controle op actieve streaming radio
             - if:
                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
               then:
@@ -133,6 +126,10 @@ wekker_met_ochtendroutine:
             - service: light.turn_off
               target:
                 entity_id: light.woonkamer_eethoek_keuken_zha_group_0x0008
+        - delay:
+            seconds: 2
+        # Stuur een laatste melding van de reistijd naar werklocatie
+        - *melding_reistijd_huis_naar_werk
       else:
         stop: "De ochtendroutine is gestopt want er wordt thuisgewerkt"
 
