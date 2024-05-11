@@ -7,7 +7,6 @@ wasprogramma:
     - Kleuren
     - Startuitstel
     - Overig
-  initial: Geen
   icon: mdi:washing-machine
 werklocatie_maandag:
   name: "Werklocatie maandag"
@@ -46,4 +45,5 @@ internet_radio_streams:
     - "BNR Nieuwsradio"
     - "Radio Veronica"
     - "NPO Radio 2"
+    - "GP Radio"
   icon: mdi:radio-tower
