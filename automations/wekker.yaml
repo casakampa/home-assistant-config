@@ -16,8 +16,8 @@
       data:
         variables:
           werklocatie: >-
-            {% set today = {'Monday': 'maandag', 'Tuesday': 'dinsdag', 'Wednesday': 'woensdag', 'Thursday': 'donderdag', 'Friday': 'vrijdag'}[now().strftime('%A')] %}
-            {{ states('input_select.werklocatie_' ~ today) | lower }}
+            {% from 'date_functions.jinja' import vandaag %}
+            {{ states('input_select.werklocatie_' ~ vandaag()) | lower }}
 
 - id: 8753cfbe-5d4b-4e2b-aca0-c9b43ebd3141
   alias: "Wekker: Statuscontrole"

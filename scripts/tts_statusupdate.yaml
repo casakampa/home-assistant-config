@@ -12,7 +12,8 @@ tts_statusupdate:
         Goedenavond
       {% endif %}
     dag: >
-      Het is {{ {'Monday': 'maandag', 'Tuesday': 'dinsdag', 'Wednesday': 'woensdag', 'Thursday': 'donderdag', 'Friday': 'vrijdag', 'Saturday': 'zaterdag', 'Sunday': 'zondag'}[now().strftime('%A')] }}
+      {% from 'date_functions.jinja' import vandaag %}
+      Het is {{ vandaag() }}
     tijd: >
       {% from 'tts_functions.jinja' import dutch_time_announcement %}
       {% set nu = now().strftime('%H:%M') %}
