@@ -5,37 +5,34 @@
   trigger:
     - platform: state
       entity_id: sensor.onbereikbare_lampen
-      not_from:
-        - "unavailable"
-        - "unknown"
-        - "none"
-      not_to:
-        - "unavailable"
-        - "unknown"
-        - "none"
+      to: ~
   variables:
     tag: &tag "bereikbaarheid_lampen"
-    bericht: >-
-      {% set lampen = state_attr(trigger.entity_id, 'lampen') %}
-      {% set aantal = int(states( trigger.entity_id )) %}
+    aantal: >-
+      {% set aantal = int(states(trigger.entity_id)) %}
       {% if aantal >= 1 %}
-        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp'  ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar:' ~ ' ' ~ lampen | join(', ') }}
+        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar:'}}
       {% else %}
         Alle lampen zijn bereikbaar
       {% endif %}
+    lampen: >-
+      {% set lampen = state_attr(trigger.entity_id, 'lampen') %}
+      {{ lampen | join(', ') }}
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - parallel:
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
           service: notify.iphone_12
           data:
-            message: "{{ bericht }}"
+            message: "{{ aantal }} {{ lampen }}"
             data:
               tag: *tag
               push:
                 interruption-level: passive
         - service: persistent_notification.create
           data:
-            message: "{{ bericht }}"
+            message: "{{ aantal }} {{ lampen }}"
             notification_id: *tag
         - alias: "Vertel welke lampen (on)bereikbaar zijn"
           service: tts.speak
@@ -46,4 +43,4 @@
             media_player_entity_id:
               - media_player.sonos_woonkamer
               - media_player.sonos_slaapkamer
-            message: "{{ bericht }}"
+            message: "{{ aantal }}"
