@@ -28,15 +28,9 @@
   trigger:
     - platform: state
       entity_id: sensor.buitentemperatuur
-      not_from:
-        - "unavailable"
-        - "unknown"
-        - "none"
-      not_to:
-        - "unavailable"
-        - "unknown"
-        - "none"
   mode: queued
+  condition:
+    - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Wanneer de sensor wordt bijgewerkt, update de buitentemperatuur in de OTGW"
       service: opentherm_gw.set_outside_temperature
