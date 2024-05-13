@@ -95,7 +95,7 @@
           and is_state('calendar.vakanties', 'off')
           and is_state('binary_sensor.workday_sensor', 'on')
           and is_state('input_boolean.wekker_status', 'on')
-          and is_state('input_boolean.wekker_' ~ today, 'on')
+          and is_state('input_boolean.wekker_' ~ vandaag(), 'on')
           and today_at(states('input_datetime.wektijd_' ~ vandaag())) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) < now() < today_at(states('input_datetime.wektijd_' ~ vandaag())) + timedelta(minutes=1)
           else 'off' }}
       attributes:
