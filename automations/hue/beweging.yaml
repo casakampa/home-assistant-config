@@ -290,8 +290,8 @@
       entity_id: binary_sensor.aqara_motion_toilet
   variables:
     helderheid_dag: 80
-    helderheid_nacht: 30
-    lamp: "light.lamp_toilet"
+    helderheid_nacht: 15
+    lamp: "light.toilet_zha_group_0x000a"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
