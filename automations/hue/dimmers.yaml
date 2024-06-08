@@ -33,35 +33,16 @@
             - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
               choose:
                 - conditions:
-                    - alias: "Tijd tussen de zonsopkomst en zonsondergang geldt als dag"
-                      condition: sun
-                      before: sunset
-                      after: sunrise
+                    - condition: time
+                      after: input_datetime.light_home_day_time
+                    - condition: time
+                      before: input_datetime.light_home_night_time
                   sequence:
                     - <<: *turn_on_entities
                       data:
                         brightness_pct: "{{ brightness }}"
                         color_temp_kelvin: *color_temp
                         transition: "{{ transition }}"
-                - conditions:
-                    - alias: "Tijdsspannes tussen ingestelde tijden en zonsopkomst of zonsondergang. Deze situatie is gemaakt voor randzaken, wanneer andere condities niet overeenkomen."
-                      or:
-                        - and:
-                            - condition: time
-                              after: input_datetime.light_home_day_time
-                            - condition: sun
-                              before: sunrise
-                        - and:
-                            - condition: time
-                              before: input_datetime.light_home_night_time
-                            - condition: sun
-                              after: sunset
-                  sequence:
-                    - <<: *turn_on_entities
-                      data:
-                        brightness_pct: "{{ brightness }}"
-                        transition: "{{ transition * 2 }}"
-                        color_temp_kelvin: *color_temp
                 - conditions:
                     - alias: "Tijdsspannes tussen ingestelde tijden"
                       or:
@@ -75,7 +56,7 @@
                     - <<: *turn_on_entities
                       data:
                         brightness_pct: 10
-                        transition: "{{ transition / 2 }}"
+                        transition: "{{ transition }}"
                         color_temp_kelvin: *color_temp
                 - conditions:
                     - alias: "Nacht"
@@ -171,6 +152,153 @@
                           target:
                             entity_id: input_boolean.play_streaming_radio
 
+- id: 287dcb3f-4fee-4a66-b0c6-8672c199a447
+  alias: "Verlichting: Slaapkamer (dimmer)"
+  description: "Activeer verlichting slaapkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 091f815c74eb50b132fcca673d5afac8 # Hue Dimmer V1
+        cluster_id: 64512
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 7c7a67688e3e2118b866cb472fd357e7 # Hue Dimmer V2
+        cluster_id: 64512
+  variables:
+    command: "{{ trigger.event.data.command }}"
+    media_player: "media_player.chromecast_woonkamer"
+    sonos_speaker: "media_player.sonos_slaapkamer"
+    brightness: 50
+    transition: 1
+    light: "light.slaapkamer_zha_group_0x0005"
+    area: "light.alle_lampen_zha_group_0x0006"
+  action:
+    - &hue_dimmer_beta_logica
+      if:
+        - "{{ is_state('input_boolean.beta_mode', 'off') }}"
+      then:
+        - *hue_dimmer_logica
+      else:
+        - if:
+            - "{{ command == 'off_short_release' }}"
+          then:
+            - alias: "Wissel tussen modes"
+              service: input_select.select_next
+              target:
+                entity_id: input_select.dimmer_mode
+            - alias: "Vertel de actieve modus"
+              service: tts.speak
+              target:
+                entity_id: tts.piper
+              data:
+                cache: true
+                media_player_entity_id:
+                  - "{{ sonos_speaker }}"
+                message: >-
+                  Nu actief: {{ states('input_select.dimmer_mode') }}.
+          else:
+            - choose:
+                - conditions:
+                    - "{{ is_state('input_select.dimmer_mode', 'Audio') }}"
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - "{{ command == 'on_short_release' }}"
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'off') }}"
+                          sequence:
+                            - alias: "Schakel streaming radio in"
+                              service: input_boolean.turn_on
+                              target:
+                                entity_id: input_boolean.play_streaming_radio
+                        - conditions:
+                            - "{{ command == 'up_short_release' }}"
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                          sequence:
+                            - alias: "Verhoog het volume"
+                              service: input_number.set_value
+                              target:
+                                entity_id: input_number.sonos_media_volume
+                              data:
+                                value: "{{ min((int(states('input_number.sonos_media_volume'), 80) + 5), 80) }}"
+                        - conditions:
+                            - "{{ command == 'down_short_release' }}"
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                          sequence:
+                            - alias: "Verlaag het volume"
+                              service: input_number.set_value
+                              target:
+                                entity_id: input_number.sonos_media_volume
+                              data:
+                                value: "{{ max((int(states('input_number.sonos_media_volume'), 80) - 5), 10) }}"
+                        - conditions:
+                            - "{{ command == 'down_hold' }}"
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                          sequence:
+                            - alias: "Maak het mogelijk muziek te dempen en op te heffen."
+                              service: input_boolean.toggle
+                              target:
+                                entity_id: input_boolean.mute_streaming_radio
+                        - conditions:
+                            - "{{ command == 'off_hold' }}"
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                          sequence:
+                            - alias: "Schakel streaming radio uit"
+                              service: input_boolean.turn_off
+                              target:
+                                entity_id: input_boolean.play_streaming_radio
+                - conditions:
+                    - "{{ is_state('input_select.dimmer_mode', 'Verlichting') }}"
+                  sequence:
+                    - *hue_dimmer_logica
+              default:
+                - stop: "Er is geen geldige keuze"
+
+- id: daeda308-7b60-470e-8706-d92576912cd7
+  alias: "Verlichting: Woonkamer (dimmer)"
+  description: "Activeer verlichting woonkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 012d4979feb78a9bbe126a6c141e8d45
+        cluster_id: 64512
+  variables:
+    command: "{{ trigger.event.data.command }}"
+    media_player: "media_player.chromecast_woonkamer"
+    sonos_speaker: "media_player.sonos_woonkamer"
+    brightness: 50
+    transition: 1
+    light: "light.woonkamer_zha_group_0x0003"
+    area: "light.alle_lampen_zha_group_0x0006"
+  action: *hue_dimmer_beta_logica
+
+- id: 52fae87c-f939-4742-8632-90bc1397fdc2
+  alias: "Verlichting: Eethoek (dimmer)"
+  description: "Activeer verlichting eethoek op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 8f208f07bd94e1f17fcd5ec049f6af0c
+        cluster_id: 64512
+  variables:
+    command: "{{ trigger.event.data.command }}"
+    media_player: "media_player.chromecast_woonkamer"
+    sonos_speaker: "media_player.sonos_woonkamer"
+    brightness: 60
+    transition: 1
+    light: "light.eethoek_zha_group_0x0009"
+    area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
+  action: *hue_dimmer_beta_logica
+
 - id: 56bc495a-439f-46d1-8f11-749f9286a238
   alias: "Verlichting: Keuken (dimmer)"
   description: "Activeer verlichting keuken op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
@@ -185,11 +313,12 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     media_player: "media_player.chromecast_woonkamer"
+    sonos_speaker: "media_player.sonos_woonkamer"
     brightness: 75
     transition: 1
     light: "light.keuken_zha_group_0x0002"
     area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
-  action: *hue_dimmer_logica
+  action: *hue_dimmer_beta_logica
 
 - id: 8ab7cbeb-efaa-4d69-91cb-f38f4410f679
   alias: "Verlichting: Keuken (dimmer) extensie"
@@ -228,68 +357,3 @@
                   service: automation.turn_on
                   target:
                     entity_id: "{{ automation }}"
-
-- id: 287dcb3f-4fee-4a66-b0c6-8672c199a447
-  alias: "Verlichting: Slaapkamer (dimmer)"
-  description: "Activeer verlichting slaapkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
-  initial_state: true
-  mode: restart
-  trigger:
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_id: 091f815c74eb50b132fcca673d5afac8 # Hue Dimmer V1
-        cluster_id: 64512
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_id: 7c7a67688e3e2118b866cb472fd357e7 # Hue Dimmer V2
-        cluster_id: 64512
-  variables:
-    command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.chromecast_woonkamer"
-    brightness: 50
-    transition: 1
-    light: "light.slaapkamer_zha_group_0x0005"
-    area: "light.alle_lampen_zha_group_0x0006"
-  action: *hue_dimmer_logica
-
-- id: daeda308-7b60-470e-8706-d92576912cd7
-  alias: "Verlichting: Woonkamer (dimmer)"
-  description: "Activeer verlichting woonkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
-  initial_state: true
-  mode: restart
-  trigger:
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_id: 012d4979feb78a9bbe126a6c141e8d45
-        cluster_id: 64512
-  variables:
-    command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.chromecast_woonkamer"
-    brightness: 50
-    transition: 1
-    light: "light.woonkamer_zha_group_0x0003"
-    area: "light.alle_lampen_zha_group_0x0006"
-  action: *hue_dimmer_logica
-
-- id: 52fae87c-f939-4742-8632-90bc1397fdc2
-  alias: "Verlichting: Eethoek (dimmer)"
-  description: "Activeer verlichting eethoek op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
-  initial_state: true
-  mode: restart
-  trigger:
-    - platform: event
-      event_type: zha_event
-      event_data:
-        device_id: 8f208f07bd94e1f17fcd5ec049f6af0c
-        cluster_id: 64512
-  variables:
-    command: "{{ trigger.event.data.command }}"
-    media_player: "media_player.chromecast_woonkamer"
-    brightness: 60
-    transition: 1
-    light: "light.eethoek_zha_group_0x0009"
-    area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
-  action: *hue_dimmer_logica

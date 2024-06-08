@@ -84,3 +84,6 @@ play_streaming_radio:
 mute_streaming_radio:
   name: Demp streaming radio
   icon: mdi:volume-mute
+beta_mode:
+  name: "Beta mode (bugtesting)"
+  icon: mdi:bug-outline
