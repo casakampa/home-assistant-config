@@ -10,7 +10,7 @@
         device_id: 13eea38ac9f669fba8af67a6bcb10ba5
         cluster_id: 64512
   condition:
-    - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release'] }}"
+    - "{{ trigger.event.data.args.press_type in ['short_release', 'double_press', 'long_release'] }}"
   action:
     - if:
         - "{{ is_state('input_boolean.beta_mode', 'off') }}"

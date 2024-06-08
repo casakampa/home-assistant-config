@@ -178,24 +178,35 @@ hue_dimmer_beta_logica:
     - if:
         - "{{ command == 'off_short_release' }}"
       then:
-        - alias: "Wissel tussen modes"
-          service: input_select.select_next
-          target:
-            entity_id: input_select.dimmer_mode
-        - alias: "Vertel de actieve modus"
-          service: tts.speak
-          target:
-            entity_id: tts.piper
-          data:
-            cache: true
-            media_player_entity_id:
-              - "{{ sonos_speaker }}"
-            message: >-
-              Nu actief: {{ states('input_select.dimmer_mode') }}.
+        - wait_for_trigger:
+            - platform: event
+              event_type: zha_event
+              event_data:
+                command: "off_double_press"
+          timeout:
+            milliseconds: 500
+          continue_on_timeout: true
+        - if:
+            - "{{ wait.trigger is none }}"
+          then:
+            - alias: "Wissel tussen modes"
+              service: input_select.select_next
+              target:
+                entity_id: input_select.dimmer_mode
+            - alias: "Vertel de actieve modus"
+              service: tts.speak
+              target:
+                entity_id: tts.piper
+              data:
+                cache: true
+                media_player_entity_id:
+                  - "{{ sonos_speaker }}"
+                message: >-
+                  Nu actief: {{ states('input_select.dimmer_mode') }}.
       else:
         - choose:
             - conditions:
-                - "{{ is_state('input_select.dimmer_mode', 'Audio') }}"
+                - "{{ is_state('input_select.dimmer_mode', 'Media') }}"
               sequence:
                 - choose:
                     - conditions:
@@ -236,12 +247,25 @@ hue_dimmer_beta_logica:
                             entity_id: input_boolean.mute_streaming_radio
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
-                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                        - or:
+                            - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                            - "{{ not is_state(media_player, 'off') }}"
                       sequence:
-                        - alias: "Schakel streaming radio uit"
-                          service: input_boolean.turn_off
-                          target:
-                            entity_id: input_boolean.play_streaming_radio
+                        - parallel:
+                            - if:
+                                - "{{ not is_state(media_player, 'off') }}"
+                              then:
+                                - alias: "Zet de gekozen media_player uit"
+                                  service: media_player.turn_off
+                                  target:
+                                    entity_id: "{{ media_player }}"
+                            - if:
+                                - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                              then:
+                                - alias: "Stop streaming radio"
+                                  service: input_boolean.turn_off
+                                  target:
+                                    entity_id: input_boolean.play_streaming_radio
                   default:
                     - stop: "Er is geen bruikbaar command aangeleverd"
             - conditions:
@@ -314,7 +338,7 @@ hue_dimmer_beta_logica:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
-                            transition: "{{ transition / 2 }}"
+                            transition: "{{ transition }}"
                     - conditions:
                         - "{{ command == 'down_short_release' }}"
                       sequence:
@@ -327,9 +351,9 @@ hue_dimmer_beta_logica:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
-                            transition: "{{ transition / 2 }}"
+                            transition: "{{ transition }}"
                     - conditions:
-                        - "{{ command == 'off_short_release' }}"
+                        - "{{ command == 'off_double_press' }}"
                       sequence:
                         - service: light.turn_off
                           target:
@@ -339,39 +363,11 @@ hue_dimmer_beta_logica:
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
                       sequence:
-                        - if:
-                            - "{{ is_state(area, 'on') }}"
-                          then:
-                            - parallel:
-                                - alias: "Zet alle lampen in het huis uit"
-                                  service: light.turn_off
-                                  target:
-                                    entity_id: "{{ area }}"
-                                  data:
-                                    transition: "{{ transition }}"
-                                - alias: "Zet de gekozen media_player uit"
-                                  service: media_player.turn_off
-                                  target:
-                                    entity_id: "{{ media_player }}"
-                                - if:
-                                    - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
-                                  then:
-                                    # Stop de muziek op Sonos luidsprekers
-                                    - service: input_boolean.turn_off
-                                      target:
-                                        entity_id: input_boolean.play_streaming_radio
-                          else:
-                            - parallel:
-                                - alias: "Zet de gekozen media_player uit"
-                                  service: media_player.turn_off
-                                  target:
-                                    entity_id: "{{ media_player }}"
-                                - if:
-                                    - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
-                                  then:
-                                    # Stop de muziek op Sonos luidsprekers
-                                    - service: input_boolean.turn_off
-                                      target:
-                                        entity_id: input_boolean.play_streaming_radio
+                        - alias: "Zet alle lampen in het huis uit"
+                          service: light.turn_off
+                          target:
+                            entity_id: "{{ area }}"
+                          data:
+                            transition: "{{ transition }}"
           default:
             - stop: "Er is geen geldige keuze"

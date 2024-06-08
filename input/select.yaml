@@ -51,5 +51,5 @@ dimmer_mode:
   name: "Dimmer Mode"
   options:
     - "Verlichting"
-    - "Audio"
+    - "Media"
   icon: mdi:remote
