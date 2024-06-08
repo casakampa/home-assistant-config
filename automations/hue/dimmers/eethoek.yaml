@@ -15,23 +15,19 @@
     - if:
         - "{{ is_state('input_boolean.beta_mode', 'off') }}"
       then:
-        - alias: "Zet de radio aan met deze instellingen"
+        - alias: "Stuur de verlichting aan"
           service: script.hue_dimmer_default_logica
           data:
             command: "{{ trigger.event.data.command }}"
             media_player: "media_player.chromecast_woonkamer"
-            brightness: 60
-            transition: 1
             light: "light.eethoek_zha_group_0x0009"
             area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
       else:
-        - alias: "Zet de radio aan met deze instellingen"
+        - alias: "Stuur de verlichting en multimedia aan"
           service: script.hue_dimmer_beta_logica
           data:
             command: "{{ trigger.event.data.command }}"
             media_player: "media_player.chromecast_woonkamer"
             sonos_speaker: "media_player.sonos_woonkamer"
-            brightness: 60
-            transition: 1
             light: "light.eethoek_zha_group_0x0009"
             area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"

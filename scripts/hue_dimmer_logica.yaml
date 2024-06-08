@@ -162,12 +162,6 @@ hue_dimmer_beta_logica:
     sonos_speaker:
       description: "The speaker to play the announcements on"
       example: "media_player.sonos_woonkamer"
-    brightness:
-      description: "The initial brightness"
-      example: "50"
-    transition:
-      description: "The initial transition"
-      example: "1"
     light:
       description: "The initial lights"
       example: "light.lamp_bioscoopkamer"
@@ -176,33 +170,22 @@ hue_dimmer_beta_logica:
       example: "light.alle_lampen_zha_group_0x0006"
   sequence:
     - if:
-        - "{{ command == 'off_short_release' }}"
+        - "{{ command == 'off_double_press' }}"
       then:
-        - wait_for_trigger:
-            - platform: event
-              event_type: zha_event
-              event_data:
-                command: "off_double_press"
-          timeout:
-            milliseconds: 500
-          continue_on_timeout: true
-        - if:
-            - "{{ wait.trigger is none }}"
-          then:
-            - alias: "Wissel tussen modes"
-              service: input_select.select_next
-              target:
-                entity_id: input_select.dimmer_mode
-            - alias: "Vertel de actieve modus"
-              service: tts.speak
-              target:
-                entity_id: tts.piper
-              data:
-                cache: true
-                media_player_entity_id:
-                  - "{{ sonos_speaker }}"
-                message: >-
-                  Nu actief: {{ states('input_select.dimmer_mode') }}.
+        - alias: "Wissel tussen modes"
+          service: input_select.select_next
+          target:
+            entity_id: input_select.dimmer_mode
+        - alias: "Vertel de actieve modus"
+          service: tts.speak
+          target:
+            entity_id: tts.piper
+          data:
+            cache: true
+            media_player_entity_id: >-
+              {{ sonos_speaker }}
+            message: >-
+              Nu actief: {{ states('input_select.dimmer_mode') }}.
       else:
         - choose:
             - conditions:
@@ -286,9 +269,8 @@ hue_dimmer_beta_logica:
                               sequence:
                                 - <<: *turn_on_entities
                                   data:
-                                    brightness_pct: "{{ brightness }}"
+                                    brightness_pct: "{{ float(50) }}"
                                     color_temp_kelvin: *color_temp
-                                    transition: "{{ transition }}"
                             - conditions:
                                 - alias: "Tijdsspannes tussen ingestelde tijden"
                                   or:
@@ -302,7 +284,6 @@ hue_dimmer_beta_logica:
                                 - <<: *turn_on_entities
                                   data:
                                     brightness_pct: 10
-                                    transition: "{{ transition }}"
                                     color_temp_kelvin: *color_temp
                             - conditions:
                                 - alias: "Nacht"
@@ -325,7 +306,6 @@ hue_dimmer_beta_logica:
                             entity_id: "{{ area }}"
                           data:
                             brightness_pct: 100
-                            transition: "{{ transition }}"
                     - conditions:
                         - "{{ command == 'up_short_release' }}"
                       sequence:
@@ -338,7 +318,6 @@ hue_dimmer_beta_logica:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
-                            transition: "{{ transition }}"
                     - conditions:
                         - "{{ command == 'down_short_release' }}"
                       sequence:
@@ -351,15 +330,30 @@ hue_dimmer_beta_logica:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
-                            transition: "{{ transition }}"
                     - conditions:
-                        - "{{ command == 'off_double_press' }}"
+                        - "{{ command == 'off_short_release' }}"
                       sequence:
-                        - service: light.turn_off
-                          target:
-                            entity_id: "{{ light }}"
-                          data:
-                            transition: "{{ transition }}"
+                        - if:
+                            - "{{ command == 'off_short_release' }}"
+                          then:
+                            - wait_for_trigger:
+                                - platform: event
+                                  event_type: zha_event
+                                  event_data:
+                                    command: "off_double_press"
+                              timeout:
+                                milliseconds: 500
+                              continue_on_timeout: true
+                            - if:
+                                - "{{ wait.trigger is none }}"
+                              then:
+                                - service: light.turn_off
+                                  target:
+                                    entity_id: "{{ light }}"
+                              else:
+                                - stop: "Geen geldige keuze"
+                          else:
+                            - stop: "Geen geldige keuze"
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
                       sequence:
@@ -367,7 +361,5 @@ hue_dimmer_beta_logica:
                           service: light.turn_off
                           target:
                             entity_id: "{{ area }}"
-                          data:
-                            transition: "{{ transition }}"
           default:
             - stop: "Er is geen geldige keuze"

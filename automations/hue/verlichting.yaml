@@ -436,7 +436,7 @@
 
 - id: 3aace0f0-00a2-4c66-96f4-958d873cf660
   alias: "Verlichting: Slaapkamer (computer)"
-  description: "Deze automatisering regelt de verlichting in de slaapkamer bij gebruik van de computer"
+  description: "Deze automatisering regelt bij gebruik van de computer de verlichting in de slaapkamer"
   trigger:
     - platform: state
       entity_id: device_tracker.gamepc_ryzen5
@@ -448,11 +448,18 @@
     - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
     - "{{ is_state('sun.sun', 'below_horizon') }}"
   action:
-    - alias: "Activeer de verlichting in de slaapkamer via automation.verlichting_slaapkamer_dimmer"
-      service: automation.trigger
+    - alias: "Activeer de juiste mode"
+      service: input_select.select_option
       target:
-        entity_id: automation.verlichting_slaapkamer_dimmer
+        entity_id: input_select.dimmer_mode
+      data:
+        value: "Verlichting"
+    - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_beta_logica"
+      service: script.turn_on
+      target:
+        entity_id: script.hue_dimmer_beta_logica
       data:
         variables:
+          light: "light.slaapkamer_zha_group_0x0005"
           command: >
             {{ iif( is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release

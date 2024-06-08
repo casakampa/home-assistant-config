@@ -12,12 +12,10 @@
   condition:
     - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release'] }}"
   action:
-    - alias: "Zet de radio aan met deze instellingen"
+    - alias: "Stuur de verlichting aan"
       service: script.hue_dimmer_default_logica
       data:
         command: "{{ trigger.event.data.command }}"
         media_player: "media_player.lg_oled"
-        brightness: 50
-        transition: 1
         light: "light.lamp_bioscoopkamer"
         area: "light.alle_lampen_zha_group_0x0006"
