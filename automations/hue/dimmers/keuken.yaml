@@ -1,0 +1,75 @@
+- id: 56bc495a-439f-46d1-8f11-749f9286a238
+  alias: "Verlichting: Keuken (dimmer)"
+  description: "Activeer verlichting keuken op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 13eea38ac9f669fba8af67a6bcb10ba5
+        cluster_id: 64512
+  condition:
+    - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release'] }}"
+  action:
+    - if:
+        - "{{ is_state('input_boolean.beta_mode', 'off') }}"
+      then:
+        - alias: "Zet de radio aan met deze instellingen"
+          service: script.hue_dimmer_default_logica
+          data:
+            command: "{{ trigger.event.data.command }}"
+            media_player: "media_player.chromecast_woonkamer"
+            brightness: 75
+            transition: 1
+            light: "light.keuken_zha_group_0x0002"
+            area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
+      else:
+        - alias: "Zet de radio aan met deze instellingen"
+          service: script.hue_dimmer_beta_logica
+          data:
+            command: "{{ trigger.event.data.command }}"
+            media_player: "media_player.chromecast_woonkamer"
+            sonos_speaker: "media_player.sonos_woonkamer"
+            brightness: 75
+            transition: 1
+            light: "light.keuken_zha_group_0x0002"
+            area: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
+
+- id: 8ab7cbeb-efaa-4d69-91cb-f38f4410f679
+  alias: "Verlichting: Keuken (dimmer) extensie"
+  description: "Deactiveer automation.verlichting_keuken_beweging totdat de verlichting met de Hue Dimmer is uitgeschakeld."
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 13eea38ac9f669fba8af67a6bcb10ba5
+        cluster_id: 64512
+  variables:
+    command: "{{ trigger.event.data.command }}"
+    automation: "automation.verlichting_keuken_beweging"
+  action:
+    - alias: "Zet de automatisering automation.verlichting_keuken_beweging aan of uit op basis van ingedrukte knop Hue Dimmer"
+      choose:
+        - conditions:
+            - "{{ command == 'on_short_release' }}"
+          sequence:
+            - if:
+                - "{{ is_state(automation, 'on') }}"
+              then:
+                - alias: "Schakel automatisering Verlichting Keuken beweging uit"
+                  service: automation.turn_off
+                  target:
+                    entity_id: "{{ automation }}"
+        - conditions:
+            - "{{ command == 'off_short_release' }}"
+          sequence:
+            - if:
+                - "{{ is_state(automation, 'off') }}"
+              then:
+                - alias: "Schakel automatisering Verlichting Keuken beweging in"
+                  service: automation.turn_on
+                  target:
+                    entity_id: "{{ automation }}"

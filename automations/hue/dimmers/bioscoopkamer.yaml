@@ -1,0 +1,23 @@
+- id: ca51687d-fcf7-4bfe-97ca-48842017a1dd
+  alias: "Verlichting: Bioscoopkamer (dimmer)"
+  description: "Activeer verlichting bioscoopkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: ffa7a6d89a911af5c5c96267dd5491fd
+        cluster_id: 64512
+  condition:
+    - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release'] }}"
+  action:
+    - alias: "Zet de radio aan met deze instellingen"
+      service: script.hue_dimmer_default_logica
+      data:
+        command: "{{ trigger.event.data.command }}"
+        media_player: "media_player.lg_oled"
+        brightness: 50
+        transition: 1
+        light: "light.lamp_bioscoopkamer"
+        area: "light.alle_lampen_zha_group_0x0006"

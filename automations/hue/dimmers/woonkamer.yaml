@@ -1,0 +1,37 @@
+- id: daeda308-7b60-470e-8706-d92576912cd7
+  alias: "Verlichting: Woonkamer (dimmer)"
+  description: "Activeer verlichting woonkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  trigger:
+    - platform: event
+      event_type: zha_event
+      event_data:
+        device_id: 012d4979feb78a9bbe126a6c141e8d45
+        cluster_id: 64512
+  condition:
+    - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release'] }}"
+  action:
+    - if:
+        - "{{ is_state('input_boolean.beta_mode', 'off') }}"
+      then:
+        - alias: "Zet de radio aan met deze instellingen"
+          service: script.hue_dimmer_default_logica
+          data:
+            command: "{{ trigger.event.data.command }}"
+            media_player: "media_player.chromecast_woonkamer"
+            brightness: 50
+            transition: 1
+            light: "light.woonkamer_zha_group_0x0003"
+            area: "light.alle_lampen_zha_group_0x0006"
+      else:
+        - alias: "Zet de radio aan met deze instellingen"
+          service: script.hue_dimmer_beta_logica
+          data:
+            command: "{{ trigger.event.data.command }}"
+            media_player: "media_player.chromecast_woonkamer"
+            sonos_speaker: "media_player.sonos_slaapkamer"
+            brightness: 50
+            transition: 1
+            light: "light.woonkamer_zha_group_0x0003"
+            area: "light.alle_lampen_zha_group_0x0006"
