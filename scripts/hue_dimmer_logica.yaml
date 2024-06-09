@@ -40,9 +40,8 @@ hue_dimmer_basic_logica:
                   sequence:
                     - <<: *turn_on_entities
                       data:
-                        brightness_pct: "{{ brightness }}"
+                        brightness_pct: "{{ float(50) }}"
                         color_temp_kelvin: *color_temp
-                        transition: "{{ transition }}"
                 - conditions:
                     - alias: "Tijdsspannes tussen ingestelde tijden"
                       or:
@@ -56,7 +55,6 @@ hue_dimmer_basic_logica:
                     - <<: *turn_on_entities
                       data:
                         brightness_pct: 10
-                        transition: "{{ transition }}"
                         color_temp_kelvin: *color_temp
                 - conditions:
                     - alias: "Nacht"
@@ -79,7 +77,6 @@ hue_dimmer_basic_logica:
                 entity_id: "{{ area }}"
               data:
                 brightness_pct: 100
-                transition: "{{ transition }}"
         - conditions:
             - "{{ command == 'up_short_release' }}"
           sequence:
@@ -87,12 +84,11 @@ hue_dimmer_basic_logica:
               data:
                 brightness_step_pct: 10
         - conditions:
-            - "{{ command == 'up_long_release' }}"
+            - "{{ command == 'up_hold' }}"
           sequence:
             - <<: *turn_on_entities
               data:
                 color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
-                transition: "{{ transition / 2 }}"
         - conditions:
             - "{{ command == 'down_short_release' }}"
           sequence:
@@ -100,20 +96,17 @@ hue_dimmer_basic_logica:
               data:
                 brightness_step_pct: -10
         - conditions:
-            - "{{ command == 'down_long_release' }}"
+            - "{{ command == 'down_hold' }}"
           sequence:
             - <<: *turn_on_entities
               data:
                 color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
-                transition: "{{ transition / 2 }}"
         - conditions:
             - "{{ command == 'off_short_release' }}"
           sequence:
             - service: light.turn_off
               target:
                 entity_id: "{{ light }}"
-              data:
-                transition: "{{ transition }}"
         - conditions:
             - "{{ command == 'off_long_release' }}"
           sequence:
@@ -125,30 +118,34 @@ hue_dimmer_basic_logica:
                       service: light.turn_off
                       target:
                         entity_id: "{{ area }}"
-                      data:
-                        transition: "{{ transition }}"
-                    - alias: "Zet de gekozen media_player uit"
-                      service: media_player.turn_off
-                      target:
-                        entity_id: "{{ media_player }}"
+                    - if:
+                        - "{{ not is_state(media_player, 'off') }}"
+                      then:
+                        - alias: "Zet de gekozen media_player uit"
+                          service: media_player.turn_off
+                          target:
+                            entity_id: "{{ media_player }}"
                     - if:
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       then:
-                        # Stop de muziek op Sonos luidsprekers
-                        - service: input_boolean.turn_off
+                        - alias: "Stop streaming radio"
+                          service: input_boolean.turn_off
                           target:
                             entity_id: input_boolean.play_streaming_radio
               else:
                 - parallel:
-                    - alias: "Zet de gekozen media_player uit"
-                      service: media_player.turn_off
-                      target:
-                        entity_id: "{{ media_player }}"
+                    - if:
+                        - "{{ not is_state(media_player, 'off') }}"
+                      then:
+                        - alias: "Zet de gekozen media_player uit"
+                          service: media_player.turn_off
+                          target:
+                            entity_id: "{{ media_player }}"
                     - if:
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       then:
-                        # Stop de muziek op Sonos luidsprekers
-                        - service: input_boolean.turn_off
+                        - alias: "Stop streaming radio"
+                          service: input_boolean.turn_off
                           target:
                             entity_id: input_boolean.play_streaming_radio
 
@@ -330,7 +327,7 @@ hue_dimmer_multimedia_logica:
                           data:
                             brightness_step_pct: 10
                     - conditions:
-                        - "{{ command == 'up_long_release' }}"
+                        - "{{ command == 'up_hold' }}"
                       sequence:
                         - <<: *turn_on_entities
                           data:
@@ -342,7 +339,7 @@ hue_dimmer_multimedia_logica:
                           data:
                             brightness_step_pct: -10
                     - conditions:
-                        - "{{ command == 'down_long_release' }}"
+                        - "{{ command == 'down_hold' }}"
                       sequence:
                         - <<: *turn_on_entities
                           data:
