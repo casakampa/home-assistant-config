@@ -8,7 +8,7 @@
   action:
     - service: homeassistant.reload_config_entry
       data:
-        entry_id: e4e7281844f73863a7041347b0044f8b
+        entry_id: "{{ config_entry_id('sensor.envoy_iq7a_current_power_production') }}"
 
 - id: 8e513b89-3a00-4393-8eaa-04f8405b63f7
   alias: "Herlaad WebOS integratie"
@@ -33,4 +33,4 @@
             minutes: 5
     - service: homeassistant.reload_config_entry
       data:
-        entity_id: media_player.lg_oled
+        entry_id: "{{ config_entry_id('media_player.lg_oled') }}"

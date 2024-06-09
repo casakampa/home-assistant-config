@@ -47,3 +47,9 @@ internet_radio_streams:
     - "NPO Radio 2"
     - "GP Radio"
   icon: mdi:radio-tower
+dimmer_mode:
+  name: "Dimmer Mode"
+  options:
+    - "Verlichting"
+    - "Media"
+  icon: mdi:remote
