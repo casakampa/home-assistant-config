@@ -201,6 +201,23 @@ hue_dimmer_beta_logica:
                           target:
                             entity_id: input_boolean.play_streaming_radio
                     - conditions:
+                        - "{{ command == 'on_double_press' }}"
+                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                      sequence:
+                        - service: input_select.select_next
+                          target:
+                            entity_id: input_select.internet_radio_streams
+                        - alias: "Vertel de actieve modus"
+                          service: tts.speak
+                          target:
+                            entity_id: tts.piper
+                          data:
+                            cache: true
+                            media_player_entity_id: >-
+                              {{ sonos_speaker }}
+                            message: >-
+                              Je luistert naar {{ states('input_select.internet_radio_streams') }}.
+                    - conditions:
                         - "{{ command == 'up_short_release' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
