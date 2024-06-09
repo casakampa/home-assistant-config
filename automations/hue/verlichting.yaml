@@ -454,10 +454,10 @@
         entity_id: input_select.dimmer_mode
       data:
         value: "Verlichting"
-    - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_beta_logica"
+    - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_multimedia_logica"
       service: script.turn_on
       target:
-        entity_id: script.hue_dimmer_beta_logica
+        entity_id: script.hue_dimmer_multimedia_logica
       data:
         variables:
           light: "light.slaapkamer_zha_group_0x0005"

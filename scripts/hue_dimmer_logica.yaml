@@ -1,5 +1,5 @@
-hue_dimmer_default_logica:
-  alias: "Verlichting: Standaard Hue dimmer aansturing"
+hue_dimmer_basic_logica:
+  alias: "Dimmer: Verlichting aansturing"
   icon: mdi:lightbulb-on-outline
   fields:
     media_player:
@@ -152,8 +152,8 @@ hue_dimmer_default_logica:
                           target:
                             entity_id: input_boolean.play_streaming_radio
 
-hue_dimmer_beta_logica:
-  alias: "Verlichting: Beta Hue dimmer aansturing"
+hue_dimmer_multimedia_logica:
+  alias: "Dimmer: Multimedia aansturing"
   icon: mdi:lightbulb-on-outline
   fields:
     media_player:
@@ -200,6 +200,23 @@ hue_dimmer_beta_logica:
                           service: input_boolean.turn_on
                           target:
                             entity_id: input_boolean.play_streaming_radio
+                    - conditions:
+                        - "{{ command == 'on_double_press' }}"
+                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
+                      sequence:
+                        - service: input_select.select_next
+                          target:
+                            entity_id: input_select.internet_radio_streams
+                        - alias: "Vertel de actieve modus"
+                          service: tts.speak
+                          target:
+                            entity_id: tts.piper
+                          data:
+                            cache: true
+                            media_player_entity_id: >-
+                              {{ sonos_speaker }}
+                            message: >-
+                              Je luistert naar {{ states('input_select.internet_radio_streams') }}.
                     - conditions:
                         - "{{ command == 'up_short_release' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
