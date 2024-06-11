@@ -8,9 +8,6 @@ hue_dimmer_basic_logica:
     brightness:
       description: "The initial brightness"
       example: "50"
-    transition:
-      description: "The initial transition"
-      example: "1"
     light:
       description: "The initial lights"
       example: "light.lamp_bioscoopkamer"
@@ -40,7 +37,7 @@ hue_dimmer_basic_logica:
                   sequence:
                     - <<: *turn_on_entities
                       data:
-                        brightness_pct: "{{ float(50) }}"
+                        brightness_pct: "{{ float(brightness) if brightness is defined else float(50) }}"
                         color_temp_kelvin: *color_temp
                 - conditions:
                     - alias: "Tijdsspannes tussen ingestelde tijden"
@@ -159,6 +156,9 @@ hue_dimmer_multimedia_logica:
     sonos_speaker:
       description: "The speaker to play the announcements on"
       example: "media_player.sonos_woonkamer"
+    brightness:
+      description: "The initial brightness"
+      example: "50"
     light:
       description: "The initial lights"
       example: "light.lamp_bioscoopkamer"
@@ -216,7 +216,6 @@ hue_dimmer_multimedia_logica:
                               Je luistert naar {{ states('input_select.internet_radio_streams') }}.
                     - conditions:
                         - "{{ command == 'up_short_release' }}"
-                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
                         - alias: "Verhoog het volume"
                           service: input_number.set_value
@@ -226,7 +225,6 @@ hue_dimmer_multimedia_logica:
                             value: "{{ min((int(states('input_number.sonos_media_volume'), 80) + 5), 80) }}"
                     - conditions:
                         - "{{ command == 'down_short_release' }}"
-                        - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
                         - alias: "Verlaag het volume"
                           service: input_number.set_value
@@ -283,7 +281,7 @@ hue_dimmer_multimedia_logica:
                               sequence:
                                 - <<: *turn_on_entities
                                   data:
-                                    brightness_pct: "{{ float(50) }}"
+                                    brightness_pct: "{{ float(brightness) if brightness is defined else float(50) }}"
                                     color_temp_kelvin: *color_temp
                             - conditions:
                                 - alias: "Tijdsspannes tussen ingestelde tijden"
