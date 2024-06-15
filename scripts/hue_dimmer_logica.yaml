@@ -1,6 +1,7 @@
 hue_dimmer_basic_logica:
   alias: "Dimmer: Verlichting aansturing"
   icon: mdi:lightbulb-on-outline
+  mode: restart
   fields:
     media_player:
       description: "The media player to control"
@@ -149,6 +150,7 @@ hue_dimmer_basic_logica:
 hue_dimmer_multimedia_logica:
   alias: "Dimmer: Multimedia aansturing"
   icon: mdi:lightbulb-on-outline
+  mode: restart
   fields:
     media_player:
       description: "The media player to control"
@@ -197,6 +199,21 @@ hue_dimmer_multimedia_logica:
                           service: input_boolean.turn_on
                           target:
                             entity_id: input_boolean.play_streaming_radio
+                    - conditions:
+                        - "{{ command == 'on_long_release' }}"
+                      sequence:
+                        - alias: "Vertel hoe laat het is"
+                          service: tts.speak
+                          target:
+                            entity_id: tts.piper
+                          data:
+                            cache: false
+                            media_player_entity_id: >-
+                              {{ sonos_speaker }}
+                            message: >-
+                              {% from 'tts_functions.jinja' import dutch_time_announcement %}
+                              {% set nu = now().strftime('%H:%M') %}
+                              Het is {{ dutch_time_announcement(nu) }}
                     - conditions:
                         - "{{ command == 'on_double_press' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
