@@ -193,12 +193,38 @@ hue_dimmer_multimedia_logica:
                 - choose:
                     - conditions:
                         - "{{ command == 'on_short_release' }}"
-                        - "{{ is_state('input_boolean.play_streaming_radio', 'off') }}"
                       sequence:
-                        - alias: "Schakel streaming radio in"
-                          service: input_boolean.turn_on
-                          target:
-                            entity_id: input_boolean.play_streaming_radio
+                        - wait_for_trigger:
+                            - platform: event
+                              event_type: zha_event
+                              event_data:
+                                command: "on_double_press"
+                          timeout:
+                            milliseconds: 500
+                          continue_on_timeout: true
+                        - if:
+                            - "{{ wait.trigger is none }}"
+                          then:
+                            - alias: "Vertel de actieve modus"
+                              service: tts.speak
+                              target:
+                                entity_id: tts.piper
+                              data:
+                                cache: true
+                                media_player_entity_id: >-
+                                  {{ sonos_speaker }}
+                                message: >-
+                                  Je luistert naar {{ states('input_select.internet_radio_streams') }}.
+                            - if: "{{ is_state('input_boolean.play_streaming_radio', 'off') }}"
+                              then:
+                                - alias: "Schakel streaming radio in"
+                                  service: input_boolean.turn_on
+                                  target:
+                                    entity_id: input_boolean.play_streaming_radio
+                              else:
+                                - stop: "Radioactief"
+                          else:
+                            - stop: "Geen passende actie beschikbaar"
                     - conditions:
                         - "{{ command == 'on_long_release' }}"
                       sequence:
@@ -362,25 +388,20 @@ hue_dimmer_multimedia_logica:
                     - conditions:
                         - "{{ command == 'off_short_release' }}"
                       sequence:
+                        - wait_for_trigger:
+                            - platform: event
+                              event_type: zha_event
+                              event_data:
+                                command: "off_double_press"
+                          timeout:
+                            milliseconds: 500
+                          continue_on_timeout: true
                         - if:
-                            - "{{ command == 'off_short_release' }}"
+                            - "{{ wait.trigger is none }}"
                           then:
-                            - wait_for_trigger:
-                                - platform: event
-                                  event_type: zha_event
-                                  event_data:
-                                    command: "off_double_press"
-                              timeout:
-                                milliseconds: 500
-                              continue_on_timeout: true
-                            - if:
-                                - "{{ wait.trigger is none }}"
-                              then:
-                                - service: light.turn_off
-                                  target:
-                                    entity_id: "{{ light }}"
-                              else:
-                                - stop: "Geen geldige keuze"
+                            - service: light.turn_off
+                              target:
+                                entity_id: "{{ light }}"
                           else:
                             - stop: "Geen geldige keuze"
                     - conditions:
