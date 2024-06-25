@@ -1,6 +1,7 @@
 start_streaming_radio:
   alias: "Start streaming radio"
   icon: mdi:play-circle
+  mode: restart
   sequence:
     - service: media_player.play_media
       target:
@@ -8,13 +9,14 @@ start_streaming_radio:
           {{ media_player }}
       data:
         media_content_id: >-
-          {%- set radio_urls = {
-              'Qmusic Foute uur nonstop': 'aac://https://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_fouteuur_64.aac',
-              'BNR Nieuwsradio': 'aac://https://stream.bnr.nl/bnr_aac_96_20',
-              'Radio Veronica': 'aac://https://21223.live.streamtheworld.com/VERONICAAAC.aac',
-              'NPO Radio 2': 'aac://https://icecast.omroep.nl/radio2-bb-aac',
+          {%- set stations = {
+              'Qmusic Foute uur nonstop': 'x-rincon-mp3radio://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_fouteuur_64.aac',
+              'BNR Nieuwsradio': 'x-rincon-mp3radio://stream.bnr.nl/bnr_mp3_128_20',
+              'Radio Veronica': 'x-rincon-mp3radio://27783.live.streamtheworld.com/VERONICA.mp3',
+              'NPO Radio 2': 'x-rincon-mp3radio://icecast.omroep.nl/radio2-bb-mp3',
+              'GP Radio': 'x-rincon-mp3radio://xxxxxx'
             } -%}
-          {{ radio_urls[states('input_select.internet_radio_streams')] }}
+          {{ stations[states('input_select.internet_radio_streams')] }}
         media_content_type: "music"
     - service: media_player.volume_set
       data:
