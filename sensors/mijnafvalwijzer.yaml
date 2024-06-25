@@ -3,4 +3,5 @@
   provider: mijnafvalwijzer
   postal_code: !secret afvalwijzer_postal_code
   street_number: !secret afvalwijzer_house_number
+  exclude_pickup_today: false
   default_label: Geen
