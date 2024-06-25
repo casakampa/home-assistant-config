@@ -441,19 +441,26 @@
     - platform: state
       entity_id: device_tracker.gamepc_ryzen5
       to: "home"
+      id: computer
     - platform: state
       entity_id: sensor.drempelwaarde_woonkamer
+      id: sensor
+    - platform: state
+      entity_id: sun.sun
+      to: "below_horizon"
+      id: sun
   condition:
     - "{{ has_value(trigger.entity_id) }}"
-    - "{{ is_state('device_tracker.gamepc_ryzen5', 'home') }}"
-    - "{{ is_state('sun.sun', 'below_horizon') }}"
+    - or:
+        - "{{ trigger.id in ['sun', 'sensor'] and is_state('device_tracker.gamepc_ryzen5', 'home') }}"
+        - "{{ trigger.id == 'computer' and is_state('sun.sun', 'below_horizon') }}"
   action:
     - alias: "Activeer de juiste mode"
       service: input_select.select_option
       target:
         entity_id: input_select.dimmer_mode
       data:
-        value: "Verlichting"
+        option: "Verlichting"
     - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_multimedia_logica"
       service: script.turn_on
       target:
@@ -462,4 +469,4 @@
         variables:
           light: "light.slaapkamer_zha_group_0x0005"
           command: >
-            {{ iif( is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
+            {{ iif(is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
