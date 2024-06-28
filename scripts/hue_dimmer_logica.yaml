@@ -215,6 +215,36 @@ hue_dimmer_multimedia_logica:
                                   {{ sonos_speaker }}
                                 message: >-
                                   Je luistert naar {{ states('input_select.internet_radio_streams') }}.
+                            - alias: "Activeer de Sonos luidspreker in de ruimte waarin de muziek wordt aangezet, wanneer deze is uitgeschakeld."
+                              choose:
+                                - conditions:
+                                    - "{{ sonos_speaker == 'media_player.sonos_slaapkamer' }}"
+                                  sequence:
+                                    - alias: "Activeer de Sonos in de slaapkamer als deze nog niet is ingeschakeld"
+                                      if:
+                                        - "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'off') }}"
+                                      then:
+                                        - alias: "Activeer Sonos Slaapkamer"
+                                          service: input_boolean.turn_on
+                                          target:
+                                            entity_id: input_boolean.play_media_sonos_slaapkamer
+                                        - delay:
+                                            milliseconds: 100
+                                - conditions:
+                                    - "{{ sonos_speaker == 'media_player.sonos_woonkamer' }}"
+                                  sequence:
+                                    - alias: "Activeer de Sonos in de woonkamer als deze nog niet is ingeschakeld"
+                                      if:
+                                        - "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'off') }}"
+                                      then:
+                                        - alias: "Activeer Sonos Woonkamer"
+                                          service: input_boolean.turn_on
+                                          target:
+                                            entity_id: input_boolean.play_media_sonos_woonkamer
+                                        - delay:
+                                            milliseconds: 100
+                              default:
+                                - stop: "De gekozen luidspreker is al actief"
                             - if: "{{ is_state('input_boolean.play_streaming_radio', 'off') }}"
                               then:
                                 - alias: "Schakel streaming radio in"
