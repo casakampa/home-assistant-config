@@ -83,24 +83,30 @@
                         - "{{ trigger.id == 'select_streaming_radio' }}"
                         - "{{ trigger.id == 'boolean_play_media' and trigger.to_state.state == 'on' }}"
           sequence:
-            - alias: "Controleer of er groep gemaakt moet worden van de geselecteerde luidspreker(s)"
+            - alias: >
+                Controleer of de actieve luidsprekers al zijn samengevoegd tot een groep.
+                Voeg deze samen wanneer dit nodig is, of haal ze uit elkaar wanneer een luidspreker wordt uitgeschakeld.
               if:
-                - "{{ boolean_slaapkamer_is_on }}"
-                - "{{ boolean_woonkamer_is_on }}"
+                - "{{ state_attr('media_player.sonos_woonkamer', 'group_members') | count != 2 }}"
               then:
-                - service: media_player.join
-                  target:
-                    entity_id: media_player.sonos_woonkamer
-                  data:
-                    group_members: media_player.sonos_slaapkamer
-              else:
-                - service: media_player.unjoin
-                  target:
-                    entity_id: >
-                      {{ states.media_player
-                        | selectattr('entity_id', 'contains', 'sonos')
-                        | map(attribute='entity_id')
-                        | list }}
+                - alias: "Controleer of er groep gemaakt moet worden van de geselecteerde luidspreker(s)"
+                  if:
+                    - "{{ boolean_slaapkamer_is_on }}"
+                    - "{{ boolean_woonkamer_is_on }}"
+                  then:
+                    - service: media_player.join
+                      target:
+                        entity_id: media_player.sonos_woonkamer
+                      data:
+                        group_members: media_player.sonos_slaapkamer
+                  else:
+                    - service: media_player.unjoin
+                      target:
+                        entity_id: >
+                          {{ states.media_player
+                            | selectattr('entity_id', 'contains', 'sonos')
+                            | map(attribute='entity_id')
+                            | list }}
             - alias: "Controleer op welke geselecteerde luidspreker(s) gestreamd moet worden"
               if:
                 - or:
