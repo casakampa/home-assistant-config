@@ -1,37 +1,5 @@
 # Template based sensors and buttons
 - sensor:
-    - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
-      name: "{{ this.attributes.get('afvalsoort') }}"
-      icon: mdi:delete-restore
-      state: >-
-        {% set sensor = 'sensor.afvalwijzer_' ~ this.attributes.get('next_type') %}
-        {% set collection_date = as_local(as_datetime(states(sensor))).date() %}
-        {% set days = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag' ] %}
-        {% set days_until = state_attr(sensor, 'days_until_collection_date') %}
-        {% set weeks_until = (days_until / 7) | round(0, 'ceil') %}
-        {% if days_until <= 1 %}
-          {{ (['Vandaag', 'Morgen'])[days_until] }}
-        {% elif (days_until < 7 - now().isoweekday()) or (now().isoweekday() in [6, 7] and days_until < 7) %}
-          {{ days[collection_date.weekday()] | title }}
-        {% elif days_until < 14 - now().isoweekday() %}
-            {{ 'Volgende week ' ~ days[collection_date.weekday()] }}
-        {% else %}
-            {{ days[collection_date.weekday()] | title ~ ' over ' ~ weeks_until ~ (' weken' if (weeks_until > 1) else ' week') }}
-        {% endif %}
-      picture: >-
-        {% set next_type = this.attributes.get('next_type') %}
-        {{ 'https://www.maartenvandekamp.nl/afvalwijzer/' ~ ( next_type ~ '_100.png' if (has_value('sensor.afvalwijzer_' ~ next_type) and not is_state('sensor.afvalwijzer_' ~ next_type, 'Geen')) else 'kliko.jpg' ) }}
-      attributes:
-        afvalsoort: >-
-          {% set afvalsoorten = {
-            'papier': 'Papier',
-            'gft': 'GFT',
-            'pmd': 'Plastic',
-            'restafval': 'Restafval'
-            } %}
-          {{ afvalsoorten.get(this.attributes.get('next_type'), 'Geen') }}
-        next_type: "{{ states('sensor.afvalwijzer_next_type') }}"
-      availability: "{{ has_value('sensor.afvalwijzer_next_type') and has_value('sensor.afvalwijzer_next_date') }}"
     - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
       name: "Kleurtemperatuur verlichting"
       icon: mdi:palette
@@ -115,6 +83,42 @@
           {% elif now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
             Thuiswerken
           {% endif %}
+
+# Afvalwijzer sensor
+- trigger:
+    - platform: state
+      entity_id: sensor.afvalwijzer_next_type
+  sensor:
+    - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
+      name: "{{ this.attributes.afvalsoort }}"
+      icon: mdi:delete-restore
+      state: >-
+        {% set next_type = states('sensor.afvalwijzer_' ~ trigger.to_state.state ) %}
+        {% set collection_date = as_local(as_datetime(next_type)).date() %}
+        {% set days = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag' ] %}
+        {% set days_until = (collection_date - now().date()).days %}
+        {% if days_until <= 1 %}
+          {{ (['Vandaag', 'Morgen'])[days_until] }}
+        {% elif (days_until < 7 - now().isoweekday()) or (now().isoweekday() in [6, 7] and days_until < 7) %}
+          {{ days[collection_date.weekday()] | title }}
+        {% elif days_until <= 14 - now().isoweekday() %}
+          {{ 'Volgende week ' ~ days[collection_date.weekday()] }}
+        {% else %}
+          {{ days[collection_date.weekday()] | title ~ ' over ' ~ (days_until / 7) | round(0, 'ceil') ~ ' weken' }}
+        {% endif %}
+      picture: >-
+        {% set trash_type = trigger.to_state.state %}
+          {{ 'https://www.maartenvandekamp.nl/afvalwijzer/' ~ ( trash_type ~ '_100.png' if (has_value('sensor.afvalwijzer_' ~ trash_type) and not is_state('sensor.afvalwijzer_' ~ trash_type, 'Geen')) else 'kliko.jpg' ) }}
+      attributes:
+        afvalsoort: >-
+          {% set afvalsoorten = {
+            'papier': 'Papier en karton',
+            'gft': 'Groente-, Fruit-, Tuinafval en Etensresten',
+            'pmd': 'Plastic verpakkingen, Metalen verpakkingen en Drankkartons',
+            'restafval': 'Restafval'
+            } %}
+            {{ afvalsoorten[trigger.to_state.state] }}
+      availability: "{{ has_value(trigger.entity_id) }}"
 
 # Monitor hvac_action van de thermostaat voor veranderingen
 - trigger:
