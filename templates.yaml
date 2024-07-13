@@ -99,7 +99,7 @@
         {% set days_until = (collection_date - now().date()).days %}
         {% if days_until <= 1 %}
           {{ (['Vandaag', 'Morgen'])[days_until] }}
-        {% elif (days_until < 7 - now().isoweekday()) or (now().isoweekday() in [6, 7] and days_until < 7) %}
+        {% elif (days_until < 7 - (now().isoweekday() in [6, 7] or now().isoweekday())) %}
           {{ days[collection_date.weekday()] | title }}
         {% elif days_until <= 14 - now().isoweekday() %}
           {{ 'Volgende week ' ~ days[collection_date.weekday()] }}
@@ -184,7 +184,7 @@
         {% else %}
         nacht
         {% endif %}
-      availability: "{{ has_value('sensor.hue_motion_woonkamer_illuminance') }}"
+      availability: "{{ has_value(trigger.entity_id) }}"
 - trigger:
     - platform: state
       entity_id: sensor.hue_motion_gang_illuminance
@@ -200,7 +200,7 @@
         {% else %}
         nacht
         {% endif %}
-      availability: "{{ has_value('sensor.hue_motion_gang_illuminance') }}"
+      availability: "{{ has_value(trigger.entity_id) }}"
 - trigger:
     - platform: state
       entity_id: sensor.hue_motion_achtertuin_illuminance
@@ -216,7 +216,7 @@
         {% else %}
         nacht
         {% endif %}
-      availability: "{{ has_value('sensor.hue_motion_achtertuin_illuminance') }}"
+      availability: "{{ has_value(trigger.entity_id) }}"
 # Knoppen om scripts te activeren
 - button:
     - unique_id: b4ad4b16-567e-4ba4-a7c4-4a9d47650493
