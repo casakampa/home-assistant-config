@@ -19,7 +19,7 @@ tts_kliko_wegzetten:
         media_player_entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
-        message: "Vergeet niet de {{ afvalsoort }}kliko aan de weg te zetten."
+        message: "Vergeet niet de kliko voor {{ afvalsoort }} aan de weg te zetten."
 
 tts_kliko_ophalen:
   alias: "TTS: Kliko ophalen"
@@ -42,4 +42,4 @@ tts_kliko_ophalen:
         media_player_entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
-        message: "De {{ afvalsoort }}kliko staat nog aan de weg."
+        message: "De kliko voor {{ afvalsoort }} staat nog aan de weg."
