@@ -399,24 +399,28 @@ hue_dimmer_multimedia_logica:
                             brightness_step_pct: 10
                     - conditions:
                         - "{{ command == 'up_hold' }}"
+                        - "{{ is_state(light, 'on') }}"
                       sequence:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
                     - conditions:
                         - "{{ command == 'down_short_release' }}"
+                        - "{{ is_state(light, 'on') }}"
                       sequence:
                         - <<: *turn_on_entities
                           data:
                             brightness_step_pct: -10
                     - conditions:
                         - "{{ command == 'down_hold' }}"
+                        - "{{ is_state(light, 'on') }}"
                       sequence:
                         - <<: *turn_on_entities
                           data:
                             color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
                     - conditions:
                         - "{{ command == 'off_short_release' }}"
+                        - "{{ is_state(light, 'on') }}"
                       sequence:
                         - wait_for_trigger:
                             - platform: event
