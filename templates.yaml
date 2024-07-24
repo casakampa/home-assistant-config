@@ -43,7 +43,7 @@
       icon: mdi:lightbulb-alert-outline
       state: "{{ this.attributes.lampen | count }}"
       attributes:
-        lampen: "{{ states.light | rejectattr('entity_id', 'contains', 'zha') | rejectattr('state', 'in', ['on', 'off']) | map(attribute='name') | list }}"
+        lampen: "{{ states.light | rejectattr('state', 'in', ['on', 'off']) | rejectattr('entity_id', 'contains', 'zha') | map(attribute='name') | list }}"
 # Template binary sensor voor wekker
 - binary_sensor:
     - unique_id: c6a135b3-23d6-4417-b786-e1e7b04c5b06
