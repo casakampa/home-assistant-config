@@ -112,9 +112,9 @@
       attributes:
         afvalsoort: >-
           {% set afvalsoorten = {
-            'papier': 'Papier en karton',
-            'gft': 'Groente-, Fruit-, Tuinafval en Etensresten',
-            'pmd': 'Plastic verpakkingen, Metalen verpakkingen en Drankkartons',
+            'papier': 'Papier',
+            'gft': 'GFT',
+            'pmd': 'Plastic',
             'restafval': 'Restafval'
             } %}
             {{ afvalsoorten[trigger.to_state.state] }}
