@@ -41,6 +41,7 @@
       choose:
         - conditions:
             - "{{ command == 'on_short_release' }}"
+            - "{{ is_state('input_select.dimmer_mode', 'Verlichting') }}"
           sequence:
             - if:
                 - "{{ is_state(automation, 'on') }}"
@@ -51,6 +52,7 @@
                     entity_id: "{{ automation }}"
         - conditions:
             - "{{ command == 'off_short_release' }}"
+            - "{{ is_state('input_select.dimmer_mode', 'Verlichting') }}"
           sequence:
             - if:
                 - "{{ is_state(automation, 'off') }}"
