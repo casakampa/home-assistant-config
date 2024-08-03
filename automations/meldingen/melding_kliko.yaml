@@ -82,7 +82,7 @@
             - *boolean_herhaal_herinnering
             - parallel:
                 - *tts_kliko_wegzetten
-                - service: notify.iphone_12
+                - action: notify.iphone_12
                   data:
                     message: "Het {{ afvalsoort }} wordt morgen geleegd."
                     data:

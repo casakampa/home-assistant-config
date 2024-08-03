@@ -30,7 +30,7 @@
               tag: *tag
               push:
                 interruption-level: passive
-        - service: persistent_notification.create
+        - action: persistent_notification.create
           data:
             message: "{{ aantal }} {{ lampen }}"
             notification_id: *tag

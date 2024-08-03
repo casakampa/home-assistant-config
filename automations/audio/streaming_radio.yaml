@@ -94,13 +94,13 @@
                     - "{{ boolean_slaapkamer_is_on }}"
                     - "{{ boolean_woonkamer_is_on }}"
                   then:
-                    - service: media_player.join
+                    - action: media_player.join
                       target:
                         entity_id: media_player.sonos_woonkamer
                       data:
                         group_members: media_player.sonos_slaapkamer
                   else:
-                    - service: media_player.unjoin
+                    - action: media_player.unjoin
                       target:
                         entity_id: >
                           {{ states.media_player

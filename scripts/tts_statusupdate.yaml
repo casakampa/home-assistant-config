@@ -31,13 +31,13 @@ tts_statusupdate:
         Vandaag wordt de {{ afvalsoort }}container geleegd.
       {% endif %}
   sequence:
-    - service: media_player.volume_set
+    - action: media_player.volume_set
       target:
         entity_id:
           - media_player.sonos_slaapkamer
       data:
         volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
-    - service: tts.speak
+    - action: tts.speak
       target:
         entity_id: tts.piper
       data:

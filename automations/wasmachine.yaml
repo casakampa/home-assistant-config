@@ -62,7 +62,7 @@
           repeat:
             while: "{{ is_state(wasprogramma, 'Geen') }}"
             sequence:
-              - service: notify.iphone_12
+              - action: notify.iphone_12
                 data:
                   message: "Selecteer het wasprogramma 🧺"
                   data:
@@ -102,7 +102,7 @@
                       - conditions: "{{ actie == startuitstel }}"
                         sequence:
                           - parallel:
-                              - service: input_select.select_option
+                              - action: input_select.select_option
                                 target:
                                   entity_id: *select_wasprogramma
                                 data:
@@ -131,7 +131,7 @@
                         sequence:
                           - variables:
                               tag: "wasmachine_uitschakelen"
-                          - service: notify.iphone_12
+                          - action: notify.iphone_12
                             data:
                               message: "De wasmachine wordt over 30 seconden uitgeschakeld"
                               data:
@@ -160,7 +160,7 @@
           else:
             - stop: "Het programma Start is niet afgerond, de automatisering wordt gestopt."
       else:
-        - service: notify.iphone_12
+        - action: notify.iphone_12
           data:
             message: "Er is niet aan de voorwaarden voldaan. De instellingen worden gereset, probeer het opnieuw."
             data:
@@ -170,7 +170,7 @@
               tag: *tag
               group: *group
         - parallel:
-            - service: input_boolean.turn_off
+            - action: input_boolean.turn_off
               target:
                 entity_id: *boolean_wasprogramma_startuitstel
             - *deactiveer_wasprogramma_actief
@@ -202,7 +202,7 @@
   condition:
     - "{{ is_state(wasprogramma_startuitstel, 'on') }}"
   action:
-    - service: input_boolean.turn_off
+    - action: input_boolean.turn_off
       target:
         entity_id: *boolean_wasprogramma_startuitstel
     - *activeer_wasprogramma_afronding

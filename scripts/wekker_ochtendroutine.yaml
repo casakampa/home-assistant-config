@@ -68,7 +68,7 @@ wekker_met_ochtendroutine:
           service: script.turn_on
           target:
             entity_id: script.tts_statusupdate
-        - service: notify.iphone_12
+        - action: notify.iphone_12
           data:
             message: "Tijd om uit bed te stappen."
             data:
@@ -80,7 +80,7 @@ wekker_met_ochtendroutine:
         minutes: 5
     - parallel:
         # Schakel lamp uit
-        - service: light.turn_off
+        - action: light.turn_off
           target:
             entity_id: *slaapkamer
         # Zet de radio aan
@@ -111,7 +111,7 @@ wekker_met_ochtendroutine:
                 - "{{ is_state('media_player.chromecast_woonkamer', 'playing') }}"
               then:
                 # Schakel Chromecast uit
-                - service: media_player.turn_off
+                - action: media_player.turn_off
                   target:
                     entity_id: media_player.chromecast_woonkamer
             # Controle op actieve streaming radio
@@ -119,11 +119,11 @@ wekker_met_ochtendroutine:
                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
               then:
                 # Stop de muziek op Sonos luidsprekers
-                - service: input_boolean.turn_off
+                - action: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.play_streaming_radio
             # Schakel lampen uit
-            - service: light.turn_off
+            - action: light.turn_off
               target:
                 entity_id: light.woonkamer_eethoek_keuken_zha_group_0x0008
         - delay:
@@ -144,13 +144,13 @@ controle_daglicht_woonkamer:
         - "{{ not is_state('sensor.drempelwaarde_woonkamer', 'dag') }}"
       then:
         - parallel:
-            - service: light.turn_on
+            - action: light.turn_on
               target:
                 entity_id: light.woonkamer_zha_group_0x0003
               data:
                 brightness_pct: 40
                 color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
-            - service: light.turn_on
+            - action: light.turn_on
               target:
                 entity_id: light.keuken_zha_group_0x0002
               data:

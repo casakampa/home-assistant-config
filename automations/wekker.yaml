@@ -40,7 +40,7 @@
       repeat:
         while: "{{ is_state('sensor.wekkermodus', 'Vakantie') }}"
         sequence:
-          - service: notify.iphone_12
+          - action: notify.iphone_12
             data:
               message: "De wekker staat op Vakantiemodus. Wil je dit wijzigen?"
               data:
@@ -73,7 +73,7 @@
                 if:
                   - "{{ wait.trigger.event.data.action == wekkermodus }}"
                 then:
-                  - service: input_boolean.turn_on
+                  - action: input_boolean.turn_on
                     target:
                       entity_id: input_boolean.wekker_status
                 else:

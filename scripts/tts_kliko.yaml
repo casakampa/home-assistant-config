@@ -4,14 +4,14 @@ tts_kliko_wegzetten:
   variables:
     afvalsoort: "{{ state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort') }}"
   sequence:
-    - service: media_player.volume_set
+    - action: media_player.volume_set
       target:
         entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
       data:
         volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
-    - service: tts.speak
+    - action: tts.speak
       target:
         entity_id: tts.piper
       data:
@@ -27,14 +27,14 @@ tts_kliko_ophalen:
   variables:
     afvalsoort: "{{ state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort') }}"
   sequence:
-    - service: media_player.volume_set
+    - action: media_player.volume_set
       target:
         entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
       data:
         volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
-    - service: tts.speak
+    - action: tts.speak
       target:
         entity_id: tts.piper
       data:

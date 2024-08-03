@@ -10,14 +10,14 @@
     title: "⚠️ Waarschuwing ⚠️"
     message: "CV-druk is lager dan {{ trigger.below }} bar. Zo snel mogelijk bijvullen!"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "{{ message }}"
         data:
           subtitle: "{{ title }}"
           push:
             interruption-level: critical
-    - service: persistent_notification.create
+    - action: persistent_notification.create
       data:
         title: "{{ title }}"
         message: "{{ message }}"
@@ -52,14 +52,14 @@
     title: "⚠️ Waarschuwing ⚠️"
     message: "Controleer de CV ketel, er is een diagnosemelding."
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "{{ message }}"
         data:
           subtitle: "{{ title }}"
           push:
             interruption-level: critical
-    - service: persistent_notification.create
+    - action: persistent_notification.create
       data:
         title: "{{ title }}"
         message: "{{ message }}"
@@ -82,7 +82,7 @@
           repeat:
             while: "{{ is_state( trigger.entity_id, 'on') }}"
             sequence:
-              - service: notify.iphone_12
+              - action: notify.iphone_12
                 data:
                   message: "De thermostaat is verhoogd naar {{ state_attr('climate.otgw','temperature') }} °C"
                   data:

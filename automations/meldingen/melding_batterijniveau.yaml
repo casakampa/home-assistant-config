@@ -26,7 +26,7 @@
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "{{ state_attr(trigger.entity_id, 'friendly_name') }}niveau is lager dan {{ int(states(trigger.below), 15) }}%"
         data:

@@ -6,7 +6,7 @@
     - platform: time
       at: "03:30:00"
   action:
-    - service: homeassistant.reload_config_entry
+    - action: homeassistant.reload_config_entry
       data:
         entry_id: "{{ config_entry_id('sensor.envoy_iq7a_current_power_production') }}"
 
@@ -31,6 +31,6 @@
           to: "off"
           for:
             minutes: 5
-    - service: homeassistant.reload_config_entry
+    - action: homeassistant.reload_config_entry
       data:
         entry_id: "{{ config_entry_id('media_player.lg_oled') }}"

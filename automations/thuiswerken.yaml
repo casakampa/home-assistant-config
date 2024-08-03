@@ -42,7 +42,7 @@
                   weekday:
                     - fri
       then:
-        - service: input_boolean.turn_on
+        - action: input_boolean.turn_on
           target:
             entity_id: input_boolean.thuiswerk_status
       else:
@@ -64,9 +64,9 @@
     - "{{ is_state('input_boolean.thuiswerk_status', 'on')}}"
     - "{{ is_state('device_tracker.ave_5cd2156vvx', 'home')}}"
   action:
-    - service: light.turn_off
+    - action: light.turn_off
       target:
         entity_id: light.woonkamer_en_keuken_zha_group_0x0007
-    - service: media_player.turn_off
+    - action: media_player.turn_off
       target:
         entity_id: media_player.chromecast_woonkamer
