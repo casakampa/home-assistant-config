@@ -2,7 +2,7 @@
   alias: "Melding: Deursensor"
   description: "Stuur melding wanneer een deur wordt geopend of gesloten"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - binary_sensor.deursensor_voordeur
         - binary_sensor.deursensor_achterdeur

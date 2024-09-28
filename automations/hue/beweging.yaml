@@ -6,23 +6,13 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.woonkamer_template_motion_sensor
   variables:
     lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
-    anchors:
-      - &lamp_aan
-        service: light.turn_on
-        target:
-          entity_id: "{{ lamp }}"
-      - &lamp_uit
-        service: light.turn_off
-        target:
-          entity_id: "{{ lamp }}"
-      - &beweging_gedetecteerd "{{ trigger.to_state.state == 'on' }}"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
-    - *beweging_gedetecteerd
+    - "{{ trigger.to_state.state == 'on' }}"
     - and:
         - "{{ is_state('sensor.drempelwaarde_woonkamer', 'nacht') }}"
         - "{{ is_state('input_boolean.visite', 'off') }}"
@@ -33,24 +23,30 @@
               after: input_datetime.light_woonkamer_night_time
   action:
     - alias: "Zet de automatisering Verlichting Keuken (beweging) tijdens deze automatisering uit"
-      service: automation.turn_off
+      action: automation.turn_off
       target:
         entity_id: automation.verlichting_keuken_beweging
-    - <<: *lamp_aan
+    - <<: &lamp_aan
+        action: light.turn_on
+        target:
+          entity_id: "{{ lamp }}"
       data:
         brightness_pct: 1
         color_temp_kelvin: 3000
     - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
       wait_for_trigger:
-        - platform: state
+        - trigger: state
           entity_id:
             - binary_sensor.woonkamer_template_motion_sensor
           to: "off"
           for:
             seconds: 5
-    - *lamp_uit
+    - <<: &lamp_uit
+        action: light.turn_off
+        target:
+          entity_id: "{{ lamp }}"
     - alias: "Zet de automatisering Verlichting Keuken (beweging) na deze automatisering aan"
-      service: automation.turn_on
+      action: automation.turn_on
       target:
         entity_id: automation.verlichting_keuken_beweging
 
@@ -60,50 +56,53 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.hue_motion_zolder_occupancy
   variables:
     helderheid_dag: 80
     helderheid_nacht: 20
     lamp: "light.zolder_zha_group_0x0004"
-    anchors:
-      - &lights_off
-        alias: "Controleer of de lamp nog brandt"
-        if:
-          - "{{ is_state(lamp, 'on') }}"
-        then:
-          - <<: *lamp_aan
-            data:
-              brightness_pct: 10
-          - delay:
-              seconds: 5
-          - *lamp_uit
-      - &vroege_ochtend_late_avond
-        alias: "Tijdsspannes tussen ingestelde tijden"
-        or:
-          - condition: time
-            after: "06:00"
-            before: input_datetime.light_home_day_time
-          - condition: time
-            after: input_datetime.light_home_night_time
-            before: "23:59:59"
-      - &nacht
-        alias: "Nacht"
-        condition: time
-        after: "00:00"
-        before: "06:00"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
-        - *beweging_gedetecteerd
+        - "{{ trigger.to_state.state == 'on' }}"
         - or:
             - "{{ float(states('sensor.hue_motion_zolder_illuminance'), 20) <= 20 }}"
             - "{{ is_state('light.zolder_zha_group_0x0004', 'on') }}"
       then:
         - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
           choose:
+            - conditions:
+                - alias: "Nacht"
+                  condition: time
+                  after: "00:00"
+                  before: "06:00"
+              sequence:
+                - <<: *lamp_aan
+                  data:
+                    brightness_pct: 10
+                - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
+                  wait_for_trigger:
+                    - trigger: template
+                      value_template: "{{ is_state(trigger.entity_id, 'off') }}"
+                      for:
+                        seconds: 5
+                - *lamp_uit
+            - conditions:
+                - alias: "Tijdsspannes tussen ingestelde tijden"
+                  or:
+                    - condition: time
+                      after: "06:00"
+                      before: input_datetime.light_home_day_time
+                    - condition: time
+                      after: input_datetime.light_home_night_time
+                      before: "23:59:59"
+              sequence:
+                - <<: *lamp_aan
+                  data:
+                    brightness_pct: "{{ helderheid_nacht }}"
             - conditions:
                 - condition: time
                   after: input_datetime.light_home_day_time
@@ -112,27 +111,17 @@
                 - <<: *lamp_aan
                   data:
                     brightness_pct: "{{ helderheid_dag }}"
-            - conditions:
-                - *vroege_ochtend_late_avond
-              sequence:
-                - <<: *lamp_aan
-                  data:
-                    brightness_pct: "{{ helderheid_nacht }}"
-            - conditions:
-                - *nacht
-              sequence:
-                - <<: *lamp_aan
-                  data:
-                    brightness_pct: 10
-                - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
-                  wait_for_trigger:
-                    - platform: template
-                      value_template: "{{ is_state(trigger.entity_id, 'off') }}"
-                      for:
-                        seconds: 5
-                - *lamp_uit
       else:
-        - *lights_off
+        - alias: "Controleer of de lamp nog brandt"
+          if:
+            - "{{ is_state(lamp, 'on') }}"
+          then:
+            - <<: *lamp_aan
+              data:
+                brightness_pct: 10
+            - delay:
+                seconds: 5
+            - *lamp_uit
 
 - id: 0221c907-db60-44c4-9735-e7a210bbcce4
   alias: "Verlichting: Achtertuin (beweging)"
@@ -140,7 +129,7 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.hue_motion_achtertuin_occupancy
   variables:
     lamp: "light.buitenlamp_achtertuin"
@@ -150,7 +139,7 @@
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
-        - *beweging_gedetecteerd
+        - "{{ trigger.to_state.state == 'on' }}"
       then:
         - if:
             - "{{ is_state('sensor.drempelwaarde_achtertuin', 'schemer') }}"
@@ -165,7 +154,16 @@
               data:
                 brightness_pct: 30
       else:
-        - *lights_off
+        - alias: "Controleer of de lamp nog brandt"
+          if:
+            - "{{ is_state(lamp, 'on') }}"
+          then:
+            - <<: *lamp_aan
+              data:
+                brightness_pct: 10
+            - delay:
+                seconds: 5
+            - *lamp_uit
 
 - id: 6f855c9d-9a85-4771-84df-868c0ec5ffb8
   alias: "Verlichting: Gang (beweging)"
@@ -173,63 +171,20 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.gang_template_motion_sensor
-  variables:
-    helderheid_dag: 65
-    helderheid_nacht: 20
-    lamp: "light.lamp_gang"
-    anchors:
-      - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
-      - &lights_on_with_color_temp_kelvin
-        alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
-        choose:
-          - conditions:
-              - condition: time
-                after: input_datetime.light_home_day_time
-              - condition: sun
-                after: sunrise
-              - condition: time
-                before: input_datetime.light_home_night_time
-            sequence:
-              - <<: *lamp_aan
-                data:
-                  brightness_pct: "{{ helderheid_dag }}"
-                  color_temp_kelvin: *color_temp
-          - conditions:
-              - *vroege_ochtend_late_avond
-            sequence:
-              - <<: *lamp_aan
-                data:
-                  brightness_pct: "{{ helderheid_nacht }}"
-                  color_temp_kelvin: *color_temp
-          - conditions:
-              - *nacht
-            sequence:
-              - <<: *lamp_aan
-                data:
-                  brightness_pct: 10
-                  color_temp_kelvin: 2250
-              - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
-                wait_for_trigger:
-                  - platform: template
-                    value_template: "{{ is_state(trigger.entity_id, 'off') }}"
-                    for:
-                      seconds: 5
-              - *lamp_uit
-        default:
-          - stop: "Er was geen passend scenario voor deze trigger"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
-      if:
-        - *beweging_gedetecteerd
-        - "{{ float(states('sensor.hue_motion_gang_illuminance'), 20) <= 20 }}"
-      then:
-        - *lights_on_with_color_temp_kelvin
-      else:
-        - *lights_off
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 65
+        helderheid_nacht: 20
+        sensor_lichtsterkte: "sensor.hue_motion_gang_illuminance"
+        drempelwaarde: 20
+        lamp: "light.lamp_gang"
 
 - id: caeb83c2-c9a7-43cd-87e6-bf7c3378e83b
   alias: "Verlichting: Overloop (beweging)"
@@ -237,23 +192,20 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.hue_motion_overloop_occupancy
-  variables:
-    helderheid_dag: 65
-    helderheid_nacht: 15
-    lamp: "light.lamp_overloop"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
-      if:
-        - *beweging_gedetecteerd
-        - "{{ float(states('sensor.hue_motion_overloop_illuminance'), 20) <= 20 }}"
-      then:
-        - *lights_on_with_color_temp_kelvin
-      else:
-        - *lights_off
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 65
+        helderheid_nacht: 15
+        sensor_lichtsterkte: "sensor.hue_motion_overloop_illuminance"
+        drempelwaarde: 20
+        lamp: "light.lamp_overloop"
 
 - id: 59dfe4f3-9178-4023-812f-5420f833edb0
   alias: "Verlichting: Keuken (beweging)"
@@ -261,24 +213,21 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.aqara_motion_keuken
-  variables:
-    helderheid_dag: 75
-    helderheid_nacht: 20
-    lamp: "light.keuken_zha_group_0x0002"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ is_state('script.wekker_met_ochtendroutine', 'off') }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
-      if:
-        - *beweging_gedetecteerd
-        - "{{ float(states('sensor.aqara_motion_keuken_illuminance'), 35) <= 35 }}"
-      then:
-        - *lights_on_with_color_temp_kelvin
-      else:
-        - *lights_off
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 75
+        helderheid_nacht: 20
+        sensor_lichtsterkte: "sensor.aqara_motion_keuken_illuminance"
+        drempelwaarde: 35
+        lamp: "light.keuken_zha_group_0x0002"
 
 - id: 02fa3101-591d-4eb5-811e-a64278af099e
   alias: "Verlichting: Toilet (beweging)"
@@ -286,19 +235,15 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.aqara_motion_toilet
-  variables:
-    helderheid_dag: 80
-    helderheid_nacht: 15
-    lamp: "light.toilet_zha_group_0x000a"
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
-      if:
-        - *beweging_gedetecteerd
-      then:
-        - *lights_on_with_color_temp_kelvin
-      else:
-        - *lights_off
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 80
+        helderheid_nacht: 15
+        lamp: "light.toilet_zha_group_0x000a"

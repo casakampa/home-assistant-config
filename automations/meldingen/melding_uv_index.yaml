@@ -3,7 +3,7 @@
   description: "Stuur een melding bij een matige en sterke UV-index"
   mode: queued
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.thuis_uv_index
   condition:
     - "{{ has_value(trigger.entity_id) }}"

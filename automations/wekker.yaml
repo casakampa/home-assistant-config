@@ -4,13 +4,13 @@
   initial_state: true
   mode: parallel
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: "binary_sensor.wekker"
       from: "off"
       to: "on"
   action:
     - alias: "Genereer de juiste werkdag en geef de variabele werklocatie door aan script.wekker_met_ochtendroutine"
-      service: script.turn_on
+      action: script.turn_on
       target:
         entity_id: script.wekker_met_ochtendroutine
       data:
@@ -23,7 +23,7 @@
   alias: "Wekker: Statuscontrole"
   description: "Ga elke zondag om 20:30 na of de wekker ingeschakeld moet worden, bij actieve vakantiemodus"
   trigger:
-    - platform: template
+    - trigger: template
       value_template: "{{ now().isoweekday() == 7 and now().strftime('%H:%M') == '20:30' and is_state('sensor.wekkermodus', 'Vakantie') }}"
   condition:
     - or:
@@ -55,11 +55,11 @@
                 tag: "{{ this.entity_id }}"
           - alias: "Wacht op gemaakte keuze"
             wait_for_trigger:
-              - platform: event
+              - trigger: event
                 event_type: mobile_app_notification_action
                 event_data:
                   action: "{{ wekkermodus }}"
-              - platform: event
+              - trigger: event
                 event_type: mobile_app_notification_action
                 event_data:
                   action: "{{ vakantiemodus }}"

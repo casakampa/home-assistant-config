@@ -2,16 +2,16 @@
   alias: "Deurbel"
   description: "Handelt alles af voor de deurbel. Wanneer er wordt aangebeld, wanneer de deurbel afgaat vanwege EMI in de meterkast (vals alarm), en wanneer de deur niet wordt geopend."
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.deurbel_voordeur
       from: "off"
       to: "on"
-    - platform: event
+    - trigger: event
       event_type: mobile_app_notification_action
       event_data:
         action: "VISITE"
       id: "visite"
-    - platform: event
+    - trigger: event
       event_type: mobile_app_notification_action
       event_data:
         action: "VALS_ALARM"
@@ -24,7 +24,7 @@
               id: "vals_alarm"
           sequence:
             - alias: "Vals alarm, waarschijnlijk veroorzaakt door een stroompuls in de meterkast"
-              service: script.turn_on
+              action: script.turn_on
               target:
                 entity_id: script.deurbel_vals_alarm
         - conditions:
@@ -32,12 +32,12 @@
               id: "visite"
           sequence:
             - alias: "Val de gasten niet lastig met automatiseringen die ongevraagd zaken uitschakelen"
-              service: input_boolean.turn_on
+              action: input_boolean.turn_on
               target:
                 entity_id: input_boolean.visite
       default:
         - alias: "Start het eerste deel voor de deurbel"
-          service: script.turn_on
+          action: script.turn_on
           target:
             entity_id: script.deurbel_start
         - alias: "Wacht tot de deur wordt geopend en voer de bijbehorende stappen uit, anders voer het script uit voor geen reactie."
@@ -49,11 +49,11 @@
             - "{{ wait.completed }}"
           then:
             - alias: "De deur is geopend, voer het tweede deel van de automatisering uit middels een script"
-              service: script.turn_on
+              action: script.turn_on
               target:
                 entity_id: script.deurbel_deur_geopend
           else:
             - alias: "Voer het script uit gemaakt voor het niet openen van de deur"
-              service: script.turn_on
+              action: script.turn_on
               target:
                 entity_id: script.deurbel_deur_niet_geopend

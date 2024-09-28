@@ -3,27 +3,27 @@
   description: >
     Deze automatisering regelt de aansturing van de audio en de volumeregeling ervan.
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: input_boolean.play_streaming_radio
       id: boolean_streaming_radio
-    - platform: state
+    - trigger: state
       entity_id: input_select.internet_radio_streams
       id: select_streaming_radio
-    - platform: state
+    - trigger: state
       entity_id:
         - input_boolean.play_media_sonos_slaapkamer
         - input_boolean.play_media_sonos_woonkamer
       id: boolean_play_media
-    - platform: state
+    - trigger: state
       entity_id: zone.home
       to: "0"
       for:
         minutes: 15
       id: "not_home"
-    - platform: state
+    - trigger: state
       entity_id: input_number.sonos_media_volume
       id: ha_volume
-    - platform: state
+    - trigger: state
       entity_id: input_boolean.mute_streaming_radio
       id: mute_volume
   mode: queued
@@ -47,7 +47,7 @@
                 - "{{ trigger.to_state.state == 'on' }}"
               then:
                 - alias: "Demp actieve luidspreker(s)."
-                  service: media_player.volume_mute
+                  action: media_player.volume_mute
                   target:
                     entity_id: *playing_media_player
                   data:
@@ -55,7 +55,7 @@
               else:
                 - &unmute_media_player
                   alias: "Hef demping luidspreker(s) op"
-                  service: media_player.volume_mute
+                  action: media_player.volume_mute
                   target:
                     entity_id: >
                       {{ states.media_player
@@ -69,7 +69,7 @@
             - "{{ trigger.id == 'ha_volume' }}"
           sequence:
             - alias: "Synchroniseer het Home Assistant volume met de Sonos luidspreker(s)."
-              service: media_player.volume_set
+              action: media_player.volume_set
               target:
                 entity_id: *playing_media_player
               data:
@@ -114,7 +114,7 @@
                     - "{{ boolean_woonkamer_is_on }}"
               then:
                 - alias: "Start streaming radio op de geselecteerde luidspreker(s)"
-                  service: script.turn_on
+                  action: script.turn_on
                   target:
                     entity_id: script.start_streaming_radio
                   data:
@@ -146,18 +146,18 @@
                     - "{{ boolean_woonkamer_is_on }}"
               then:
                 - alias: "Verwijder deze luidspreker uit de groep van luidsprekers"
-                  service: media_player.unjoin
+                  action: media_player.unjoin
                   target:
                     entity_id: >
                       {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
                 - alias: "Stop met streaming naar deze luidspreker"
-                  service: media_player.media_stop
+                  action: media_player.media_stop
                   target:
                     entity_id: >
                       {{ trigger.entity_id | replace('input_boolean.play_media_', 'media_player.') }}
               else:
                 - alias: "Stop met streaming naar alle actieve luidsprekers"
-                  service: media_player.media_stop
+                  action: media_player.media_stop
                   target:
                     entity_id: *playing_media_player
             - if: >
@@ -170,7 +170,7 @@
               then:
                 - *unmute_media_player
                 - alias: "Heft demping luidspreker(s) op."
-                  service: input_boolean.turn_off
+                  action: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.mute_streaming_radio
               else:
@@ -182,7 +182,7 @@
                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
               then:
                 - alias: "Stop met streaming radio"
-                  service: input_boolean.turn_off
+                  action: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.play_streaming_radio
               else:

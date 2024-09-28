@@ -4,7 +4,7 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: event
+    - trigger: event
       event_type: zha_event
       event_data:
         device_id: ffa7a6d89a911af5c5c96267dd5491fd
@@ -13,7 +13,7 @@
     - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release', 'hold'] }}"
   action:
     - alias: "Stuur de verlichting aan"
-      service: script.hue_dimmer_basic_logica
+      action: script.hue_dimmer_basic_logica
       data:
         command: "{{ trigger.event.data.command }}"
         media_player: "media_player.lg_oled"

@@ -2,7 +2,7 @@
   alias: "Repack database"
   description: "De automatisering optimaliseert één keer per week de database voor ruimtegebruik en snelheid"
   trigger:
-    - platform: time
+    - trigger: time
       at: "05:00"
   condition:
     - condition: time

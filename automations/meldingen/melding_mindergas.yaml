@@ -3,7 +3,7 @@
   description: "Stuur een melding wanneer de CV gisteren niet ingeschakeld is geweest voor registratie op MinderGas.nl"
   mode: single
   trigger:
-    platform: time
+    trigger: time
     at: "08:00"
   condition:
     condition: numeric_state

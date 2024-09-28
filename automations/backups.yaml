@@ -2,7 +2,7 @@
   alias: "Backup"
   description: "Maakt dagelijks om 5:00 een volledige backup"
   trigger:
-    - platform: time
+    - trigger: time
       at: "05:00"
   action:
     - action: script.turn_on

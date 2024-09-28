@@ -3,9 +3,9 @@
   description: "Op basis van ingestelde booleans wordt het script van de ochtendroutine onderbroken, zodat automatiseringen niet worden afgemaakt/gestart."
   initial_state: true
   trigger:
-    - platform: time
+    - trigger: time
       at: "06:00"
-    - platform: state
+    - trigger: state
       entity_id:
         - input_boolean.thuiswerken_maandag
         - input_boolean.thuiswerken_dinsdag
@@ -47,7 +47,7 @@
             entity_id: input_boolean.thuiswerk_status
       else:
         - alias: "Deactiveer thuiswerkmodus"
-          service: input_boolean.turn_off
+          action: input_boolean.turn_off
           target:
             entity_id: input_boolean.thuiswerk_status
 
@@ -55,7 +55,7 @@
   alias: "Thuiswerken: uitbreiding"
   description: "Controleer op twee momenten of thuiswerken actief is en de laptop van het werk is ingeschakeld, en voer de bijbehorende acties uit."
   trigger:
-    - platform: time
+    - trigger: time
       at:
         - "08:30" # een vroege afspraak of les
         - "09:00" # prima tijd om rustig aan te doen en te beginnen

@@ -2,7 +2,7 @@
   alias: "Melding: Bewegingsdetectie"
   description: "Stuur melding wanneer tijdens afwezigheid beweging wordt gedetecteerd"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - binary_sensor.hue_motion_zolder_occupancy
         - binary_sensor.hue_motion_gang_occupancy

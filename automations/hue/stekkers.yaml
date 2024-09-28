@@ -3,21 +3,21 @@
   description: "Op basis van de trigger en voorwaarden wordt een Hue Smart Plug in- of uitgeschakeld"
   trigger:
     # Triggers voor inschakelen
-    - platform: state
+    - trigger: state
       entity_id: zone.home
       from: "0"
       id: "turn_on"
-    - platform: time
+    - trigger: time
       at: input_datetime.light_home_day_time
       id: "turn_on"
     # Triggers voor uitschakelen
-    - platform: state
+    - trigger: state
       entity_id: zone.home
       to: "0"
       for:
         minutes: 15
       id: "turn_off"
-    - platform: time
+    - trigger: time
       at: input_datetime.plug_woonkamer_night_time
       id: "turn_off"
   condition:
