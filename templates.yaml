@@ -16,6 +16,7 @@
             {{ int(min(4000, temp)) }}
           {% endif %}
       unit_of_measurement: "K"
+      availability: "{{ is_number(state_attr('sun.sun', 'elevation')) and is_number(states('sensor.max_sun_elevation')) }}"
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       name: "Z-Stack coordinator firmware"
       state: >-
@@ -26,6 +27,7 @@
         {% set no_prerelease = is_state_attr(source, 'prerelease', false) -%}
         {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
         {{ version.split('_')[3] if version | length > 0 and has_value(source) and no_prerelease else this.state }}
+      availability: "{{ has_value('sensor.z_stack_firmware_releases') }}"
       attributes:
         html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
     # Bereken de buitentemperatuur op basis van de twee bronnen, wanneer beide beschikbaar zijn
@@ -78,9 +80,7 @@
             Werkdag
           {% endif %}
         description: >-
-          {% if is_state('calendar.vakanties', 'on') %}
-            Geniet ervan!
-          {% elif now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
+          {% if now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
             Thuiswerken
           {% endif %}
 

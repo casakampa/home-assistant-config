@@ -2,7 +2,7 @@ tts_kliko_wegzetten:
   alias: "TTS: Kliko aan de weg"
   icon: "mdi:delete"
   variables:
-    afvalsoort: "{{ state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort') }}"
+    afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
   sequence:
     - action: media_player.volume_set
       target:
@@ -19,13 +19,13 @@ tts_kliko_wegzetten:
         media_player_entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
-        message: "Vergeet niet de kliko voor {{ afvalsoort }} aan de weg te zetten."
+        message: "{{ states('sensor.afvalwijzer_volgende_leging') }} wordt de {{ afvalsoort }}-kliko geleegd."
 
 tts_kliko_ophalen:
   alias: "TTS: Kliko ophalen"
   icon: "mdi:delete-empty"
   variables:
-    afvalsoort: "{{ state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort') }}"
+    afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
   sequence:
     - action: media_player.volume_set
       target:
@@ -42,4 +42,4 @@ tts_kliko_ophalen:
         media_player_entity_id:
           - media_player.sonos_woonkamer
           - media_player.sonos_slaapkamer
-        message: "De kliko voor {{ afvalsoort }} staat nog aan de weg."
+        message: "De {{ afvalsoort }}-kliko staat nog aan de weg."

@@ -20,15 +20,13 @@ tts_statusupdate:
       en het is {{ dutch_time_announcement(nu) }}
     buitentemperatuur: >
       {{ iif(has_value('sensor.buitentemperatuur'),
-      'Buiten is het momenteel ' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ ' graden',
+      'Buiten is het momenteel' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ 'graden',
       'De buitentemperatuur is momenteel niet beschikbaar')
       }}
     afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
-    container: >-
-      {% if not is_state('sensor.afvalwijzer_tomorrow', 'Geen') %}
-        Ter herinnering: zet vanavond de {{ afvalsoort }}container aan de weg.
-      {% elif is_state('input_boolean.kliko_aan_de_weg', 'on') %}
-        Vandaag wordt de {{ afvalsoort }}container geleegd.
+    kliko: >-
+      {% if int(states('sensor.afvalwijzer_next_in_days')) <= 2 %}
+        {{ states('sensor.afvalwijzer_volgende_leging') }} wordt de {{ afvalsoort }}-kliko geleegd.
       {% endif %}
   sequence:
     - action: media_player.volume_set
@@ -48,4 +46,4 @@ tts_statusupdate:
           {{ dagdeel }}!
           {{ dag }}, {{ tijd }}.
           {{ buitentemperatuur }}.
-          {{ container }}.
+          {{ kliko }}.

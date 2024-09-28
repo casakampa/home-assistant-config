@@ -313,6 +313,19 @@ hue_dimmer_multimedia_logica:
                           service: input_boolean.toggle
                           target:
                             entity_id: input_boolean.mute_streaming_radio
+                        - if:
+                            - "{{ is_state('input_boolean.mute_streaming_radio', 'on') }}"
+                          then:
+                            - alias: "Vertel de actieve modus"
+                              service: tts.speak
+                              target:
+                                entity_id: tts.piper
+                              data:
+                                cache: true
+                                media_player_entity_id: >-
+                                  {{ sonos_speaker }}
+                                message: >-
+                                  Audio is gedempt
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
                         - or:
