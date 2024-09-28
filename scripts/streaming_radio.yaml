@@ -3,7 +3,7 @@ start_streaming_radio:
   icon: mdi:play-circle
   mode: restart
   sequence:
-    - service: media_player.play_media
+    - action: media_player.play_media
       target:
         entity_id: >
           {{ media_player }}
@@ -14,11 +14,11 @@ start_streaming_radio:
               'BNR Nieuwsradio': 'x-rincon-mp3radio://stream.bnr.nl/bnr_mp3_128_20',
               'Radio Veronica': 'x-rincon-mp3radio://27783.live.streamtheworld.com/VERONICA.mp3',
               'NPO Radio 2': 'x-rincon-mp3radio://icecast.omroep.nl/radio2-bb-mp3',
-              'GP Radio': 'x-rincon-mp3radio://xxxxxx'
+              'GP Radio': 'x-rincon-mp3radio://uk15freenew.listen2myradio.com/live.mp3?typeportmount=_28072_FLV?_=1719581807741'
             } -%}
           {{ stations[states('input_select.internet_radio_streams')] }}
         media_content_type: "music"
-    - service: media_player.volume_set
+    - action: media_player.volume_set
       data:
         volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
       target:
@@ -39,26 +39,26 @@ prepare_streaming_radio:
       description: "The volume level for the radio"
       example: "50"
   sequence:
-    - service: input_boolean.turn_off
+    - action: input_boolean.turn_off
       target:
         entity_id:
           - input_boolean.play_media_sonos_woonkamer
           - input_boolean.play_media_sonos_slaapkamer
     - delay:
         milliseconds: 100
-    - service: input_boolean.turn_on
+    - action: input_boolean.turn_on
       target:
         entity_id: "input_boolean.play_media_sonos_{{ kamer }}"
-    - service: input_select.select_option
+    - action: input_select.select_option
       target:
         entity_id: input_select.internet_radio_streams
       data:
         option: "{{ station }}"
-    - service: input_number.set_value
+    - action: input_number.set_value
       target:
         entity_id: input_number.sonos_media_volume
       data:
         value: "{{ min(volume, 80) }}"
-    - service: input_boolean.turn_on
+    - action: input_boolean.turn_on
       target:
         entity_id: input_boolean.play_streaming_radio

@@ -179,7 +179,7 @@ deurbel_melding_lg_oled:
     - *check_aanwezigheid
     # Check if the media player is available, otherwhise bail
     - *check_media_player
-    - service: notify.lg_oled
+    - action: notify.lg_oled
       data:
         message: "Er is aangebeld"
     - *media_player_pause

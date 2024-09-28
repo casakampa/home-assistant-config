@@ -2,7 +2,7 @@
   alias: "Melding: Lage CV-druk"
   description: "Melding wanneer de ketel bijgevuld dient te worden"
   trigger:
-    - platform: numeric_state
+    - trigger: numeric_state
       entity_id: sensor.ch_water_pressure_boiler_otgw
       below: 1
   mode: single
@@ -10,14 +10,14 @@
     title: "⚠️ Waarschuwing ⚠️"
     message: "CV-druk is lager dan {{ trigger.below }} bar. Zo snel mogelijk bijvullen!"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "{{ message }}"
         data:
           subtitle: "{{ title }}"
           push:
             interruption-level: critical
-    - service: persistent_notification.create
+    - action: persistent_notification.create
       data:
         title: "{{ title }}"
         message: "{{ message }}"
@@ -26,40 +26,40 @@
   alias: "Update OTGW" # OTC is Outside Temperature Control
   description: "Aangezien er geen buitenvoeler op de ketel zit, is dit handig om te gebruiken icm WAR. Met elke update wordt de interne klok gesynchroniseerd"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.buitentemperatuur
   mode: queued
   condition:
     - "{{ has_value(trigger.entity_id) }}"
   action:
     - alias: "Wanneer de sensor wordt bijgewerkt, update de buitentemperatuur in de OTGW"
-      service: opentherm_gw.set_outside_temperature
+      action: opentherm_gw.set_outside_temperature
       data:
         gateway_id: otgw
         temperature: "{{ float(states('sensor.buitentemperatuur'), 10) }}"
     - alias: "Update de klok tegelijkertijd met de buitentemperatuur"
-      service: opentherm_gw.set_clock
+      action: opentherm_gw.set_clock
       data:
         gateway_id: otgw
 
 - id: a8b4f651-e700-4237-a200-2576dc1a7ea6
   alias: "Diagnosemelding CV"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.slave_diagnostic_indication_boiler_otgw
       to: "on"
   variables:
     title: "⚠️ Waarschuwing ⚠️"
     message: "Controleer de CV ketel, er is een diagnosemelding."
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "{{ message }}"
         data:
           subtitle: "{{ title }}"
           push:
             interruption-level: critical
-    - service: persistent_notification.create
+    - action: persistent_notification.create
       data:
         title: "{{ title }}"
         message: "{{ message }}"
@@ -70,7 +70,7 @@
     Deze automatisering wordt geactiveerd wanneer de status van de sensor wijzigt.
     Zolang deze aan staat, wordt de melding met een regelmatige interval herhaald totdat dit niet meer het geval is en de melding wordt verwijderd.
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.overschrijding_maximumtemperatuur_thermostaat
   mode: restart
   condition:
@@ -82,7 +82,7 @@
           repeat:
             while: "{{ is_state( trigger.entity_id, 'on') }}"
             sequence:
-              - service: notify.iphone_12
+              - action: notify.iphone_12
                 data:
                   message: "De thermostaat is verhoogd naar {{ state_attr('climate.otgw','temperature') }} °C"
                   data:
@@ -95,7 +95,7 @@
                   minutes: 2
       else:
         - alias: "Verwijder de notificatie"
-          service: notify.mobile_app_iphone_12_van_maarten
+          action: notify.mobile_app_iphone_12_van_maarten
           data:
             message: "clear_notification"
             data:

@@ -3,7 +3,7 @@
   description: "Verander de kleurtemperatuur van actieve lampen"
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.kleurtemperatuur_verlichting
   condition:
     - "{{ has_value(trigger.entity_id) }}"
@@ -19,7 +19,7 @@
           - if:
               - "{{ is_state(repeat.item, 'on') }}" # verlichting moet ingeschakeld zijn, anders zetten onderstaande acties onbedoeld de verlichting aan.
             then:
-              - service: light.turn_on
+              - action: light.turn_on
                 target:
                   entity_id: "{{ repeat.item }}"
                 data:
@@ -45,35 +45,35 @@
   trace:
     stored_traces: 40
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.drempelwaarde_woonkamer
       to: "dag"
       for:
         minutes: 2
       id: "woonkamer_dag"
-    - platform: state
+    - trigger: state
       entity_id: zone.home
       from: "0"
       id: "thuiskomst"
-    - platform: state
+    - trigger: state
       entity_id: sensor.drempelwaarde_woonkamer
       to: "schemer"
       for:
         minutes: 2
       id: "woonkamer_schemer"
-    - platform: sun
+    - trigger: sun
       event: sunset
       offset: "-00:15:00"
       id: "zonsondergang"
-    - platform: sun
+    - trigger: sun
       event: sunset
       offset: "00:30:00"
       id: "helderheid_verlagen"
-    - platform: template
+    - trigger: template
       value_template: >-
         {{ now() > today_at(states('input_datetime.light_woonkamer_night_time')) - timedelta(minutes = int(states('input_number.verlichting_woonkamer_dimtijd'), 30)) }}
       id: "verlichting_dimmen"
-    - platform: time
+    - trigger: time
       at: input_datetime.light_woonkamer_night_time
       id: "verlichting_uit"
   variables:
@@ -99,7 +99,7 @@
                   #    condition: time
                   #    before: input_datetime.light_home_night_time
                   sequence:
-                    - service: light.turn_on
+                    - action: light.turn_on
                       target:
                         entity_id: *verlichting
                       data:
@@ -112,7 +112,7 @@
                       before: sunset
                       before_offset: "00:20:00"
                   sequence:
-                    - service: light.turn_off
+                    - action: light.turn_off
                       target:
                         entity_id: *verlichting
                       data:
@@ -123,7 +123,7 @@
             - if:
                 - "{{ states('zone.home') == '0' }}"
               then:
-                - service: light.turn_on
+                - action: light.turn_on
                   target:
                     entity_id: *verlichting
                   data:
@@ -153,7 +153,7 @@
                           condition: time
                           after: input_datetime.light_home_day_time
                       then:
-                        - service: light.turn_on
+                        - action: light.turn_on
                           target:
                             entity_id: *verlichting
                           data:
@@ -171,7 +171,7 @@
                             - *chromecast_geen_netflix
                           sequence:
                             - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximale waarde"
-                              service: light.turn_on
+                              action: light.turn_on
                               target:
                                 entity_id: *verlichting
                               data:
@@ -182,7 +182,7 @@
                             - "{{ trigger.id == 'verlichting_uit' }}"
                             - *chromecast_geen_netflix
                           sequence:
-                            - service: light.turn_off
+                            - action: light.turn_off
                               target:
                                 entity_id: *verlichting
                       default:
@@ -196,7 +196,7 @@
   alias: "Bij hoge temperatuur, alle lampen 100%"
   description: "Zekerheid voor alles, maar stel dat er enorme warmte in een ruimte is dan wil ik hier van op de hoogte worden gebracht."
   trigger:
-    - platform: numeric_state
+    - trigger: numeric_state
       entity_id:
         - sensor.hue_motion_woonkamer_temperature
         - sensor.hue_motion_trap_temperature
@@ -207,13 +207,13 @@
   mode: parallel
   action:
     - parallel:
-        - service: light.turn_on
+        - action: light.turn_on
           target:
             entity_id: light.alle_lampen_zha_group_0x0006
           data:
             brightness_pct: 100
             flash: long
-        - service: notify.iphone_12
+        - action: notify.iphone_12
           data:
             message: "Waarschuwing: {{ trigger.to_state.name }} meet een temperatuur boven 50 graden"
             data:
@@ -227,31 +227,31 @@
   description: "Deze automatisering regelt de verlichting in de bioscoopkamer"
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: input_button.lg_pixel_refresh_kort
       id: "pixel_refresh_kort"
-    - platform: state
+    - trigger: state
       entity_id: input_button.lg_pixel_refresh_lang
       id: "pixel_refresh_lang"
-    - platform: state
+    - trigger: state
       entity_id: sensor.drempelwaarde_achtertuin
       to: "schemer"
       id: "schemer"
-    - platform: state
+    - trigger: state
       entity_id: switch.stekker_bioscoopkamer
       to: "on"
       id: "stekker_aan"
-    - platform: state
+    - trigger: state
       entity_id: switch.stekker_bioscoopkamer
       to: "off"
       for:
         seconds: 30
       id: "stekker_uit"
-    - platform: state
+    - trigger: state
       entity_id: media_player.lg_oled
       to: "off"
       id: "lg_uit"
-    - platform: state
+    - trigger: state
       entity_id: media_player.lg_oled
       attribute: source
       to:
@@ -280,12 +280,12 @@
             - delay:
                 seconds: 30
             - alias: "Zet de lamp in de bioscoopkamer uit"
-              service: light.turn_off
+              action: light.turn_off
               target:
                 entity_id: *lamp
             - delay: "{{ 900 if trigger.id == 'pixel_refresh_kort' else 3600 }}"
             - alias: "Zet de stekker in de bioscoopkamer uit"
-              service: switch.turn_off
+              action: switch.turn_off
               target:
                 entity_id: "switch.stekker_bioscoopkamer"
         - conditions:
@@ -299,7 +299,7 @@
                     - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
                   sequence:
                     - alias: "Zet bij schemer de verlichting in de bioscoopkamer zachtjes aan"
-                      service: light.turn_on
+                      action: light.turn_on
                       target:
                         entity_id: *lamp
                       data:
@@ -311,7 +311,7 @@
                     - *zon
                   sequence:
                     - alias: "Zet na zonsondergang de verlichting in de bioscoopkamer aan"
-                      service: light.turn_on
+                      action: light.turn_on
                       target:
                         entity_id: *lamp
                       data:
@@ -328,7 +328,7 @@
                       id: "stekker_uit"
                   sequence:
                     - alias: "Zet 30 seconden na het uitschakelen van de stekker de verlichting in de bioscoopkamer uit"
-                      service: light.turn_off
+                      action: light.turn_off
                       target:
                         entity_id: *lamp
                 - conditions:
@@ -336,7 +336,7 @@
                       id: "lg_uit"
                   sequence:
                     - alias: "Verhoog de lichtsterkte wanneer de LG OLED wordt uitgeschakeld"
-                      service: light.turn_on
+                      action: light.turn_on
                       target:
                         entity_id: *lamp
                       data:
@@ -349,7 +349,7 @@
                     - *zon
                   sequence:
                     - alias: "Verlaag de lichtsterkte wanneer een streamingapp wordt gestart op de LG OLED"
-                      service: light.turn_on
+                      action: light.turn_on
                       target:
                         entity_id: *lamp
                       data:
@@ -364,16 +364,16 @@
   alias: "Verlichting: Voortuin"
   description: "Deze automatisering regelt de verlichting in de voortuin"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sun.sun
       to:
         - below_horizon
         - above_horizon
       id: zon
-    - platform: time
+    - trigger: time
       at: input_datetime.light_home_day_time
       id: ochtend
-    - platform: time
+    - trigger: time
       at: "00:00"
       id: nacht
   variables:
@@ -386,7 +386,7 @@
             - "{{ is_state('sun.sun', 'below_horizon') }}"
             - "{{ is_state(lamp, 'off') }}"
           sequence:
-            - service: light.turn_on
+            - action: light.turn_on
               target:
                 entity_id: "{{ lamp }}"
               data:
@@ -397,7 +397,7 @@
                 - "{{ trigger.id == 'nacht' }}"
             - "{{ is_state(lamp, 'on') }}"
           sequence:
-            - service: light.turn_off
+            - action: light.turn_off
               target:
                 entity_id: "{{ lamp }}"
       default:
@@ -407,9 +407,9 @@
   alias: "Verlichting: Trapkast"
   description: "Deze automatisering regelt de verlichting in de trapkast"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.deursensor_trapkast
-    - platform: state
+    - trigger: state
       entity_id: light.lamp_trapkast
       to: "on"
       for:
@@ -423,14 +423,14 @@
     - if:
         - "{{ trigger.entity_id == sensor and is_state(sensor, 'on') }}"
       then:
-        - service: light.turn_on
+        - action: light.turn_on
           target:
             entity_id: "{{ lamp }}"
           data:
             brightness_pct: 80
             color_temp_kelvin: 4000
       else:
-        - service: light.turn_off
+        - action: light.turn_off
           target:
             entity_id: "{{ lamp }}"
 
@@ -438,14 +438,14 @@
   alias: "Verlichting: Slaapkamer (computer)"
   description: "Deze automatisering regelt bij gebruik van de computer de verlichting in de slaapkamer"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: device_tracker.gamepc_ryzen5
       to: "home"
       id: computer
-    - platform: state
+    - trigger: state
       entity_id: sensor.drempelwaarde_woonkamer
       id: sensor
-    - platform: state
+    - trigger: state
       entity_id: sun.sun
       to: "below_horizon"
       id: sun
@@ -456,13 +456,13 @@
         - "{{ trigger.id == 'computer' and is_state('sun.sun', 'below_horizon') }}"
   action:
     - alias: "Activeer de juiste mode"
-      service: input_select.select_option
+      action: input_select.select_option
       target:
         entity_id: input_select.dimmer_mode
       data:
         option: "Verlichting"
     - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_multimedia_logica"
-      service: script.turn_on
+      action: script.turn_on
       target:
         entity_id: script.hue_dimmer_multimedia_logica
       data:

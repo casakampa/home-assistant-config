@@ -3,13 +3,13 @@
   description: "Stuur een melding bij een matige en sterke UV-index"
   mode: queued
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.thuis_uv_index
   condition:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ int(trigger.to_state.state, 4) > 4 }}"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: >-
           {{ iif(int(trigger.to_state.state, 4) >= 7 , 'UV-index is sterk! ☀', 'UV-index is matig 🌤') }} ({{ trigger.to_state.state }})

@@ -4,10 +4,10 @@
   alias: "Reset input_booleans"
   initial_state: true
   trigger:
-    - platform: time
+    - trigger: time
       at: "01:00"
   action:
     - alias: "Schakel de boolean uit van de deurbel"
-      service: input_boolean.turn_off
+      action: input_boolean.turn_off
       target:
         entity_id: input_boolean.status_beldrukker

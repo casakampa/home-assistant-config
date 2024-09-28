@@ -70,7 +70,7 @@ hue_dimmer_basic_logica:
         - conditions:
             - "{{ command == 'on_long_release' }}"
           sequence:
-            - service: light.turn_on
+            - action: light.turn_on
               target:
                 entity_id: "{{ area }}"
               data:
@@ -102,7 +102,7 @@ hue_dimmer_basic_logica:
         - conditions:
             - "{{ command == 'off_short_release' }}"
           sequence:
-            - service: light.turn_off
+            - action: light.turn_off
               target:
                 entity_id: "{{ light }}"
         - conditions:
@@ -274,7 +274,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'on_double_press' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
-                        - service: input_select.select_next
+                        - action: input_select.select_next
                           target:
                             entity_id: input_select.internet_radio_streams
                         - alias: "Vertel de actieve modus"
@@ -313,6 +313,19 @@ hue_dimmer_multimedia_logica:
                           service: input_boolean.toggle
                           target:
                             entity_id: input_boolean.mute_streaming_radio
+                        - if:
+                            - "{{ is_state('input_boolean.mute_streaming_radio', 'on') }}"
+                          then:
+                            - alias: "Vertel de actieve modus"
+                              service: tts.speak
+                              target:
+                                entity_id: tts.piper
+                              data:
+                                cache: true
+                                media_player_entity_id: >-
+                                  {{ sonos_speaker }}
+                                message: >-
+                                  Audio is gedempt
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
                         - or:
@@ -386,7 +399,7 @@ hue_dimmer_multimedia_logica:
                     - conditions:
                         - "{{ command == 'on_long_release' }}"
                       sequence:
-                        - service: light.turn_on
+                        - action: light.turn_on
                           target:
                             entity_id: "{{ area }}"
                           data:
@@ -433,7 +446,7 @@ hue_dimmer_multimedia_logica:
                         - if:
                             - "{{ wait.trigger is none }}"
                           then:
-                            - service: light.turn_off
+                            - action: light.turn_off
                               target:
                                 entity_id: "{{ light }}"
                           else:

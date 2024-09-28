@@ -2,14 +2,14 @@
   alias: "Melding: Dagopbrengst zonnepanelen"
   description: "Stuur bij zonsondergang de hoeveelheid opgewekte energie, hoeveel daarvan is teruggeleverd en de verhouding kWh/kWp"
   trigger:
-    - platform: sun
+    - trigger: sun
       event: sunset
   variables:
     kwh_opgewekt: "{{ float(states('sensor.envoy_iq7a_energy_production_today'), 0)  }}"
     kwh_teruggeleverd: "{{ states('sensor.dsmr_day_consumption_electricity_returned_merged', with_unit=True) }}"
     kwh_kwp: "{{ ( float(states('sensor.envoy_iq7a_energy_production_today'), 0) / 3.120 ) | round(2, 0.00) }}"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} is teruggeleverd. kWh/kWp is {{ kwh_kwp }}."
         data:
@@ -19,13 +19,13 @@
   alias: "Melding: Langdurig hoge netspanning"
   description: "Stuur een melding wanneer de netspanning 10 minuten lang hoger is dan 250 volt"
   trigger:
-    - platform: numeric_state
+    - trigger: numeric_state
       entity_id: sensor.dsmr_reading_phase_voltage_l1
       above: 250
       for:
         minutes: 10
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "Is al langer dan 10 minuten hoger dan 250 volt."
         data:

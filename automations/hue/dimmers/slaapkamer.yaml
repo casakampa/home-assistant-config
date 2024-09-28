@@ -4,12 +4,12 @@
   initial_state: true
   mode: restart
   trigger:
-    - platform: event
+    - trigger: event
       event_type: zha_event
       event_data:
         device_id: 091f815c74eb50b132fcca673d5afac8 # Hue Dimmer V1
         cluster_id: 64512
-    - platform: event
+    - trigger: event
       event_type: zha_event
       event_data:
         device_id: 7c7a67688e3e2118b866cb472fd357e7 # Hue Dimmer V2
@@ -18,7 +18,7 @@
     - "{{ trigger.event.data.args.press_type in ['short_release', 'double_press', 'long_release', 'hold'] }}"
   action:
     - alias: "Stuur de verlichting en multimedia aan"
-      service: script.hue_dimmer_multimedia_logica
+      action: script.hue_dimmer_multimedia_logica
       data:
         command: "{{ trigger.event.data.command }}"
         media_player: "media_player.chromecast_woonkamer"

@@ -2,7 +2,7 @@
   alias: "Melding: Bewegingsdetectie"
   description: "Stuur melding wanneer tijdens afwezigheid beweging wordt gedetecteerd"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - binary_sensor.hue_motion_zolder_occupancy
         - binary_sensor.hue_motion_gang_occupancy
@@ -16,7 +16,7 @@
   condition:
     - "{{ is_state('zone.home', '0') }}"
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "Locatie: {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[2] }}"
         data:

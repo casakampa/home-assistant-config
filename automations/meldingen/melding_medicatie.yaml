@@ -3,12 +3,12 @@
   description: "Stuur een melding wanneer nieuwe medicatie gehaald moet worden"
   mode: single
   trigger:
-    - platform: time
+    - trigger: time
       at: "09:00"
   condition: >-
     {{ as_timestamp(now()) >= as_timestamp(states('input_datetime.melatonine_out_of_stock')) }}
   action:
-    - service: notify.iphone_12
+    - action: notify.iphone_12
       data:
         message: "Het is 90 dagen (of meer) geleden dat je medicatie hebt gehaald. Je bent nu door je voorraad heen."
         data:

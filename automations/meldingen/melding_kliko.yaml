@@ -5,20 +5,20 @@
   trace:
     stored_traces: 25
   trigger:
-    - platform: time
+    - trigger: time
       at: input_datetime.tijdstip_melding_kliko
       id: "tijdstip"
-    - platform: event
+    - trigger: event
       event_type: mobile_app_notification_action
       event_data:
         action: "STOP_HERHALING_WEGZETTEN"
       id: "stop_herinneren"
-    - platform: event
+    - trigger: event
       event_type: mobile_app_notification_action
       event_data:
         action: "IGNORE"
       id: "overslaan"
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.deursensor_voordeur
       to: "on"
       id: "voordeur"
@@ -34,7 +34,7 @@
     anchors:
       - &boolean_herhaal_herinnering
         alias: "Zet de boolean aan om de melding van de kliko te herhalen"
-        service: input_boolean.turn_on
+        action: input_boolean.turn_on
         target:
           entity_id: "{{ boolean_herhaal_herinnering }}"
       - &interval_herinnering
@@ -43,12 +43,12 @@
           minutes: "{{ int(states('input_number.kliko_interval_herinnering'), 15) }}"
       - &boolean_stop_herinneren
         alias: "Stop met herinneren"
-        service: input_boolean.turn_off
+        action: input_boolean.turn_off
         target:
           entity_id: "{{ boolean_herhaal_herinnering }}"
       - &verwijder_notificatie_kliko
         alias: "Verwijder de notificaties van de kliko wegzetten"
-        service: notify.mobile_app_iphone_12_van_maarten
+        action: notify.mobile_app_iphone_12_van_maarten
         data:
           message: "clear_notification"
           data:
@@ -62,12 +62,12 @@
         destructive: true
       - &tts_kliko_wegzetten
         alias: "Stuur een TTS melding om de kliko weg te zetten"
-        service: script.turn_on
+        action: script.turn_on
         target:
           entity_id: script.tts_kliko_wegzetten
       - &tts_kliko_ophalen
         alias: "Stuur een TTS melding om de kliko op te halen"
-        service: script.turn_on
+        action: script.turn_on
         target:
           entity_id: script.tts_kliko_ophalen
   condition:
@@ -82,7 +82,7 @@
             - *boolean_herhaal_herinnering
             - parallel:
                 - *tts_kliko_wegzetten
-                - service: notify.iphone_12
+                - action: notify.iphone_12
                   data:
                     message: "Het {{ afvalsoort }} wordt morgen geleegd."
                     data:
@@ -102,7 +102,7 @@
                   - parallel:
                       - *tts_kliko_wegzetten
                       - alias: "Herinner mij regelmatig de kliko aan de weg te zetten"
-                        service: notify.iphone_12
+                        action: notify.iphone_12
                         data:
                           message: "Zet het {{ afvalsoort }} aan de weg."
                           data:
@@ -133,7 +133,7 @@
               after: input_datetime.tijdstip_melding_kliko
           sequence:
             - alias: "Zet de boolean aan dat de kliko aan de weg staat"
-              service: input_boolean.turn_on
+              action: input_boolean.turn_on
               target:
                 entity_id: input_boolean.kliko_aan_de_weg
             - *boolean_stop_herinneren
@@ -156,23 +156,23 @@
     stored_traces: 25
   trigger:
     # Deuren
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.deursensor_voordeur
       to: "on"
       id: "voordeur"
-    - platform: state
+    - trigger: state
       entity_id: binary_sensor.deursensor_achterdeur
       to: "on"
       id: "achterdeur"
     # Tijdstippen
-    - platform: time
+    - trigger: time
       at:
         - "11:00"
         - "13:00"
         - "15:00"
       id: "tijdstip"
     # Notificatie
-    - platform: event
+    - trigger: event
       event_type: mobile_app_notification_action
       event_data:
         action: "KLIKO_OPGEHAALD"
@@ -220,7 +220,7 @@
               - parallel:
                   - *tts_kliko_ophalen
                   - alias: "Herinner mij de kliko op te halen"
-                    service: notify.iphone_12
+                    action: notify.iphone_12
                     data:
                       message: "De kliko staat nog aan de weg"
                       data:
@@ -248,7 +248,7 @@
                       for:
                         minutes: 10
         - alias: "Zet de booleans, die met de kliko en het ophalen te maken hebben, uit"
-          service: input_boolean.turn_off
+          action: input_boolean.turn_off
           target:
             entity_id:
               - "{{ boolean_herhaal_herinnering }}"

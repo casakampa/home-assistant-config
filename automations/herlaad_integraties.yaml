@@ -3,10 +3,10 @@
   description: "Herlaad de integratie zodat de verbinding actief blijft. In het verleden raakte af en toe de verbinding verloren, waardoor er geen informatie werd doorgegeven. "
   initial_state: true
   trigger:
-    - platform: time
+    - trigger: time
       at: "03:30:00"
   action:
-    - service: homeassistant.reload_config_entry
+    - action: homeassistant.reload_config_entry
       data:
         entry_id: "{{ config_entry_id('sensor.envoy_iq7a_current_power_production') }}"
 
@@ -15,7 +15,7 @@
   description: "Herlaad de integratie zodat de TV opnieuw wordt uitgelezen. Wordt dit niet gedaan, dan is na 1 keer gebruik de status van de TV niet meer uit te lezen."
   initial_state: true
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: media_player.lg_oled
       to: "off"
       for:
@@ -26,11 +26,11 @@
         - "none"
   action:
     - wait_for_trigger:
-        - platform: state
+        - trigger: state
           entity_id: switch.stekker_bioscoopkamer
           to: "off"
           for:
             minutes: 5
-    - service: homeassistant.reload_config_entry
+    - action: homeassistant.reload_config_entry
       data:
         entry_id: "{{ config_entry_id('media_player.lg_oled') }}"

@@ -3,7 +3,7 @@
   description: "Stuur een melding wanneer een lamp (on)bereikbaar is"
   mode: restart
   trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.onbereikbare_lampen
       to: ~
   variables:
@@ -23,19 +23,19 @@
   action:
     - parallel:
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
-          service: notify.iphone_12
+          action: notify.iphone_12
           data:
             message: "{{ aantal }} {{ lampen }}"
             data:
               tag: *tag
               push:
                 interruption-level: passive
-        - service: persistent_notification.create
+        - action: persistent_notification.create
           data:
             message: "{{ aantal }} {{ lampen }}"
             notification_id: *tag
         - alias: "Vertel welke lampen (on)bereikbaar zijn"
-          service: tts.speak
+          action: tts.speak
           target:
             entity_id: tts.piper
           data:

@@ -1,7 +1,7 @@
 - id: 6c2bd0ff-ea5e-475e-9cfc-5e56d4db9112
   alias: "Melding: Software update beschikbaar"
   trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - sensor.home_assistant_core
         - sensor.home_assistant_supervisor
@@ -19,6 +19,7 @@
         - sensor.docker_mailserver
         - sensor.roundcube_webmail
         - sensor.fritz_box_5530_firmware
+        - sensor.seat_navi_system
       not_from:
         - "unavailable"
         - "unknown"
@@ -42,7 +43,7 @@
         True) }}
   action:
     - alias: "Stuur een notificatie over de software update"
-      service: notify.iphone_12
+      action: notify.iphone_12
       data:
         message: |-
           Software: {{ state_attr(trigger.entity_id, 'friendly_name') }}.
