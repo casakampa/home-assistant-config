@@ -1,14 +1,14 @@
 - id: 752639e0-9527-45a6-84e8-f54537d40278
   alias: "Repack database"
   description: "De automatisering optimaliseert één keer per week de database voor ruimtegebruik en snelheid"
-  trigger:
+  triggers:
     - trigger: time
       at: "05:00"
-  condition:
+  conditions:
     - condition: time
       weekday:
         - sun
-  action:
+  actions:
     - action: recorder.purge
       data:
         repack: true

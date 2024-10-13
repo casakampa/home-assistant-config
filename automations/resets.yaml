@@ -3,10 +3,10 @@
 - id: 4f1d6e39-5c03-4adb-aeef-3068a37c5fc9
   alias: "Reset input_booleans"
   initial_state: true
-  trigger:
+  triggers:
     - trigger: time
       at: "01:00"
-  action:
+  actions:
     - alias: "Schakel de boolean uit van de deurbel"
       action: input_boolean.turn_off
       target:

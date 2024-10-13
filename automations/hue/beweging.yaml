@@ -5,12 +5,12 @@
   description: "Activeer verlichting woonkamer op basis van Hue Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.woonkamer_template_motion_sensor
   variables:
     lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ trigger.to_state.state == 'on' }}"
     - and:
@@ -21,7 +21,7 @@
               before: input_datetime.light_home_day_time
             - condition: time
               after: input_datetime.light_woonkamer_night_time
-  action:
+  actions:
     - alias: "Zet de automatisering Verlichting Keuken (beweging) tijdens deze automatisering uit"
       action: automation.turn_off
       target:
@@ -55,16 +55,16 @@
   description: "Activeer verlichting zolder op basis van Hue Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.hue_motion_zolder_occupancy
   variables:
     helderheid_dag: 80
     helderheid_nacht: 20
     lamp: "light.zolder_zha_group_0x0004"
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - "{{ trigger.to_state.state == 'on' }}"
@@ -128,15 +128,15 @@
   description: "Bewegingsensor activeert bij beweging verlichting achtertuin tijdens schemer of nacht"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.hue_motion_achtertuin_occupancy
   variables:
     lamp: "light.buitenlamp_achtertuin"
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ not is_state('sensor.drempelwaarde_achtertuin', 'dag') }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       if:
         - "{{ trigger.to_state.state == 'on' }}"
@@ -170,12 +170,12 @@
   description: "Activeer verlichting gang op basis van Hue Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.gang_template_motion_sensor
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       action: script.hue_motion_light_logica
       data:
@@ -191,12 +191,12 @@
   description: "Activeer verlichting overloop op basis van Hue Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.hue_motion_overloop_occupancy
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       action: script.hue_motion_light_logica
       data:
@@ -212,13 +212,13 @@
   description: "Activeer verlichting keuken op basis van Aqara Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.aqara_motion_keuken
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ is_state('script.wekker_met_ochtendroutine', 'off') }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       action: script.hue_motion_light_logica
       data:
@@ -234,12 +234,12 @@
   description: "Activeer verlichting toilet op basis van Aqara Motion"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.aqara_motion_toilet
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       action: script.hue_motion_light_logica
       data:

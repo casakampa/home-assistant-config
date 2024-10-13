@@ -7,7 +7,7 @@ deurbel_start:
   sequence:
     - parallel:
         - alias: "Stuur een notificatie"
-          service: notify.iphone_12
+          action: notify.iphone_12
           data:
             message: "Er is aangebeld om {{ tijdstip }}"
             data:
@@ -22,18 +22,18 @@ deurbel_start:
                   title: "Er is visite"
                   icon: "sfsymbols:person.crop.circle.badge.plus"
         - alias: "Activeer input_boolean.deurbel_vandaag_ingedrukt"
-          service: input_boolean.turn_on
+          action: input_boolean.turn_on
           target:
             entity_id: input_boolean.status_beldrukker
         - alias: "Actualiseer de input_datetime met het tijdstip waarop is aangebeld"
-          service: input_datetime.set_datetime
+          action: input_datetime.set_datetime
           target:
             entity_id: input_datetime.deurbel_tijdstip_aanbellen
           data:
             time: "{{ tijdstip }}"
         - parallel:
             - alias: "Stuur een melding van aanbellen en schakel de verlichting in de gang in."
-              service: script.turn_on
+              action: script.turn_on
               target:
                 entity_id:
                   # Schakel Hue lamp gang in bij schemer of nacht
@@ -44,7 +44,7 @@ deurbel_start:
                 - "{{ is_state('script.deurbel_melding_chromecast_woonkamer', 'off') }}"
               then:
                 - alias: "Pauzeer, indien actief, de chromecast in de woonkamer en wacht totdat deze verder mag spelen"
-                  service: script.turn_on
+                  action: script.turn_on
                   target:
                     entity_id: script.deurbel_melding_chromecast_woonkamer
               else:
@@ -57,7 +57,7 @@ deurbel_deur_geopend:
   sequence:
     - &verwijder_notificaties
       alias: "Verwijder de notificatie van de deurbel"
-      service: notify.mobile_app_iphone_12_van_maarten
+      action: notify.mobile_app_iphone_12_van_maarten
       data:
         message: "clear_notification"
         data:
@@ -65,28 +65,28 @@ deurbel_deur_geopend:
     - &wacht_gesloten_voordeur
       alias: "Wacht tot de deur dicht is"
       wait_for_trigger:
-        - platform: state
+        - trigger: state
           entity_id: binary_sensor.deursensor_voordeur
           to: "off"
           for:
             seconds: 10
     - alias: "Wacht tot er geen beweging is in de gang"
       wait_for_trigger:
-        - platform: state
+        - trigger: state
           entity_id: binary_sensor.hue_motion_gang_occupancy
           to: "off"
           for:
             seconds: 30
     # Turn off the light
     - &deactiveer_lamp_gang
-      service: light.turn_off
+      action: light.turn_off
       target:
         entity_id: light.lamp_gang
       data:
         transition: 2
     - &activeer_automatisering_beweging
       alias: "Zet de automatisering aan voor de verlichting in de gang"
-      service: automation.turn_on
+      action: automation.turn_on
       target:
         entity_id: automation.verlichting_gang_beweging
 
@@ -97,7 +97,7 @@ deurbel_deur_niet_geopend:
   sequence:
     # Deactiveer scripts voor gedrag verlichting gang
     - &deactiveer_scripts
-      service: script.turn_off
+      action: script.turn_off
       target:
         entity_id:
           # Schakel Hue lamp gang in bij schemer of nacht
@@ -120,7 +120,7 @@ deurbel_vals_alarm:
     # Deactiveer scripts voor gedrag verlichting gang
     - *deactiveer_scripts
     - alias: "Deactiveer input_boolean.deurbel_vandaag_ingedrukt"
-      service: input_boolean.turn_off
+      action: input_boolean.turn_off
       target:
         entity_id: input_boolean.status_beldrukker
     - *deactiveer_lamp_gang
@@ -129,7 +129,7 @@ deurbel_vals_alarm:
       value_template: "{{ is_state(media_player, 'paused') }}"
     # Laat de Chromecast verder gaan met afspelen
     - &media_player_play
-      service: media_player.media_play
+      action: media_player.media_play
       target:
         entity_id: "{{ media_player }}"
 
@@ -155,7 +155,7 @@ deurbel_melding_chromecast_woonkamer:
             - "{{ is_state(media_player,'playing') }}"
           sequence:
             - &media_player_pause
-              service: media_player.media_pause
+              action: media_player.media_pause
               target:
                 entity_id: "{{ media_player }}"
             - *wacht_gesloten_voordeur
@@ -192,11 +192,11 @@ deurbel_verander_helderheid_lamp_gang_bij_aanbellen:
     - condition: template
       value_template: "{{ not is_state('sensor.drempelwaarde_gang', 'dag' ) }}"
     - alias: "Zet de automatisering uit voor de verlichting in de gang"
-      service: automation.turn_off
+      action: automation.turn_off
       target:
         entity_id: automation.verlichting_gang_beweging
     - alias: "Zet de verlichting in de gang aan"
-      service: light.turn_on
+      action: light.turn_on
       target:
         entity_id: light.lamp_gang
       data:

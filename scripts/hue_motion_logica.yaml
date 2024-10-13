@@ -1,7 +1,7 @@
 hue_motion_light_logica:
   alias: "Beweging: Verlichting aansturing"
   icon: mdi:lightbulb-on-outline
-  mode: restart
+  mode: parallel
   fields:
     trigger:
       description: "The triggering entity"
@@ -37,7 +37,7 @@ hue_motion_light_logica:
                   before: "06:00"
               sequence:
                 - <<: &lamp_aan
-                    service: light.turn_on
+                    action: light.turn_on
                     target:
                       entity_id: "{{ lamp }}"
                   data:
@@ -45,13 +45,13 @@ hue_motion_light_logica:
                     color_temp_kelvin: 2250
                 - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
                   wait_for_trigger:
-                    - platform: template
+                    - trigger: template
                       value_template: "{{ is_state(trigger, 'off') }}"
                       for:
                         seconds: 5
                 - <<: &lamp_uit
                     alias: "Zet de lamp uit"
-                    service: light.turn_off
+                    action: light.turn_off
                     target:
                       entity_id: "{{ lamp }}"
             - conditions:

@@ -1,7 +1,7 @@
 - id: 72b333b7-25a9-440e-a096-33ba1d7bc495
   alias: "Deurbel"
   description: "Handelt alles af voor de deurbel. Wanneer er wordt aangebeld, wanneer de deurbel afgaat vanwege EMI in de meterkast (vals alarm), en wanneer de deur niet wordt geopend."
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.deurbel_voordeur
       from: "off"
@@ -17,7 +17,7 @@
         action: "VALS_ALARM"
       id: "vals_alarm"
   mode: restart
-  action:
+  actions:
     - choose:
         - conditions:
             - condition: trigger

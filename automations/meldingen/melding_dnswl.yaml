@@ -2,12 +2,12 @@
   alias: "Melding: DNSWL ID verlengen"
   description: "Stuur een melding wanneer het DNSWL ID verlengd moet worden"
   mode: single
-  trigger:
+  triggers:
     - trigger: time
       at: "20:00"
   condition: >-
     {{ as_timestamp(now()) >= as_timestamp(states('input_datetime.dnswl_renew_date')) }}
-  action:
+  actions:
     - action: notify.iphone_12
       data:
         message: "Het is 90 (of meer) dagen geleden dat je het DNSWL ID hebt verlengd. Verleng deze binnen 30 dagen en reset de timer."

@@ -1,7 +1,7 @@
 - id: 4c1da598-5e42-48a6-a32f-f597b8dbaf3a
   alias: "Stekker: Woonkamer"
   description: "Op basis van de trigger en voorwaarden wordt een Hue Smart Plug in- of uitgeschakeld"
-  trigger:
+  triggers:
     # Triggers voor inschakelen
     - trigger: state
       entity_id: zone.home
@@ -20,7 +20,7 @@
     - trigger: time
       at: input_datetime.plug_woonkamer_night_time
       id: "turn_off"
-  condition:
+  conditions:
     - "{{ is_state('input_boolean.visite', 'off') }}"
     - alias: "Tijdstip waarop de stekker ingeschakeld dient te worden"
       condition: time
@@ -30,7 +30,7 @@
     - "{{ now() <= (today_at(states('input_datetime.plug_woonkamer_night_time')) + timedelta(minutes=5)) }}"
   variables:
     stekker: "switch.stekker_woonkamer"
-  action:
+  actions:
     - alias: "Kies of er in- of uitgeschakeld moet worden op basis van de voorwaarden"
       or:
         - and:

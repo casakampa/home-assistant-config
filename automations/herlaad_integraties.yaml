@@ -2,10 +2,10 @@
   alias: "Herlaad Envoy integratie"
   description: "Herlaad de integratie zodat de verbinding actief blijft. In het verleden raakte af en toe de verbinding verloren, waardoor er geen informatie werd doorgegeven. "
   initial_state: true
-  trigger:
+  triggers:
     - trigger: time
       at: "03:30:00"
-  action:
+  actions:
     - action: homeassistant.reload_config_entry
       data:
         entry_id: "{{ config_entry_id('sensor.envoy_iq7a_current_power_production') }}"
@@ -14,7 +14,7 @@
   alias: "Herlaad WebOS integratie"
   description: "Herlaad de integratie zodat de TV opnieuw wordt uitgelezen. Wordt dit niet gedaan, dan is na 1 keer gebruik de status van de TV niet meer uit te lezen."
   initial_state: true
-  trigger:
+  triggers:
     - trigger: state
       entity_id: media_player.lg_oled
       to: "off"
@@ -24,7 +24,7 @@
         - "unavailable"
         - "unknown"
         - "none"
-  action:
+  actions:
     - wait_for_trigger:
         - trigger: state
           entity_id: switch.stekker_bioscoopkamer

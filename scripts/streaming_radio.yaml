@@ -45,7 +45,7 @@ prepare_streaming_radio:
           - input_boolean.play_media_sonos_woonkamer
           - input_boolean.play_media_sonos_slaapkamer
     - delay:
-        milliseconds: 100
+        milliseconds: 500
     - action: input_boolean.turn_on
       target:
         entity_id: "input_boolean.play_media_sonos_{{ kamer }}"

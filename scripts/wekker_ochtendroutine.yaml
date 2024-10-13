@@ -10,12 +10,12 @@ wekker_met_ochtendroutine:
     anchors:
       - &bereken_reistijd_huis_naar_werk
         alias: "Bereken reistijd van huis naar vooringestelde werklocatie"
-        service: script.turn_on
+        action: script.turn_on
         target:
           entity_id: "script.calculate_travel_time_zone_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
       - &melding_reistijd_huis_naar_werk
         alias: "Geef een melding van de actuele reistijd naar de vooringestelde werklocatie"
-        service: script.turn_on
+        action: script.turn_on
         target:
           entity_id: "script.update_travel_time_to_aventus_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
         data:
@@ -24,72 +24,66 @@ wekker_met_ochtendroutine:
   sequence:
     - parallel:
         - alias: "Update input_datetime met juiste waarde, zodat verlichting woonkamer overeenkomt met wektijd."
-          service: input_datetime.set_datetime
+          action: input_datetime.set_datetime
           target:
             entity_id: input_datetime.light_home_day_time
           data:
             time: "{{ now().strftime('%H:%M') }}"
         - alias: "Start de verlichting zwak en zo warm mogelijk"
-          service: light.turn_on
+          action: light.turn_on
           target:
             entity_id: *slaapkamer
           data:
             brightness_pct: 1
             color_temp_kelvin: "{{ int(state_attr('light.lamp_slaapkamer_plafond', 'min_color_temp_kelvin'), 2202) }}"
-    - alias: "Laat de lampen 10 seconden branden, voordat er verder wordt gegaan"
+    - alias: "Laat de lampen 5 seconden branden, voordat er verder wordt gegaan"
       delay:
-        seconds: 10
+        seconds: 5
     - alias: "Simuleer een zonsopkomst met onderstaande instellingen"
-      service: light.turn_on
+      action: light.turn_on
       target:
         entity_id: *slaapkamer
       data:
         transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 10 }}" # -10 seconden vanwege de delay
         brightness_pct: "{{ int(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
         color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 3000) }}"
-    - alias: "Laat mij weten dat ik er nu uit zou moeten/kunnen gaan"
-      service: notify.iphone_12
-      data:
-        message: "Tijd om wakker te worden"
-        data:
-          tag: *tag
-          push:
-            interruption-level: time-sensitive
     - alias: "Wacht evenlang als dat de verlichting nodig heeft om de juiste helderheid te bereiken, alvorens verder te gaan"
       delay:
         minutes: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15) }}"
-    - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden"
-      service: script.turn_on
-      target:
-        entity_id: script.controle_daglicht_woonkamer # Controleert of er genoeg daglicht in de woonkamer is, anders wordt de verlichting ingeschakeld
-    # Het is zover, je moet eruit
     - parallel:
+        - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden"
+          action: script.turn_on
+          target:
+            entity_id: script.controle_daglicht_woonkamer # Controleert of er genoeg daglicht in de woonkamer is, anders wordt de verlichting ingeschakeld
+        # Tijd voor een update
         - alias: "Geef een statusupdate voor vanochtend"
-          service: script.turn_on
+          action: script.turn_on
           target:
             entity_id: script.tts_statusupdate
-        - action: notify.iphone_12
-          data:
-            message: "Tijd om uit bed te stappen."
-            data:
-              push:
-                interruption-level: time-sensitive
-                sound: "US-EN-Morgan-Freeman-Good-Morning.wav"
-              tag: *tag
+    - alias: "Wacht totdat de statusupdate is afgelopen"
+      delay:
+        seconds: 15
+    # Zet de radio aan
+    - alias: "Zet de radio aan met deze instellingen"
+      action: script.prepare_streaming_radio
+      data:
+        kamer: "slaapkamer"
+        station: "NPO Radio 2"
+        volume: 15
     - delay:
         minutes: 5
     - parallel:
-        # Schakel lamp uit
-        - action: light.turn_off
-          target:
-            entity_id: *slaapkamer
         # Zet de radio aan
         - alias: "Zet de radio aan met deze instellingen"
-          service: script.prepare_streaming_radio
+          action: script.prepare_streaming_radio
           data:
             kamer: "woonkamer"
             station: "NPO Radio 2"
             volume: 30
+        # Schakel lamp uit
+        - action: light.turn_off
+          target:
+            entity_id: *slaapkamer
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
       if:

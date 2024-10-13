@@ -2,12 +2,12 @@
   alias: "Verlichting: Kleurupdate"
   description: "Verander de kleurtemperatuur van actieve lampen"
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sensor.kleurtemperatuur_verlichting
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - repeat:
         for_each:
           - "light.keuken_zha_group_0x0002"
@@ -44,7 +44,7 @@
   mode: restart
   trace:
     stored_traces: 40
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sensor.drempelwaarde_woonkamer
       to: "dag"
@@ -84,9 +84,9 @@
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       - &geen_match "Er is geen passende actie voor deze trigger."
       - &chromecast_geen_netflix "{{ not is_state_attr('media_player.chromecast_woonkamer', 'app_name', 'Netflix') }}"
-  condition:
+  conditions:
     - "{{ is_state('input_boolean.visite', 'off') }}"
-  action:
+  actions:
     - choose:
         - conditions:
             - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders zetten onderstaande acties onbedoeld de verlichting aan.
@@ -195,7 +195,7 @@
 - id: b7481a4a-979c-46bc-a078-9950568a99dc
   alias: "Bij hoge temperatuur, alle lampen 100%"
   description: "Zekerheid voor alles, maar stel dat er enorme warmte in een ruimte is dan wil ik hier van op de hoogte worden gebracht."
-  trigger:
+  triggers:
     - trigger: numeric_state
       entity_id:
         - sensor.hue_motion_woonkamer_temperature
@@ -205,7 +205,7 @@
         - sensor.hue_motion_overloop_temperature
       above: 50
   mode: parallel
-  action:
+  actions:
     - parallel:
         - action: light.turn_on
           target:
@@ -226,7 +226,7 @@
   alias: "Verlichting: Bioscoopkamer"
   description: "Deze automatisering regelt de verlichting in de bioscoopkamer"
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: input_button.lg_pixel_refresh_kort
       id: "pixel_refresh_kort"
@@ -271,7 +271,7 @@
       - &lichtsterkte_hoog 50
       - &min_color_temp_kelvin "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
       - &zon "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
-  action:
+  actions:
     - alias: "Wat moet er gebeuren?"
       choose:
         - conditions:
@@ -363,7 +363,7 @@
 - id: a093e168-18fe-49e1-a84c-6912c5b3614c
   alias: "Verlichting: Voortuin"
   description: "Deze automatisering regelt de verlichting in de voortuin"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sun.sun
       to:
@@ -378,7 +378,7 @@
       id: nacht
   variables:
     lamp: "light.buitenlamp_voortuin"
-  action:
+  actions:
     - alias: "Kies het juiste scenario om de lamp te schakelen"
       choose:
         - conditions:
@@ -406,7 +406,7 @@
 - id: 7614bce6-ac20-43f0-b767-5ad2e2773ec9
   alias: "Verlichting: Trapkast"
   description: "Deze automatisering regelt de verlichting in de trapkast"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.deursensor_trapkast
     - trigger: state
@@ -417,9 +417,9 @@
   variables:
     lamp: "light.lamp_trapkast"
     sensor: "binary_sensor.deursensor_trapkast"
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - if:
         - "{{ trigger.entity_id == sensor and is_state(sensor, 'on') }}"
       then:
@@ -437,7 +437,7 @@
 - id: 3aace0f0-00a2-4c66-96f4-958d873cf660
   alias: "Verlichting: Slaapkamer (computer)"
   description: "Deze automatisering regelt bij gebruik van de computer de verlichting in de slaapkamer"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: device_tracker.gamepc_ryzen5
       to: "home"
@@ -449,12 +449,12 @@
       entity_id: sun.sun
       to: "below_horizon"
       id: sun
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - or:
         - "{{ trigger.id in ['sun', 'sensor'] and is_state('device_tracker.gamepc_ryzen5', 'home') }}"
         - "{{ trigger.id == 'computer' and is_state('sun.sun', 'below_horizon') }}"
-  action:
+  actions:
     - alias: "Activeer de juiste mode"
       action: input_select.select_option
       target:

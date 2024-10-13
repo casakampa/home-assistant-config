@@ -1,7 +1,7 @@
 - id: 0a69e636-7809-441e-b2a0-5fe663e38a26
   alias: "Wasprogramma: Start"
   description: "Automatisering regelt alles vanaf het inschakelen tot het activeren van de automatisering wasprogramma_afronding"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: switch.stekker_wasmachine
       to: "on"
@@ -50,7 +50,7 @@
         data:
           option: Geen
       - &url_wasmachine "/lovelace/wasmachine"
-  action:
+  actions:
     - if:
         - "{{ is_state(wasprogramma, 'Geen') }}"
         - "{{ is_state(wasprogramma_actief, 'off') }}"
@@ -190,7 +190,7 @@
 - id: f9de5d4d-8ae3-4ebd-98e6-af7a6494485d
   alias: "Wasprogramma: Startuitstel"
   description: "Start het wasprogramma na aflopen startuitstel."
-  trigger:
+  triggers:
     - trigger: numeric_state
       entity_id: sensor.stekker_wasmachine_power_consumption
       above: 10
@@ -199,9 +199,9 @@
   variables:
     wasprogramma: *select_wasprogramma
     wasprogramma_startuitstel: *boolean_wasprogramma_startuitstel
-  condition:
+  conditions:
     - "{{ is_state(wasprogramma_startuitstel, 'on') }}"
-  action:
+  actions:
     - action: input_boolean.turn_off
       target:
         entity_id: *boolean_wasprogramma_startuitstel
@@ -239,7 +239,7 @@
   alias: "Wasprogramma: Afronding"
   description: "Wordt gestart door wasprogramma_selectie, en handelt alles af van detectie van wasprogramma afgelopen tot en met het herinneren dat de was nog in de wasmachine zit"
   # initial_state: false # De automatisering wordt ingeschakeld zodra de wasmachine actief is. Anders wordt continu gemonitord of de stekker < 4 watt verbruikt.
-  trigger:
+  triggers:
     # Wasmachine is klaar en staat standby
     - trigger: numeric_state
       entity_id: sensor.stekker_wasmachine_power_consumption
@@ -255,12 +255,12 @@
     mededeling: "De was is klaar sinds {{ tijdstip }} en zit nog in de wasmachine."
   trace:
     stored_traces: 25
-  condition:
+  conditions:
     # Er moet een actief wasprogramma zijn
     - "{{ is_state(wasprogramma_actief, 'on') }}"
       # onder voorbehoud dat startuitstel is uitgeschakeld, wat betekent dat de wasmachine is gestart met het wasprogramma
     - "{{ is_state(wasprogramma_startuitstel, 'off') }}"
-  action:
+  actions:
     - parallel:
         - if:
             - "{{ is_state('person.maarten_van_de_kamp', 'home') }}"

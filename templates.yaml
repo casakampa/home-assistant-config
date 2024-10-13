@@ -86,7 +86,7 @@
 
 # Afvalwijzer sensor
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.afvalwijzer_next_type
   sensor:
     - unique_id: e52ad878-27ce-42de-8fe2-03d21fbe8797
@@ -122,7 +122,7 @@
 
 # Monitor hvac_action van de thermostaat voor veranderingen
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: climate.otgw
       attribute: hvac_action
   binary_sensor:
@@ -132,7 +132,7 @@
       state: "{{ is_state_attr('climate.otgw', 'hvac_action', 'heating') }}"
 # Maak een nieuwe template sensor voor beweging in de gang
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - binary_sensor.hue_motion_gang_occupancy
         - binary_sensor.hue_motion_trap_occupancy
@@ -145,7 +145,7 @@
       availability: "{{ (has_value('binary_sensor.hue_motion_gang_occupancy') and has_value('binary_sensor.hue_motion_trap_occupancy')) }}"
 # Maak een nieuwe template sensor voor beweging in de woonkamer en keuken
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id:
         - binary_sensor.aqara_motion_keuken
         - binary_sensor.hue_motion_woonkamer_occupancy
@@ -158,10 +158,10 @@
       availability: "{{ (has_value('binary_sensor.aqara_motion_keuken') and has_value('binary_sensor.hue_motion_woonkamer_occupancy')) }}"
 # Maakt een sensor die wordt ingeschakeld wanneer de thermostaat de ingestelde maximumtemperatuur overschrijdt
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: climate.otgw
       attribute: temperature
-  #  - platform: state # voor testdoeleinden
+  #  - trigger: state # voor testdoeleinden
   #    entity_id: input_number.thermostaat_test_temperatuur
   binary_sensor:
     - unique_id: 5080c052-00c1-4318-8d39-95efda56f34a
@@ -170,7 +170,7 @@
       availability: "{{ is_number(state_attr('climate.otgw', 'temperature')) and is_number(states('input_number.thermostaat_maximum_temperatuur')) }}"
       # state: "{{ float(states(trigger.entity_id), 19.5) > float(states('input_number.thermostaat_maximum_temperatuur'), 19.5) }}" # voor testdoeleinden
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.hue_motion_woonkamer_illuminance
   sensor:
     - unique_id: c591b645-8202-429e-96ec-628529e9958a
@@ -186,7 +186,7 @@
         {% endif %}
       availability: "{{ has_value(trigger.entity_id) }}"
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.hue_motion_gang_illuminance
   sensor:
     - unique_id: 8963c6da-0bc3-4082-9085-cb65fa936fcc
@@ -202,7 +202,7 @@
         {% endif %}
       availability: "{{ has_value(trigger.entity_id) }}"
 - trigger:
-    - platform: state
+    - trigger: state
       entity_id: sensor.hue_motion_achtertuin_illuminance
   sensor:
     - unique_id: 07999eb9-08b8-4cb6-a098-349e2414fab2

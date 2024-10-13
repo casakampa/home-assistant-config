@@ -3,15 +3,15 @@
   description: "Activeer verlichting keuken op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: event
       event_type: zha_event
       event_data:
         device_id: 13eea38ac9f669fba8af67a6bcb10ba5
         cluster_id: 64512
-  condition:
+  conditions:
     - "{{ trigger.event.data.args.press_type in ['short_release', 'double_press', 'long_release', 'hold'] }}"
-  action:
+  actions:
     - alias: "Stuur de verlichting en multimedia aan"
       action: script.hue_dimmer_multimedia_logica
       data:
@@ -27,7 +27,7 @@
   description: "Deactiveer automation.verlichting_keuken_beweging totdat de verlichting met de Hue Dimmer is uitgeschakeld."
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: event
       event_type: zha_event
       event_data:
@@ -36,7 +36,7 @@
   variables:
     command: "{{ trigger.event.data.command }}"
     automation: "automation.verlichting_keuken_beweging"
-  action:
+  actions:
     - alias: "Zet de automatisering automation.verlichting_keuken_beweging aan of uit op basis van ingedrukte knop Hue Dimmer"
       choose:
         - conditions:

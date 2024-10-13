@@ -2,7 +2,7 @@
   alias: "Melding: Bereikbaarheid lampen"
   description: "Stuur een melding wanneer een lamp (on)bereikbaar is"
   mode: restart
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sensor.onbereikbare_lampen
       to: ~
@@ -11,21 +11,21 @@
     aantal: >-
       {% set aantal = int(states(trigger.entity_id)) %}
       {% if aantal >= 1 %}
-        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar:'}}
+        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar'}}
       {% else %}
         Alle lampen zijn bereikbaar
       {% endif %}
     lampen: >-
       {% set lampen = state_attr(trigger.entity_id, 'lampen') %}
       {{ lampen | join(', ') }}
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - parallel:
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
           action: notify.iphone_12
           data:
-            message: "{{ aantal }} {{ lampen }}"
+            message: "{{ aantal }}: {{ lampen }}"
             data:
               tag: *tag
               push:
@@ -34,13 +34,18 @@
           data:
             message: "{{ aantal }} {{ lampen }}"
             notification_id: *tag
-        - alias: "Vertel welke lampen (on)bereikbaar zijn"
-          action: tts.speak
-          target:
-            entity_id: tts.piper
-          data:
-            cache: false
-            media_player_entity_id:
-              - media_player.sonos_woonkamer
-              - media_player.sonos_slaapkamer
-            message: "{{ aantal }}"
+        - if: >-
+            {{ today_at(states('input_datetime.light_home_day_time')) < now() < today_at(states('input_datetime.light_home_night_time')) }}
+          then:
+            - alias: "Vertel welke lampen (on)bereikbaar zijn"
+              action: tts.speak
+              target:
+                entity_id: tts.piper
+              data:
+                cache: false
+                media_player_entity_id:
+                  - media_player.sonos_woonkamer
+                  - media_player.sonos_slaapkamer
+                message: "{{ aantal }}"
+          else:
+            - stop: "Het is geen goed tijdstip om de melding mede te delen"

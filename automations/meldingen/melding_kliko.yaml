@@ -4,7 +4,7 @@
   mode: parallel
   trace:
     stored_traces: 25
-  trigger:
+  triggers:
     - trigger: time
       at: input_datetime.tijdstip_melding_kliko
       id: "tijdstip"
@@ -70,10 +70,10 @@
         action: script.turn_on
         target:
           entity_id: script.tts_kliko_ophalen
-  condition:
+  conditions:
     - "{{ is_state(boolean_herinnering, 'on') }}"
     - "{{ has_value(sensor_morgen) and not is_state(sensor_morgen, 'Geen') }}"
-  action:
+  actions:
     - choose:
         - conditions:
             - condition: trigger
@@ -154,7 +154,7 @@
   mode: parallel
   trace:
     stored_traces: 25
-  trigger:
+  triggers:
     # Deuren
     - trigger: state
       entity_id: binary_sensor.deursensor_voordeur
@@ -185,11 +185,11 @@
     werkdag: "binary_sensor.workday_sensor"
     tag: "notification_kliko_ophalen"
     subtitle: "🗑️ Kliko 🗑️"
-  condition:
+  conditions:
     - "{{ is_state(kliko_aan_de_weg, 'on') }}"
     - "{{ is_state(boolean_herinnering, 'on') }}"
     - "{{ has_value(sensor_vandaag) and not is_state(sensor_vandaag, 'Geen') }}"
-  action:
+  actions:
     - alias: "Controleer eerst of aan de set voorwaarden wordt voldaan, ga anders naar"
       if:
         - or:

@@ -15,9 +15,9 @@ tts_statusupdate:
       {% from 'date_functions.jinja' import vandaag %}
       Het is {{ vandaag() }}
     tijd: >
-      {% from 'tts_functions.jinja' import dutch_time_announcement %}
+      {% from 'tts_functions.jinja' import uitgesproken_tijd %}
       {% set nu = now().strftime('%H:%M') %}
-      en het is {{ dutch_time_announcement(nu) }}
+      en het is {{ uitgesproken_tijd(nu) }}
     buitentemperatuur: >
       {{ iif(has_value('sensor.buitentemperatuur'),
       'Buiten is het momenteel' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ 'graden',

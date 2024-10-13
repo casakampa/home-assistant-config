@@ -3,7 +3,7 @@
   description: "Activeer verlichting slaapkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
   initial_state: true
   mode: restart
-  trigger:
+  triggers:
     - trigger: event
       event_type: zha_event
       event_data:
@@ -14,9 +14,9 @@
       event_data:
         device_id: 7c7a67688e3e2118b866cb472fd357e7 # Hue Dimmer V2
         cluster_id: 64512
-  condition:
+  conditions:
     - "{{ trigger.event.data.args.press_type in ['short_release', 'double_press', 'long_release', 'hold'] }}"
-  action:
+  actions:
     - alias: "Stuur de verlichting en multimedia aan"
       action: script.hue_dimmer_multimedia_logica
       data:

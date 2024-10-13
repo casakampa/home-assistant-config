@@ -2,8 +2,8 @@
   alias: "Test automation"
   description: "Gebruik deze automatisering om allerlei andere functies en bedenksels te programmeren."
   initial_state: false
-  trigger: []
-  action:
+  triggers: []
+  actions:
     - alias: "Stuur een bericht"
       action: notify.iphone_12
       data:

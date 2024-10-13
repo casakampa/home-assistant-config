@@ -3,12 +3,12 @@
   description: "Deze automatisering activeert per werkdag de voorgeprogrammeerde ochtendroutine, met daarin de wekker en automatiseringen voor de verlichting"
   initial_state: true
   mode: parallel
-  trigger:
+  triggers:
     - trigger: state
       entity_id: "binary_sensor.wekker"
       from: "off"
       to: "on"
-  action:
+  actions:
     - alias: "Genereer de juiste werkdag en geef de variabele werklocatie door aan script.wekker_met_ochtendroutine"
       action: script.turn_on
       target:
@@ -22,10 +22,10 @@
 - id: 8753cfbe-5d4b-4e2b-aca0-c9b43ebd3141
   alias: "Wekker: Statuscontrole"
   description: "Ga elke zondag om 20:30 na of de wekker ingeschakeld moet worden, bij actieve vakantiemodus"
-  trigger:
+  triggers:
     - trigger: template
       value_template: "{{ now().isoweekday() == 7 and now().strftime('%H:%M') == '20:30' and is_state('sensor.wekkermodus', 'Vakantie') }}"
-  condition:
+  conditions:
     - or:
         - "{{ now().month == 8 and now().day == 27 }}" # Einde zomervakantie
         - "{{ now().month == 10 and now().day == 22 }}" # Einde herfstvakantie
@@ -35,7 +35,7 @@
   variables:
     wekkermodus: "wekker"
     vakantiemodus: "vakantie"
-  action:
+  actions:
     - alias: "Herinner aan de vraag of de wekkermodus gewijzigd moet worden"
       repeat:
         while: "{{ is_state('sensor.wekkermodus', 'Vakantie') }}"

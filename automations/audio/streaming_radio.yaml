@@ -2,7 +2,7 @@
   alias: Streaming Radio
   description: >
     Deze automatisering regelt de aansturing van de audio en de volumeregeling ervan.
-  trigger:
+  triggers:
     - trigger: state
       entity_id: input_boolean.play_streaming_radio
       id: boolean_streaming_radio
@@ -37,7 +37,7 @@
           | selectattr('state', 'eq', 'playing')
           | map(attribute='entity_id')
           | list }}
-  action:
+  actions:
     - choose:
         - conditions:
             - "{{ trigger.id == 'mute_volume' }}"

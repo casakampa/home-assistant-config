@@ -9,7 +9,7 @@ update_travel_time_to_aventus_apeldoorn:
     reistijd: "{{ states(sensor_reistijd) }}"
     anchors:
       - &notificatie_berekening_reistijd
-        service: notify.iphone_12
+        action: notify.iphone_12
         data:
           message: "De reistijd wordt berekend..."
           data:
@@ -17,13 +17,13 @@ update_travel_time_to_aventus_apeldoorn:
             tag: "{{ tag }}"
       - &sensor_update
         alias: "Update de sensor voor actuele informatie"
-        service: homeassistant.update_entity
+        action: homeassistant.update_entity
         target:
           entity_id:
             - "{{ sensor_reistijd }}"
       - &notificatie_reistijd_telefoon
         alias: "Meld de verwachte reistijd"
-        service: notify.iphone_12
+        action: notify.iphone_12
         data:
           message: &bericht >-
             {{ 'Verkeersinformatie: De verwachte reistijd naar ' ~ werklocatie ~ ' is ' ~ 
@@ -36,7 +36,7 @@ update_travel_time_to_aventus_apeldoorn:
             subtitle: "{{ subtitle }}"
             tag: "{{ tag }}"
       - &set_volume
-        service: media_player.volume_set
+        action: media_player.volume_set
         target:
           entity_id:
             - media_player.sonos_woonkamer
@@ -45,7 +45,7 @@ update_travel_time_to_aventus_apeldoorn:
           volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
       - &notificatie_reistijd_sonos
         alias: "Meld de verwachte reistijd"
-        service: tts.speak
+        action: tts.speak
         target:
           entity_id: tts.piper
         data:

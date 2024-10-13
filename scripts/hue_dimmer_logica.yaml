@@ -19,7 +19,7 @@ hue_dimmer_basic_logica:
     anchor:
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       - &turn_on_entities
-        service: light.turn_on
+        action: light.turn_on
         target:
           entity_id: "{{ light }}"
   sequence:
@@ -113,21 +113,21 @@ hue_dimmer_basic_logica:
               then:
                 - parallel:
                     - alias: "Zet alle lampen in het huis uit"
-                      service: light.turn_off
+                      action: light.turn_off
                       target:
                         entity_id: "{{ area }}"
                     - if:
                         - "{{ not is_state(media_player, 'off') }}"
                       then:
                         - alias: "Zet de gekozen media_player uit"
-                          service: media_player.turn_off
+                          action: media_player.turn_off
                           target:
                             entity_id: "{{ media_player }}"
                     - if:
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       then:
                         - alias: "Stop streaming radio"
-                          service: input_boolean.turn_off
+                          action: input_boolean.turn_off
                           target:
                             entity_id: input_boolean.play_streaming_radio
               else:
@@ -136,14 +136,14 @@ hue_dimmer_basic_logica:
                         - "{{ not is_state(media_player, 'off') }}"
                       then:
                         - alias: "Zet de gekozen media_player uit"
-                          service: media_player.turn_off
+                          action: media_player.turn_off
                           target:
                             entity_id: "{{ media_player }}"
                     - if:
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       then:
                         - alias: "Stop streaming radio"
-                          service: input_boolean.turn_off
+                          action: input_boolean.turn_off
                           target:
                             entity_id: input_boolean.play_streaming_radio
 
@@ -172,11 +172,11 @@ hue_dimmer_multimedia_logica:
         - "{{ command == 'off_double_press' }}"
       then:
         - alias: "Wissel tussen modes"
-          service: input_select.select_next
+          action: input_select.select_next
           target:
             entity_id: input_select.dimmer_mode
         - alias: "Vertel de actieve modus"
-          service: tts.speak
+          action: tts.speak
           target:
             entity_id: tts.piper
           data:
@@ -195,7 +195,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'on_short_release' }}"
                       sequence:
                         - wait_for_trigger:
-                            - platform: event
+                            - trigger: event
                               event_type: zha_event
                               event_data:
                                 command: "on_double_press"
@@ -206,7 +206,7 @@ hue_dimmer_multimedia_logica:
                             - "{{ wait.trigger is none }}"
                           then:
                             - alias: "Vertel de actieve modus"
-                              service: tts.speak
+                              action: tts.speak
                               target:
                                 entity_id: tts.piper
                               data:
@@ -225,7 +225,7 @@ hue_dimmer_multimedia_logica:
                                         - "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'off') }}"
                                       then:
                                         - alias: "Activeer Sonos Slaapkamer"
-                                          service: input_boolean.turn_on
+                                          action: input_boolean.turn_on
                                           target:
                                             entity_id: input_boolean.play_media_sonos_slaapkamer
                                         - delay:
@@ -238,7 +238,7 @@ hue_dimmer_multimedia_logica:
                                         - "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'off') }}"
                                       then:
                                         - alias: "Activeer Sonos Woonkamer"
-                                          service: input_boolean.turn_on
+                                          action: input_boolean.turn_on
                                           target:
                                             entity_id: input_boolean.play_media_sonos_woonkamer
                                         - delay:
@@ -248,7 +248,7 @@ hue_dimmer_multimedia_logica:
                             - if: "{{ is_state('input_boolean.play_streaming_radio', 'off') }}"
                               then:
                                 - alias: "Schakel streaming radio in"
-                                  service: input_boolean.turn_on
+                                  action: input_boolean.turn_on
                                   target:
                                     entity_id: input_boolean.play_streaming_radio
                               else:
@@ -259,7 +259,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'on_long_release' }}"
                       sequence:
                         - alias: "Vertel hoe laat het is"
-                          service: tts.speak
+                          action: tts.speak
                           target:
                             entity_id: tts.piper
                           data:
@@ -267,9 +267,9 @@ hue_dimmer_multimedia_logica:
                             media_player_entity_id: >-
                               {{ sonos_speaker }}
                             message: >-
-                              {% from 'tts_functions.jinja' import dutch_time_announcement %}
+                              {% from 'tts_functions.jinja' import uitgesproken_tijd %}
                               {% set nu = now().strftime('%H:%M') %}
-                              Het is {{ dutch_time_announcement(nu) }}
+                              Het is {{ uitgesproken_tijd(nu) }}
                     - conditions:
                         - "{{ command == 'on_double_press' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
@@ -278,7 +278,7 @@ hue_dimmer_multimedia_logica:
                           target:
                             entity_id: input_select.internet_radio_streams
                         - alias: "Vertel de actieve modus"
-                          service: tts.speak
+                          action: tts.speak
                           target:
                             entity_id: tts.piper
                           data:
@@ -291,7 +291,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'up_short_release' }}"
                       sequence:
                         - alias: "Verhoog het volume"
-                          service: input_number.set_value
+                          action: input_number.set_value
                           target:
                             entity_id: input_number.sonos_media_volume
                           data:
@@ -300,7 +300,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'down_short_release' }}"
                       sequence:
                         - alias: "Verlaag het volume"
-                          service: input_number.set_value
+                          action: input_number.set_value
                           target:
                             entity_id: input_number.sonos_media_volume
                           data:
@@ -310,14 +310,14 @@ hue_dimmer_multimedia_logica:
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
                         - alias: "Maak het mogelijk muziek te dempen en op te heffen."
-                          service: input_boolean.toggle
+                          action: input_boolean.toggle
                           target:
                             entity_id: input_boolean.mute_streaming_radio
                         - if:
                             - "{{ is_state('input_boolean.mute_streaming_radio', 'on') }}"
                           then:
                             - alias: "Vertel de actieve modus"
-                              service: tts.speak
+                              action: tts.speak
                               target:
                                 entity_id: tts.piper
                               data:
@@ -337,14 +337,14 @@ hue_dimmer_multimedia_logica:
                                 - "{{ not is_state(media_player, 'off') }}"
                               then:
                                 - alias: "Zet de gekozen media_player uit"
-                                  service: media_player.turn_off
+                                  action: media_player.turn_off
                                   target:
                                     entity_id: "{{ media_player }}"
                             - if:
                                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                               then:
                                 - alias: "Stop streaming radio"
-                                  service: input_boolean.turn_off
+                                  action: input_boolean.turn_off
                                   target:
                                     entity_id: input_boolean.play_streaming_radio
                   default:
@@ -436,7 +436,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ is_state(light, 'on') }}"
                       sequence:
                         - wait_for_trigger:
-                            - platform: event
+                            - trigger: event
                               event_type: zha_event
                               event_data:
                                 command: "off_double_press"
@@ -455,7 +455,7 @@ hue_dimmer_multimedia_logica:
                         - "{{ command == 'off_long_release' }}"
                       sequence:
                         - alias: "Zet alle lampen in het huis uit"
-                          service: light.turn_off
+                          action: light.turn_off
                           target:
                             entity_id: "{{ area }}"
           default:

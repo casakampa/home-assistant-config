@@ -3,7 +3,7 @@ tts_test_statusupdate:
   icon: "mdi:speaker-message"
   sequence:
     - alias: "Geef een statusupdate voor vanochtend"
-      service: script.turn_on
+      action: script.turn_on
       target:
         entity_id: script.tts_statusupdate
       data:
@@ -17,7 +17,7 @@ tts_test_wasmachine_mededeling:
     tijdstip: "{{states('input_datetime.time_for_testing')}}"
   sequence:
     - alias: "Test de notificatie voor de wasmachine"
-      service: script.turn_on
+      action: script.turn_on
       target:
         entity_id: script.tts_wasprogramma_afgelopen
       data:

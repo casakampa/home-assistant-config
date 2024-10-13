@@ -1,6 +1,6 @@
 - id: 6c2bd0ff-ea5e-475e-9cfc-5e56d4db9112
   alias: "Melding: Software update beschikbaar"
-  trigger:
+  triggers:
     - trigger: state
       entity_id:
         - sensor.home_assistant_core
@@ -24,7 +24,7 @@
         - "unavailable"
         - "unknown"
   mode: queued
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - alias: "Stuur alleen een notificatie wanneer zowel de oude als nieuwe staat bekend zijn."
       condition: template
@@ -41,7 +41,7 @@
         {{ iif(trigger.entity_id == 'sensor.nextcloud',
         version(states('sensor.nextcloud') >= 'v29.0.0'),
         True) }}
-  action:
+  actions:
     - alias: "Stuur een notificatie over de software update"
       action: notify.iphone_12
       data:

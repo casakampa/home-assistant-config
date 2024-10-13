@@ -2,7 +2,7 @@
   alias: "Thuiswerken"
   description: "Op basis van ingestelde booleans wordt het script van de ochtendroutine onderbroken, zodat automatiseringen niet worden afgemaakt/gestart."
   initial_state: true
-  trigger:
+  triggers:
     - trigger: time
       at: "06:00"
     - trigger: state
@@ -13,7 +13,7 @@
         - input_boolean.thuiswerken_donderdag
         - input_boolean.thuiswerken_vrijdag
       to: "on"
-  action:
+  actions:
     - if:
         - or:
             - and:
@@ -54,16 +54,16 @@
 - id: fb44cfe4-dcf9-424d-ad3b-0505cebc82ec
   alias: "Thuiswerken: uitbreiding"
   description: "Controleer op twee momenten of thuiswerken actief is en de laptop van het werk is ingeschakeld, en voer de bijbehorende acties uit."
-  trigger:
+  triggers:
     - trigger: time
       at:
         - "08:30" # een vroege afspraak of les
         - "09:00" # prima tijd om rustig aan te doen en te beginnen
-  condition:
+  conditions:
     - "{{ is_state('binary_sensor.workday_sensor', 'on')}}"
     - "{{ is_state('input_boolean.thuiswerk_status', 'on')}}"
     - "{{ is_state('device_tracker.ave_5cd2156vvx', 'home')}}"
-  action:
+  actions:
     - action: light.turn_off
       target:
         entity_id: light.woonkamer_en_keuken_zha_group_0x0007

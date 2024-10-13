@@ -2,13 +2,13 @@
   alias: "Melding: UV-index"
   description: "Stuur een melding bij een matige en sterke UV-index"
   mode: queued
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sensor.thuis_uv_index
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
     - "{{ int(trigger.to_state.state, 4) > 4 }}"
-  action:
+  actions:
     - action: notify.iphone_12
       data:
         message: >-

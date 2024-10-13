@@ -1,7 +1,7 @@
 - id: d3674aa8-67d5-43b8-a0bc-16fff9a16dce
   alias: "Melding: Lage CV-druk"
   description: "Melding wanneer de ketel bijgevuld dient te worden"
-  trigger:
+  triggers:
     - trigger: numeric_state
       entity_id: sensor.ch_water_pressure_boiler_otgw
       below: 1
@@ -9,7 +9,7 @@
   variables:
     title: "⚠️ Waarschuwing ⚠️"
     message: "CV-druk is lager dan {{ trigger.below }} bar. Zo snel mogelijk bijvullen!"
-  action:
+  actions:
     - action: notify.iphone_12
       data:
         message: "{{ message }}"
@@ -25,13 +25,13 @@
 - id: b5da03a9-99eb-416d-906c-a6acdf4d2781
   alias: "Update OTGW" # OTC is Outside Temperature Control
   description: "Aangezien er geen buitenvoeler op de ketel zit, is dit handig om te gebruiken icm WAR. Met elke update wordt de interne klok gesynchroniseerd"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: sensor.buitentemperatuur
   mode: queued
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - alias: "Wanneer de sensor wordt bijgewerkt, update de buitentemperatuur in de OTGW"
       action: opentherm_gw.set_outside_temperature
       data:
@@ -44,14 +44,14 @@
 
 - id: a8b4f651-e700-4237-a200-2576dc1a7ea6
   alias: "Diagnosemelding CV"
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.slave_diagnostic_indication_boiler_otgw
       to: "on"
   variables:
     title: "⚠️ Waarschuwing ⚠️"
     message: "Controleer de CV ketel, er is een diagnosemelding."
-  action:
+  actions:
     - action: notify.iphone_12
       data:
         message: "{{ message }}"
@@ -69,13 +69,13 @@
   description: >
     Deze automatisering wordt geactiveerd wanneer de status van de sensor wijzigt.
     Zolang deze aan staat, wordt de melding met een regelmatige interval herhaald totdat dit niet meer het geval is en de melding wordt verwijderd.
-  trigger:
+  triggers:
     - trigger: state
       entity_id: binary_sensor.overschrijding_maximumtemperatuur_thermostaat
   mode: restart
-  condition:
+  conditions:
     - "{{ has_value(trigger.entity_id) }}"
-  action:
+  actions:
     - if: "{{ is_state( trigger.entity_id, 'on') }}"
       then:
         - alias: "Herhaal de melding met vaste interval"
