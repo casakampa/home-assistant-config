@@ -1,0 +1,138 @@
+- id: ea4667b4-17d0-46be-ac99-c8415ebced8b
+  alias: "Verlichting: Bioscoopkamer"
+  description: "Deze automatisering regelt de verlichting in de bioscoopkamer"
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: input_button.lg_pixel_refresh_kort
+      id: "pixel_refresh_kort"
+    - trigger: state
+      entity_id: input_button.lg_pixel_refresh_lang
+      id: "pixel_refresh_lang"
+    - trigger: state
+      entity_id: sensor.drempelwaarde_achtertuin
+      to: "schemer"
+      id: "schemer"
+    - trigger: state
+      entity_id: switch.stekker_bioscoopkamer
+      to: "on"
+      id: "stekker_aan"
+    - trigger: state
+      entity_id: switch.stekker_bioscoopkamer
+      to: "off"
+      for:
+        seconds: 30
+      id: "stekker_uit"
+    - trigger: state
+      entity_id: media_player.lg_oled
+      to: "off"
+      id: "lg_uit"
+    - trigger: state
+      entity_id: media_player.lg_oled
+      attribute: source
+      to:
+        - "Apple TV"
+        - "KPN iTV"
+        - "Live TV"
+        - "Netflix"
+        - "Photo & Video"
+        - "YouTube"
+        - "NPO"
+      id: "streaming_aan"
+  variables:
+    lamp: &lamp "light.lamp_bioscoopkamer"
+    anchor:
+      - &transitie 5
+      - &lichtsterkte_laag 5
+      - &lichtsterkte_hoog 50
+      - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
+      - &min_color_temp_kelvin "{{ int(state_attr('light.lamp_bioscoopkamer', 'min_color_temp_kelvin'), 2202) }}"
+      - &zon "{{ has_value('sun.sun') and is_state('sun.sun', 'below_horizon') }}"
+  actions:
+    - alias: "Wat moet er gebeuren?"
+      choose:
+        - conditions:
+            - "{{ trigger.id in ['pixel_refresh_kort', 'pixel_refresh_lang'] }}"
+          sequence:
+            - delay:
+                seconds: 30
+            - alias: "Zet de lamp in de bioscoopkamer uit"
+              action: light.turn_off
+              target:
+                entity_id: *lamp
+            - delay: "{{ 900 if trigger.id == 'pixel_refresh_kort' else 3600 }}"
+            - alias: "Zet de stekker in de bioscoopkamer uit"
+              action: switch.turn_off
+              target:
+                entity_id: "switch.stekker_bioscoopkamer"
+        - conditions:
+            - "{{ is_state(lamp, 'off') }}"
+          sequence:
+            - alias: "De lamp staat uit, kies wat er met de verlichting moet gebeuren"
+              choose:
+                - conditions:
+                    - condition: trigger
+                      id: "schemer"
+                    - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
+                  sequence:
+                    - alias: "Zet bij schemer de verlichting in de bioscoopkamer zachtjes aan"
+                      action: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        brightness_pct: *lichtsterkte_laag
+                        color_temp_kelvin: *min_color_temp_kelvin
+                - conditions:
+                    - condition: trigger
+                      id: "stekker_aan"
+                    - *zon
+                  sequence:
+                    - alias: "Zet na zonsondergang de verlichting in de bioscoopkamer aan"
+                      action: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: *lichtsterkte_hoog
+                        color_temp_kelvin: *color_temp
+        - conditions:
+            - "{{ is_state(lamp, 'on') }}"
+          sequence:
+            - alias: "De lamp staat aan, kies wat er met de verlichting moet gebeuren"
+              choose:
+                - conditions:
+                    - condition: trigger
+                      id: "stekker_uit"
+                  sequence:
+                    - alias: "Zet 30 seconden na het uitschakelen van de stekker de verlichting in de bioscoopkamer uit"
+                      action: light.turn_off
+                      target:
+                        entity_id: *lamp
+                - conditions:
+                    - condition: trigger
+                      id: "lg_uit"
+                  sequence:
+                    - alias: "Verhoog de lichtsterkte wanneer de LG OLED wordt uitgeschakeld"
+                      action: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: *lichtsterkte_hoog
+                        color_temp_kelvin: *color_temp
+                - conditions:
+                    - condition: trigger
+                      id: "streaming_aan"
+                    - *zon
+                  sequence:
+                    - alias: "Verlaag de lichtsterkte wanneer een streamingapp wordt gestart op de LG OLED"
+                      action: light.turn_on
+                      target:
+                        entity_id: *lamp
+                      data:
+                        transition: *transitie
+                        brightness_pct: *lichtsterkte_laag
+                        color_temp_kelvin: *min_color_temp_kelvin
+      default:
+        - stop: "Er is iets misgegaan in de automatisering voor de verlichting van de bioscoopkamer"
+          error: true

@@ -4,19 +4,18 @@
       name: "Kleurtemperatuur verlichting"
       icon: mdi:palette
       state: >-
-        {% set elevation = float(state_attr('sun.sun', 'elevation')) %}
-        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 25) %}
-          {% if elevation <= -5.0 %}
-            {{ 2500 }}
-          {% elif elevation >= max_elevation %}
-            {{ 4000 }}
-          {% else %}
-            {% set angle_factor = ((elevation / max_elevation) + 1.5) %}
-            {% set temp = (((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 ) | round(-2) %}
-            {{ int(min(4000, temp)) }}
-          {% endif %}
+        {% set elevation = float(state_attr('sun.sun', 'elevation'), 10) %}
+        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 30) %}
+        {% if elevation <= -5.0 %}
+          2500
+        {% elif elevation >= max_elevation %}
+          4000
+        {% else %}
+          {% set angle_factor = (elevation / max_elevation) + 1.5 %}
+          {% set temp = ((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 %}
+          {{ [temp, 4000] | min | round(-2) | int  }}
+        {% endif %}
       unit_of_measurement: "K"
-      availability: "{{ is_number(state_attr('sun.sun', 'elevation')) and is_number(states('sensor.max_sun_elevation')) }}"
     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
       name: "Z-Stack coordinator firmware"
       state: >-
@@ -119,6 +118,24 @@
             } %}
             {{ afvalsoorten[trigger.to_state.state] }}
       availability: "{{ has_value(trigger.entity_id) }}"
+
+- trigger:
+    - trigger: time_pattern
+      minutes: "/45"
+  sensor:
+    - unique_id: a105e692-cef6-4478-ac67-53ca9f0b2c87
+      name: "Updatebare lampen"
+      icon: mdi:update
+      state: "{{ this.attributes.lampen | count }}"
+      attributes:
+        lampen: >-
+          {% set updatable_lights = states.update
+            | selectattr('attributes.device_class', '==', 'firmware')
+            | selectattr('state', '==', 'on')
+            | selectattr('entity_id', 'search', 'lamp|spot|lightstrip')
+            | map(attribute='entity_id')
+            | list %}
+          {{ updatable_lights }}
 
 # Monitor hvac_action van de thermostaat voor veranderingen
 - trigger:

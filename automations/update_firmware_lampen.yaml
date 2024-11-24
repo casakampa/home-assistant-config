@@ -1,0 +1,19 @@
+- id: f11a04d7-3768-4539-b43b-408f1b72c746
+  alias: "Automatische firmware update lampen"
+  description: >-
+    De automatisering wordt getriggerd door sensor.updatebare_lampen.
+    In de voorwaarden wordt gecontroleerd of de sensor een geldige waarde heeft na de trigger, en hoeveel updatebare lampen er zijn.
+
+    Wanneer deze waarde groter is dan 0, kies de eerste updatebare lamp uit de lijst van het attribuut van de sensor en update deze.
+  triggers:
+    - trigger: state
+      entity_id: sensor.updatebare_lampen
+      from: ~
+      to: ~
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ int(states('sensor.updatebare_lampen')) >= 1 }}"
+  actions:
+    - action: update.install
+      data:
+        entity_id: "{{ state_attr('sensor.updatebare_lampen', 'lampen') | first }}"

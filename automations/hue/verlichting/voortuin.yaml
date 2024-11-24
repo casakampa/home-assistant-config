@@ -1,0 +1,42 @@
+- id: a093e168-18fe-49e1-a84c-6912c5b3614c
+  alias: "Verlichting: Voortuin"
+  description: "Deze automatisering regelt de verlichting in de voortuin"
+  triggers:
+    - trigger: state
+      entity_id: sun.sun
+      to:
+        - below_horizon
+        - above_horizon
+      id: zon
+    - trigger: time
+      at: input_datetime.light_home_day_time
+      id: ochtend
+    - trigger: time
+      at: "00:00"
+      id: nacht
+  variables:
+    lamp: "light.buitenlamp_voortuin"
+  actions:
+    - alias: "Kies het juiste scenario om de lamp te schakelen"
+      choose:
+        - conditions:
+            - "{{ trigger.id in ['ochtend', 'zon'] }}"
+            - "{{ is_state('sun.sun', 'below_horizon') }}"
+            - "{{ is_state(lamp, 'off') }}"
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: "{{ lamp }}"
+              data:
+                brightness_pct: 30
+        - conditions:
+            - or:
+                - "{{ is_state('sun.sun', 'above_horizon') }}"
+                - "{{ trigger.id == 'nacht' }}"
+            - "{{ is_state(lamp, 'on') }}"
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: "{{ lamp }}"
+      default:
+        - stop: "Geen passend scenario voor deze trigger"

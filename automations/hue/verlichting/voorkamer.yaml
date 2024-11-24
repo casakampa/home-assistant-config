@@ -1,0 +1,54 @@
+- id: 3aace0f0-00a2-4c66-96f4-958d873cf660
+  alias: "Verlichting: Voorkamer (computer)"
+  description: "Deze automatisering regelt bij gebruik van de computer de verlichting in de voorkamer"
+  triggers:
+    - trigger: state
+      entity_id: device_tracker.gamepc_ryzen5
+      to: "home"
+      id: computer
+    - trigger: state
+      entity_id: sensor.drempelwaarde_woonkamer
+      id: sensor
+    - trigger: state
+      entity_id: sun.sun
+      to: "below_horizon"
+      id: sun
+    - trigger: state
+      entity_id: switch.stekker_voorkamer
+      from: "on"
+      to: "off"
+      id: stekker
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+  actions:
+    - alias: "Kies of verlichting ingeschakeld of uitgeschakeld moet worden"
+      choose:
+        - conditions:
+            - or:
+                - "{{ trigger.id in ['sun', 'sensor'] and is_state('device_tracker.gamepc_ryzen5', 'home') }}"
+                - "{{ trigger.id == 'computer' and is_state('sun.sun', 'below_horizon') }}"
+          sequence:
+            - alias: "Activeer de juiste mode"
+              action: input_select.select_option
+              target:
+                entity_id: input_select.dimmer_mode
+              data:
+                option: "Verlichting"
+            - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_basic_logica"
+              action: script.turn_on
+              target:
+                entity_id: script.hue_dimmer_basic_logica
+              data:
+                variables:
+                  light: "light.voorkamer_zha_group_0x000b"
+                  command: >
+                    {{ iif(is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
+        - conditions:
+            - "{{ trigger.id == 'stekker' and is_state('sun.sun', 'below_horizon') }}"
+          sequence:
+            - alias: "Zet de verlichting uit"
+              action: light.turn_off
+              target:
+                entity_id: light.voorkamer_zha_group_0x000b
+      default:
+        - stop: "Er is geen passend scenario bij deze actie"

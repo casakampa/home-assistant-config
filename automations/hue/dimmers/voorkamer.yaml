@@ -1,0 +1,21 @@
+- id: 11cfc695-bbf2-4e07-b02b-bc58a00cab39
+  alias: "Verlichting: Voorkamer (dimmer)"
+  description: "Activeer verlichting voorkamer op basis van Hue Dimmer, of schakel alle lampen in en uit dmv lang indrukken"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: event
+      event_type: zha_event
+      event_data:
+        device_id: 9beb6153abfe0eca8873decd132ecbe7
+        cluster_id: 64512
+  conditions:
+    - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release', 'hold'] }}"
+  actions:
+    - alias: "Stuur de verlichting aan"
+      action: script.hue_dimmer_basic_logica
+      data:
+        command: "{{ trigger.event.data.command }}"
+        media_player: "media_player.lg_oled"
+        light: "light.voorkamer_zha_group_0x000b"
+        area: "light.alle_lampen_zha_group_0x0006"

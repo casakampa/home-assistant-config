@@ -1,0 +1,27 @@
+- id: b7481a4a-979c-46bc-a078-9950568a99dc
+  alias: "Bij hoge temperatuur, alle lampen 100%"
+  description: "Zekerheid voor alles, maar stel dat er enorme warmte in een ruimte is dan wil ik hier van op de hoogte worden gebracht."
+  triggers:
+    - trigger: numeric_state
+      entity_id:
+        - sensor.hue_motion_woonkamer_temperature
+        - sensor.hue_motion_trap_temperature
+        - sensor.hue_motion_zolder_temperature
+        - sensor.hue_motion_gang_temperature
+        - sensor.hue_motion_overloop_temperature
+      above: 50
+  mode: parallel
+  actions:
+    - parallel:
+        - action: light.turn_on
+          target:
+            entity_id: light.alle_lampen_zha_group_0x0006
+          data:
+            brightness_pct: 100
+            flash: long
+        - action: notify.iphone_12
+          data:
+            message: "Waarschuwing: {{ trigger.to_state.name }} meet een temperatuur boven 50 graden"
+            data:
+              push:
+                interruption-level: critical

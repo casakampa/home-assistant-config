@@ -1,0 +1,166 @@
+- id: 4f96b956-cc4f-4ac7-b046-4b6bc073e417
+  alias: "Verlichting: Woonkamer"
+  description: >-
+    Deze automatisering regelt de verlichting in de woonkamer.
+
+    Wanneer iemand aanwezig is, wordt de verlichting in de volgende situatie uitgeschakeld:
+      - Er is voldoende daglicht
+
+    Wanneer iemand aanwezig is, of thuiskomt, wordt de verlichting in de volgende situaties ingeschakeld:
+      - Het schemert, vanwege slecht weer of de zon die opkomt of ondergaat
+      - De vooringestelde hoeveelheid minuten voorafgaand aan het ingestelde tijdstip
+
+    Bij bovenstaande situaties wordt gecontroleerd of er visite aanwezig is, anders wordt het niet uitgevoerd
+
+    Wanneer niemand aanwezig is, wordt de verlichting in de volgende situatie ingeschakeld:
+      - Bij zonsondergang (het uitschakelen van de verlichting wordt gedaan door de aanwezigheidssimulatie)
+  mode: restart
+  trace:
+    stored_traces: 40
+  triggers:
+    - trigger: state
+      entity_id: sensor.drempelwaarde_woonkamer
+      to: "dag"
+      for:
+        minutes: 2
+      id: "woonkamer_dag"
+    - trigger: state
+      entity_id: zone.home
+      from: "0"
+      id: "thuiskomst"
+    - trigger: state
+      entity_id: sensor.drempelwaarde_woonkamer
+      to: "schemer"
+      for:
+        minutes: 2
+      id: "woonkamer_schemer"
+    - trigger: sun
+      event: sunset
+      offset: "-00:15:00"
+      id: "zonsondergang"
+    - trigger: sun
+      event: sunset
+      offset: "00:30:00"
+      id: "helderheid_verlagen"
+    - trigger: template
+      value_template: >-
+        {{ now() > today_at(states('input_datetime.light_woonkamer_night_time')) - timedelta(minutes = int(states('input_number.verlichting_woonkamer_dimtijd'), 30)) }}
+      id: "verlichting_dimmen"
+    - trigger: time
+      at: input_datetime.light_woonkamer_night_time
+      id: "verlichting_uit"
+  variables:
+    transitie: &transitietijd 30
+    brightness_pct: &helderheid "{{ int(states('input_number.verlichting_woonkamer_lichtsterkte'), 30) }}"
+    verlichting: &verlichting "light.woonkamer_zha_group_0x0003"
+    anchor:
+      - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
+      - &geen_match "Er is geen passende actie voor deze trigger."
+      - &chromecast_geen_netflix "{{ not is_state_attr('media_player.chromecast_woonkamer', 'app_name', 'Netflix') }}"
+  conditions:
+    - "{{ is_state('input_boolean.visite', 'off') }}"
+  actions:
+    - choose:
+        - conditions:
+            - "{{ is_state(verlichting, 'on') }}" # verlichting moet ingeschakeld zijn, anders zetten onderstaande acties onbedoeld de verlichting aan.
+            - "{{ trigger.id in ['helderheid_verlagen', 'woonkamer_dag'] }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - "{{ trigger.id == 'helderheid_verlagen' }}"
+                  #  - alias: "Voorkom dat deze automatisering andere triggers overschrijft, door deze alleen uit te voeren voordat het nacht wordt."
+                  #    condition: time
+                  #    before: input_datetime.light_home_night_time
+                  sequence:
+                    - action: light.turn_on
+                      target:
+                        entity_id: *verlichting
+                      data:
+                        transition: "{{ transitie | multiply(10, 300) }}"
+                        brightness_pct: *helderheid
+                - conditions:
+                    - "{{ trigger.id == 'woonkamer_dag' }}"
+                    - alias: "Alleen als de zonsondergang niet binnen 20 minuten plaatsvindt"
+                      condition: sun
+                      before: sunset
+                      before_offset: "00:20:00"
+                  sequence:
+                    - action: light.turn_off
+                      target:
+                        entity_id: *verlichting
+                      data:
+                        transition: *transitietijd
+        - conditions:
+            - "{{ trigger.id == 'zonsondergang' }}"
+          sequence:
+            - if:
+                - "{{ states('zone.home') == '0' }}"
+              then:
+                - action: light.turn_on
+                  target:
+                    entity_id: *verlichting
+                  data:
+                    transition: *transitietijd
+                    brightness_pct: *helderheid
+                    color_temp_kelvin: *color_temp
+              else:
+                - stop: *geen_match
+        - conditions:
+            - "{{ states('zone.home') >= '1' }}"
+          sequence:
+            - choose:
+                - conditions:
+                    - "{{ is_state(verlichting, 'off') }}"
+                  sequence:
+                    - if:
+                        - or:
+                            - "{{ trigger.id == 'woonkamer_schemer' }}"
+                            - and:
+                                - "{{ trigger.id == 'thuiskomst' }}"
+                                - "{{ is_state('sensor.drempelwaarde_woonkamer', 'schemer') }}"
+                        - alias: "Alleen wanneer het script van de ochtendroutine inactief is"
+                          condition: state
+                          entity_id: script.wekker_met_ochtendroutine
+                          state: "off"
+                        - alias: "Niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld"
+                          condition: time
+                          after: input_datetime.light_home_day_time
+                      then:
+                        - action: light.turn_on
+                          target:
+                            entity_id: *verlichting
+                          data:
+                            transition: *transitietijd
+                            brightness_pct: "{{ brightness_pct + 10 }}"
+                            color_temp_kelvin: *color_temp
+                      else:
+                        - stop: *geen_match
+                - conditions:
+                    - "{{ is_state(verlichting, 'on') }}"
+                  sequence:
+                    - choose:
+                        - conditions:
+                            - "{{ trigger.id == 'verlichting_dimmen' }}"
+                            - *chromecast_geen_netflix
+                          sequence:
+                            - alias: "Verlaag de lichtsterkte naar 1 procent en verhoog tegelijkertijd de kleurtemperatuur naar de maximale waarde"
+                              action: light.turn_on
+                              target:
+                                entity_id: *verlichting
+                              data:
+                                transition: "{{ int(states('input_number.verlichting_woonkamer_dimtijd'), 30) | multiply(60, 1800) }}"
+                                brightness_pct: "1"
+                                color_temp_kelvin: "{{ int(state_attr(verlichting, 'min_color_temp_kelvin'), 2000) }}"
+                        - conditions:
+                            - "{{ trigger.id == 'verlichting_uit' }}"
+                            - *chromecast_geen_netflix
+                          sequence:
+                            - action: light.turn_off
+                              target:
+                                entity_id: *verlichting
+                      default:
+                        - stop: *geen_match
+              default:
+                - stop: *geen_match
+      default:
+        - stop: *geen_match

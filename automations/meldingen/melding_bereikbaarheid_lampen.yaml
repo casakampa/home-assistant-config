@@ -11,7 +11,7 @@
     aantal: >-
       {% set aantal = int(states(trigger.entity_id)) %}
       {% if aantal >= 1 %}
-        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar'}}
+        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar:'}}
       {% else %}
         Alle lampen zijn bereikbaar
       {% endif %}
@@ -25,7 +25,7 @@
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
           action: notify.iphone_12
           data:
-            message: "{{ aantal }}: {{ lampen }}"
+            message: "{{ aantal }} {{ lampen }}"
             data:
               tag: *tag
               push:
