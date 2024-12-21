@@ -1,14 +1,14 @@
 - id: a29e2af3-286c-43ac-ad36-c93d584568ff
-  alias: "Herlaad Envoy integratie"
-  description: "Herlaad de integratie zodat de verbinding actief blijft. In het verleden raakte af en toe de verbinding verloren, waardoor er geen informatie werd doorgegeven. "
-  initial_state: true
+  alias: "Herlaad integraties"
+  description: "Herlaad integraties die zelf niet goed functioneren."
   triggers:
     - trigger: time
       at: "03:30:00"
   actions:
     - action: homeassistant.reload_config_entry
-      data:
-        entry_id: "{{ config_entry_id('sensor.envoy_iq7a_current_power_production') }}"
+      target:
+        entity_id:
+          - sensor.envoy_iq7a_current_power_production
 
 - id: 8e513b89-3a00-4393-8eaa-04f8405b63f7
   alias: "Herlaad WebOS integratie"

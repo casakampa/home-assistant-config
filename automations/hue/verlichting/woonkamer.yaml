@@ -164,3 +164,51 @@
                 - stop: *geen_match
       default:
         - stop: *geen_match
+
+- id: 637c6e76-84b2-4c29-b12c-6bc7f77cd866
+  alias: "Verlichting: Woonkamer (beweging)"
+  description: "Activeer verlichting woonkamer op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.woonkamer_template_motion_sensor
+  variables:
+    lamp: "light.woonkamer_eethoek_keuken_zha_group_0x0008"
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ trigger.to_state.state == 'on' }}"
+    - and:
+        - "{{ is_state('sensor.drempelwaarde_woonkamer', 'nacht') }}"
+        - "{{ is_state('input_boolean.visite', 'off') }}"
+        - or:
+            - condition: time
+              before: input_datetime.light_home_day_time
+            - condition: time
+              after: input_datetime.light_woonkamer_night_time
+  actions:
+    - alias: "Zet de automatisering Verlichting Keuken (beweging) tijdens deze automatisering uit"
+      action: automation.turn_off
+      target:
+        entity_id: automation.verlichting_keuken_beweging
+    - action: light.turn_on
+      target:
+        entity_id: "{{ lamp }}"
+      data:
+        brightness_pct: 1
+        color_temp_kelvin: 3000
+    - alias: "Wacht tot er 5 seconden geen beweging is gedetecteerd"
+      wait_for_trigger:
+        - trigger: state
+          entity_id:
+            - binary_sensor.woonkamer_template_motion_sensor
+          to: "off"
+          for:
+            seconds: 5
+    - action: light.turn_off
+      target:
+        entity_id: "{{ lamp }}"
+    - alias: "Zet de automatisering Verlichting Keuken (beweging) na deze automatisering aan"
+      action: automation.turn_on
+      target:
+        entity_id: automation.verlichting_keuken_beweging

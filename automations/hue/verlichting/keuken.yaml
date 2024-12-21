@@ -1,0 +1,27 @@
+- id: 59dfe4f3-9178-4023-812f-5420f833edb0
+  alias: "Verlichting: Keuken (beweging)"
+  description: "Activeer verlichting keuken op basis van Aqara Motion"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.aqara_motion_keuken
+      to: "on"
+    - trigger: state
+      entity_id: binary_sensor.aqara_motion_keuken
+      to: "off"
+      for:
+        seconds: 20
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ is_state('script.wekker_met_ochtendroutine', 'off') }}"
+  actions:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 75
+        helderheid_nacht: 20
+        sensor_lichtsterkte: "sensor.aqara_motion_keuken_illuminance"
+        drempelwaarde: 35
+        lamp: "light.keuken_zha_group_0x0002"

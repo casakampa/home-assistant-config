@@ -1,0 +1,24 @@
+- id: 02fa3101-591d-4eb5-811e-a64278af099e
+  alias: "Verlichting: Toilet (beweging)"
+  description: "Activeer verlichting toilet op basis van Aqara Motion"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.aqara_motion_toilet
+      to: "on"
+    - trigger: state
+      entity_id: binary_sensor.aqara_motion_toilet
+      to: "off"
+      for:
+        seconds: 30
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+  actions:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 80
+        helderheid_nacht: 15
+        lamp: "light.toilet_zha_group_0x000a"

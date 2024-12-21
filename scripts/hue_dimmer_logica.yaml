@@ -267,9 +267,9 @@ hue_dimmer_multimedia_logica:
                             media_player_entity_id: >-
                               {{ sonos_speaker }}
                             message: >-
-                              {% from 'tts_functions.jinja' import uitgesproken_tijd %}
+                              {% from 'tts_functions.jinja' import uitgesproken_tijd_v3 %}
                               {% set nu = now().strftime('%H:%M') %}
-                              Het is {{ uitgesproken_tijd(nu) }}
+                              {{ uitgesproken_tijd_v3(nu) }}
                     - conditions:
                         - "{{ command == 'on_double_press' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"

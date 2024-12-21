@@ -1,0 +1,20 @@
+- id: caeb83c2-c9a7-43cd-87e6-bf7c3378e83b
+  alias: "Verlichting: Overloop (beweging)"
+  description: "Activeer verlichting overloop op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.hue_motion_overloop_occupancy
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+  actions:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 65
+        helderheid_nacht: 15
+        sensor_lichtsterkte: "sensor.hue_motion_overloop_illuminance"
+        drempelwaarde: 20
+        lamp: "light.lamp_overloop"

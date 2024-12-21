@@ -1,0 +1,20 @@
+- id: 6f855c9d-9a85-4771-84df-868c0ec5ffb8
+  alias: "Verlichting: Gang (beweging)"
+  description: "Activeer verlichting gang op basis van Hue Motion"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.gang_template_motion_sensor
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+  actions:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      action: script.hue_motion_light_logica
+      data:
+        trigger: "{{ trigger.entity_id }}"
+        helderheid_dag: 65
+        helderheid_nacht: 20
+        sensor_lichtsterkte: "sensor.hue_motion_gang_illuminance"
+        drempelwaarde: 20
+        lamp: "light.lamp_gang"

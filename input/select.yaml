@@ -42,10 +42,10 @@ internet_radio_streams:
   name: "Radio Streams"
   options:
     - "Qmusic Foute uur nonstop"
-    - "BNR Nieuwsradio"
+    #    - "BNR Nieuwsradio"
     - "Radio Veronica"
     - "NPO Radio 2"
-    - "GP Radio"
+  #    - "GP Radio"
   icon: mdi:radio-tower
 dimmer_mode:
   name: "Dimmer Mode"

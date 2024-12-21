@@ -1,0 +1,49 @@
+- id: 0221c907-db60-44c4-9735-e7a210bbcce4
+  alias: "Verlichting: Achtertuin (beweging)"
+  description: "Bewegingsensor activeert bij beweging verlichting achtertuin tijdens schemer of nacht"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.hue_motion_achtertuin_occupancy
+  variables:
+    lamp: "light.buitenlamp_achtertuin"
+  conditions:
+    - "{{ has_value(trigger.entity_id) }}"
+    - "{{ not is_state('sensor.drempelwaarde_achtertuin', 'dag') }}"
+  actions:
+    - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
+      if:
+        - "{{ trigger.to_state.state == 'on' }}"
+      then:
+        - if:
+            - "{{ is_state('sensor.drempelwaarde_achtertuin', 'schemer') }}"
+          then:
+            - alias: "Wordt uitgevoerd bij schemer"
+              action: light.turn_on
+              target:
+                entity_id: "{{ lamp }}"
+              data:
+                brightness_pct: 80
+          else:
+            - alias: "Wordt uitgevoerd bij nacht"
+              action: light.turn_on
+              target:
+                entity_id: "{{ lamp }}"
+              data:
+                brightness_pct: 30
+      else:
+        - alias: "Controleer of de lamp nog brandt"
+          if:
+            - "{{ is_state(lamp, 'on') }}"
+          then:
+            - action: light.turn_on
+              target:
+                entity_id: "{{ lamp }}"
+              data:
+                brightness_pct: 10
+            - delay:
+                seconds: 5
+            - action: light.turn_off
+              target:
+                entity_id: "{{ lamp }}"

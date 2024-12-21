@@ -3,9 +3,10 @@
   description: "Deze automatisering regelt bij gebruik van de computer de verlichting in de voorkamer"
   triggers:
     - trigger: state
-      entity_id: device_tracker.gamepc_ryzen5
-      to: "home"
-      id: computer
+      entity_id: switch.stekker_voorkamer
+      from: "off"
+      to: "on"
+      id: stekker_aan
     - trigger: state
       entity_id: sensor.drempelwaarde_woonkamer
       id: sensor
@@ -17,7 +18,7 @@
       entity_id: switch.stekker_voorkamer
       from: "on"
       to: "off"
-      id: stekker
+      id: stekker_uit
   conditions:
     - "{{ has_value(trigger.entity_id) }}"
   actions:
@@ -26,14 +27,8 @@
         - conditions:
             - or:
                 - "{{ trigger.id in ['sun', 'sensor'] and is_state('device_tracker.gamepc_ryzen5', 'home') }}"
-                - "{{ trigger.id == 'computer' and is_state('sun.sun', 'below_horizon') }}"
+                - "{{ trigger.id == 'stekker_aan' and is_state('sun.sun', 'below_horizon') }}"
           sequence:
-            - alias: "Activeer de juiste mode"
-              action: input_select.select_option
-              target:
-                entity_id: input_select.dimmer_mode
-              data:
-                option: "Verlichting"
             - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_basic_logica"
               action: script.turn_on
               target:
@@ -44,7 +39,7 @@
                   command: >
                     {{ iif(is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
         - conditions:
-            - "{{ trigger.id == 'stekker' and is_state('sun.sun', 'below_horizon') }}"
+            - "{{ trigger.id == 'stekker_uit' and is_state('sun.sun', 'below_horizon') }}"
           sequence:
             - alias: "Zet de verlichting uit"
               action: light.turn_off
