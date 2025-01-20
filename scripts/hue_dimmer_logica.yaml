@@ -168,24 +168,40 @@ hue_dimmer_multimedia_logica:
       description: "The initial area"
       example: "light.alle_lampen_zha_group_0x0006"
   sequence:
-    - if:
-        - "{{ command == 'off_double_press' }}"
-      then:
-        - alias: "Wissel tussen modes"
-          action: input_select.select_next
-          target:
-            entity_id: input_select.dimmer_mode
-        - alias: "Vertel de actieve modus"
-          action: tts.speak
-          target:
-            entity_id: tts.piper
-          data:
-            cache: true
-            media_player_entity_id: >-
-              {{ sonos_speaker }}
-            message: >-
-              Nu actief: {{ states('input_select.dimmer_mode') }}.
-      else:
+    - choose:
+        - conditions:
+            - "{{ command == 'off_double_press' }}"
+          sequence:
+            - alias: "Wissel tussen modes"
+              action: input_select.select_next
+              target:
+                entity_id: input_select.dimmer_mode
+            - alias: "Vertel de actieve modus"
+              action: tts.speak
+              target:
+                entity_id: tts.piper
+              data:
+                cache: true
+                media_player_entity_id: >-
+                  {{ sonos_speaker }}
+                message: >-
+                  Nu actief: {{ states('input_select.dimmer_mode') }}.
+        - conditions:
+            - "{{ command == 'on_long_release' }}"
+          sequence:
+            - alias: "Vertel hoe laat het is"
+              action: tts.speak
+              target:
+                entity_id: tts.piper
+              data:
+                cache: false
+                media_player_entity_id: >-
+                  {{ sonos_speaker }}
+                message: >-
+                  {% from 'tts_functions.jinja' import uitgesproken_tijd_v3 %}
+                  {% set nu = now().strftime('%H:%M') %}
+                  {{ uitgesproken_tijd_v3(nu) }}
+      default:
         - choose:
             - conditions:
                 - "{{ is_state('input_select.dimmer_mode', 'Media') }}"
@@ -256,21 +272,6 @@ hue_dimmer_multimedia_logica:
                           else:
                             - stop: "Geen passende actie beschikbaar"
                     - conditions:
-                        - "{{ command == 'on_long_release' }}"
-                      sequence:
-                        - alias: "Vertel hoe laat het is"
-                          action: tts.speak
-                          target:
-                            entity_id: tts.piper
-                          data:
-                            cache: false
-                            media_player_entity_id: >-
-                              {{ sonos_speaker }}
-                            message: >-
-                              {% from 'tts_functions.jinja' import uitgesproken_tijd_v3 %}
-                              {% set nu = now().strftime('%H:%M') %}
-                              {{ uitgesproken_tijd_v3(nu) }}
-                    - conditions:
                         - "{{ command == 'on_double_press' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
                       sequence:
@@ -304,7 +305,7 @@ hue_dimmer_multimedia_logica:
                           target:
                             entity_id: input_number.sonos_media_volume
                           data:
-                            value: "{{ max((int(states('input_number.sonos_media_volume'), 80) - 5), 10) }}"
+                            value: "{{ max((int(states('input_number.sonos_media_volume'), 80) - 5), 5) }}"
                     - conditions:
                         - "{{ command == 'down_long_release' }}"
                         - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
@@ -313,19 +314,6 @@ hue_dimmer_multimedia_logica:
                           action: input_boolean.toggle
                           target:
                             entity_id: input_boolean.mute_streaming_radio
-                        - if:
-                            - "{{ is_state('input_boolean.mute_streaming_radio', 'on') }}"
-                          then:
-                            - alias: "Vertel de actieve modus"
-                              action: tts.speak
-                              target:
-                                entity_id: tts.piper
-                              data:
-                                cache: true
-                                media_player_entity_id: >-
-                                  {{ sonos_speaker }}
-                                message: >-
-                                  Audio is gedempt
                     - conditions:
                         - "{{ command == 'off_long_release' }}"
                         - or:

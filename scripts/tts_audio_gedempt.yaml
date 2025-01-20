@@ -1,0 +1,22 @@
+mute_media_players:
+  alias: "Demp media spelers"
+  icon: mdi:volume-off
+  sequence:
+    - alias: "Herhaal de melding dat de audio gedempt is."
+      repeat:
+        while: "{{ is_state('input_boolean.mute_streaming_radio', 'on') }}"
+        sequence:
+          - action: tts.speak
+            target:
+              entity_id: tts.piper
+            data:
+              cache: true
+              media_player_entity_id: >-
+                {{ states.media_player
+                  | selectattr('entity_id', 'contains', 'sonos')
+                  | selectattr('state', 'eq', 'playing')
+                  | map(attribute='entity_id')
+                  | list }}
+              message: "Audio is gedempt"
+          - delay:
+              minutes: 3

@@ -20,7 +20,7 @@ tts_statusupdate:
       en {{ uitgesproken_tijd_v3(nu) }}
     buitentemperatuur: >
       {{ iif(has_value('sensor.buitentemperatuur'),
-      'Buiten is het momenteel' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ 'graden',
+      'Buiten is het momenteel ' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ ' graden',
       'De buitentemperatuur is momenteel niet beschikbaar')
       }}
     afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
