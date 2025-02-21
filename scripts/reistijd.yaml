@@ -1,110 +1,56 @@
-update_travel_time_to_aventus_apeldoorn:
-  alias: "Melding: bereken reistijd naar Aventus Apeldoorn"
+traffic_travel_time_notification:
+  alias: "Melding: reistijd naar Aventus locatie"
   icon: mdi:routes-clock
+  fields:
+    werklocatie:
+      description: "Locatie waar wordt gewerkt"
+      example: "Apeldoorn"
   variables:
     tag: "{{ this.entity_id }}"
-    sensor: "sensor.reistijd_huis_naar_aventus_apeldoorn"
-    sensor_reistijd: "{{ sensor }}_duration_in_traffic"
-    subtitle: "Reistijd naar Aventus Apeldoorn"
-    reistijd: "{{ states(sensor_reistijd) }}"
-    anchors:
-      - &notificatie_berekening_reistijd
-        action: notify.iphone_12
-        data:
-          message: "De reistijd wordt berekend..."
-          data:
-            subtitle: "{{ subtitle }}"
-            tag: "{{ tag }}"
-      - &sensor_update
-        alias: "Update de sensor voor actuele informatie"
-        action: homeassistant.update_entity
-        target:
-          entity_id:
-            - "{{ sensor_reistijd }}"
-      - &notificatie_reistijd_telefoon
-        alias: "Meld de verwachte reistijd"
-        action: notify.iphone_12
-        data:
-          message: &bericht >-
-            {{ 'Verkeersinformatie: De verwachte reistijd naar ' ~ werklocatie ~ ' is ' ~ 
-            iif(is_number(reistijd), reistijd ~ ' minuten.' ~ 
-              iif(int(reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
-              ' Dit is langer dan gewoonlijk.',
-              ''),
-            'niet beschikbaar') }}
-          data:
-            subtitle: "{{ subtitle }}"
-            tag: "{{ tag }}"
-      - &set_volume
-        action: media_player.volume_set
-        target:
-          entity_id:
-            - media_player.sonos_woonkamer
-            - media_player.sonos_slaapkamer
-        data:
-          volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
-      - &notificatie_reistijd_sonos
-        alias: "Meld de verwachte reistijd"
-        action: tts.speak
-        target:
-          entity_id: tts.piper
-        data:
-          cache: false
-          media_player_entity_id:
-            - media_player.sonos_woonkamer
-            - media_player.sonos_slaapkamer
-          message: *bericht
+    sensor_reistijd: "{{ states('sensor.reistijd_huis_naar_aventus_' + werklocatie + '_duration_in_traffic') }}"
+    subtitle: "Reistijd naar Aventus {{ werklocatie | title }}"
+    bericht: >-
+      {{ 'Verkeersinformatie: De verwachte reistijd naar ' ~ werklocatie | title ~ ' is ' ~ 
+      iif(is_number(sensor_reistijd), sensor_reistijd ~ ' minuten.' ~ 
+        iif(int(sensor_reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
+        ' Dit is langer dan gewoonlijk!',
+        ''),
+      'niet beschikbaar') }}
   sequence:
-    - *notificatie_berekening_reistijd
-    - *sensor_update
-    - delay:
-        seconds: 1
-    - *set_volume
-    - *notificatie_reistijd_sonos
-    - *notificatie_reistijd_telefoon
+    - parallel:
+        - alias: "Meld de verwachte reistijd"
+          action: notify.iphone_12
+          data:
+            message: "{{ bericht }}"
+            data:
+              subtitle: "{{ subtitle }}"
+              tag: "{{ tag }}"
+        - alias: "Meld de verwachte reistijd"
+          action: tts.speak
+          target:
+            entity_id: tts.piper
+          data:
+            cache: false
+            media_player_entity_id:
+              - media_player.sonos_woonkamer
+              - media_player.sonos_slaapkamer
+            message: "{{ bericht }}"
 
-update_travel_time_to_aventus_deventer:
-  alias: "Melding: bereken reistijd naar Aventus Deventer"
-  icon: mdi:routes-clock
-  variables:
-    tag: "{{ this.entity_id }}"
-    sensor: "sensor.reistijd_huis_naar_aventus_deventer"
-    sensor_reistijd: "{{ sensor }}_duration_in_traffic"
-    subtitle: "Reistijd naar Aventus Deventer"
-    reistijd: "{{ states(sensor_reistijd) }}"
-  sequence:
-    - *notificatie_berekening_reistijd
-    - *sensor_update
-    - delay:
-        seconds: 1
-    - *set_volume
-    - *notificatie_reistijd_sonos
-    - *notificatie_reistijd_telefoon
-
-calculate_travel_time_zone_apeldoorn:
-  alias: "Bereken reistijd naar zone Apeldoorn"
+calculate_traffic_travel_time_aventus_location:
+  alias: "Bereken reistijd naar Aventus locatie"
   icon: mdi:map-marker-right-outline
-  variables:
-    sensor: "sensor.reistijd_huis_naar_aventus_apeldoorn"
-    sensor_reistijd: "{{sensor}}_duration_in_traffic"
+  fields:
+    werklocatie:
+      description: "Locatie waar wordt gewerkt"
+      example: "Apeldoorn"
   sequence:
     repeat:
-      while: "{{ is_state('script.wekker_met_ochtendroutine', 'on') }}"
+      while: "{{ is_state('script.wekker_ochtendroutine', 'on') }}"
       sequence:
-        - *sensor_update
+        - alias: "Update de sensor voor actuele informatie"
+          action: homeassistant.update_entity
+          target:
+            entity_id: "sensor.reistijd_huis_naar_aventus_{{werklocatie }}_duration_in_traffic"
         - delay:
             minutes: 2
-
-calculate_travel_time_zone_deventer:
-  alias: "Bereken reistijd naar zone Deventer"
-  icon: mdi:map-marker-right-outline
-  variables:
-    sensor: "sensor.reistijd_huis_naar_aventus_deventer"
-    sensor_reistijd: "{{sensor}}_duration_in_traffic"
-  sequence:
-    repeat:
-      while: "{{ is_state('script.wekker_met_ochtendroutine', 'on') }}"
-      sequence:
-        - *sensor_update
-        - delay:
-            minutes: 2
+            seconds: 30

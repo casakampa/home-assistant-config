@@ -1,26 +1,7 @@
-wekker_met_ochtendroutine:
+wekker_ochtendroutine:
   alias: "Wekker met wake-up light en ochtendroutine"
   icon: "mdi:weather-sunset-up"
   description: "Routine voor het wekken van Maarten, tot en met melden dat er vertrokken moet worden om op tijd te zijn op het werk"
-  variables:
-    tag: &tag "{{ this.entity_id }}"
-    slaapkamer: &slaapkamer "light.slaapkamer_zha_group_0x0005"
-    # Deze variabele wordt meegestuurd vanuit de automatisering Wekker en ochtendroutine in automations/alarm_clock.yaml
-    werklocatie: "{{ werklocatie }}"
-    anchors:
-      - &bereken_reistijd_huis_naar_werk
-        alias: "Bereken reistijd van huis naar vooringestelde werklocatie"
-        action: script.turn_on
-        target:
-          entity_id: "script.calculate_travel_time_zone_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
-      - &melding_reistijd_huis_naar_werk
-        alias: "Geef een melding van de actuele reistijd naar de vooringestelde werklocatie"
-        action: script.turn_on
-        target:
-          entity_id: "script.update_travel_time_to_aventus_{{ werklocatie }}" # Bereken reistijd naar werk op basis van geconfigureerde werklocatie - zie wekker
-        data:
-          variables:
-            werklocatie: "{{ werklocatie }}"
   sequence:
     - parallel:
         - alias: "Update input_datetime met juiste waarde, zodat verlichting woonkamer overeenkomt met wektijd."
@@ -32,7 +13,7 @@ wekker_met_ochtendroutine:
         - alias: "Start de verlichting zwak en zo warm mogelijk"
           action: light.turn_on
           target:
-            entity_id: *slaapkamer
+            entity_id: light.slaapkamer_zha_group_0x0005
           data:
             brightness_pct: 1
             color_temp_kelvin: "{{ int(state_attr('light.lamp_slaapkamer_plafond', 'min_color_temp_kelvin'), 2202) }}"
@@ -42,9 +23,9 @@ wekker_met_ochtendroutine:
     - alias: "Simuleer een zonsopkomst met onderstaande instellingen"
       action: light.turn_on
       target:
-        entity_id: *slaapkamer
+        entity_id: light.slaapkamer_zha_group_0x0005
       data:
-        transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 10 }}" # -10 seconden vanwege de delay
+        transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 5 }}" # -5 seconden vanwege de delay
         brightness_pct: "{{ int(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
         color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 3000) }}"
     - alias: "Wacht evenlang als dat de verlichting nodig heeft om de juiste helderheid te bereiken, alvorens verder te gaan"
@@ -54,7 +35,7 @@ wekker_met_ochtendroutine:
         - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden"
           action: script.turn_on
           target:
-            entity_id: script.controle_daglicht_woonkamer # Controleert of er genoeg daglicht in de woonkamer is, anders wordt de verlichting ingeschakeld
+            entity_id: script.controle_daglicht_woonkamer
         # Tijd voor een update
         - alias: "Geef een statusupdate voor vanochtend"
           action: script.turn_on
@@ -83,19 +64,35 @@ wekker_met_ochtendroutine:
         # Schakel lamp uit
         - action: light.turn_off
           target:
-            entity_id: *slaapkamer
+            entity_id: light.slaapkamer_zha_group_0x0005
     # Controleer of er wordt thuisgewerkt vandaag
     - alias: "Controleer op thuiswerken. Ga door wanneer dit niet zo is, stop anders de automatisering."
       if:
         - "{{ is_state('input_boolean.thuiswerk_status', 'off') }}"
       then:
+        - variables:
+            werklocatie: >-
+              {% from 'date_functions.jinja' import vandaag %}
+              {{ states('input_select.werklocatie_' ~ vandaag()) | lower }}
         # Bereken op de achtergrond de reistijd naar de betreffende werklocatie zodat deze gegevens actueel zijn
-        - *bereken_reistijd_huis_naar_werk
+        - alias: "Bereken reistijd naar Aventus locatie"
+          action: script.turn_on
+          target:
+            entity_id: script.calculate_traffic_travel_time_aventus_location
+          data:
+            variables:
+              werklocatie: "{{ werklocatie }}"
         # Eem wachten...
         - delay:
             minutes: "{{ iif(now().isoweekday() in range(1, 4), 20, 35) }}"
         # Stuur een melding van de reistijd naar de werklocatie
-        - *melding_reistijd_huis_naar_werk
+        - alias: "Vertel reistijd naar Aventus locatie"
+          action: script.turn_on
+          target:
+            entity_id: script.traffic_travel_time_notification
+          data:
+            variables:
+              werklocatie: "{{ werklocatie }}"
         # Nog even tijdrekken
         - delay:
             minutes: 5
@@ -121,13 +118,19 @@ wekker_met_ochtendroutine:
               target:
                 entity_id: light.woonkamer_eethoek_keuken_zha_group_0x0008
         - delay:
-            seconds: 2
+            seconds: 1
         # Stuur een laatste melding van de reistijd naar werklocatie
-        - *melding_reistijd_huis_naar_werk
+        - alias: "Vertel reistijd naar Aventus locatie"
+          action: script.turn_on
+          target:
+            entity_id: script.traffic_travel_time_notification
+          data:
+            variables:
+              werklocatie: "{{ werklocatie }}"
       else:
         stop: "De ochtendroutine is gestopt want er wordt thuisgewerkt"
 
-# Dit script wordt geactiveerd door het script wekker_met_ochtendroutine
+# Dit script wordt geactiveerd door het script wekker_ochtendroutine
 controle_daglicht_woonkamer:
   alias: "Schakel lichtgroep Woonkamer is, wanneer de wektijd voor de zonsopkomst is"
   icon: "mdi:format-list-checkbox"

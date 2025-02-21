@@ -14,7 +14,7 @@
         seconds: 20
   conditions:
     - "{{ has_value(trigger.entity_id) }}"
-    - "{{ is_state('script.wekker_met_ochtendroutine', 'off') }}"
+    - "{{ is_state('script.wekker_ochtendroutine', 'off') }}"
   actions:
     - alias: "Controle of aan een set van voorwaarden wordt voldaan voordat het licht wordt (her)ingeschakeld"
       action: script.hue_motion_light_logica

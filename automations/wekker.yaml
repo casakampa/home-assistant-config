@@ -2,22 +2,16 @@
   alias: "Wekker: Ochtendroutine"
   description: "Deze automatisering activeert per werkdag de voorgeprogrammeerde ochtendroutine, met daarin de wekker en automatiseringen voor de verlichting"
   initial_state: true
-  mode: parallel
   triggers:
     - trigger: state
       entity_id: "binary_sensor.wekker"
       from: "off"
       to: "on"
   actions:
-    - alias: "Genereer de juiste werkdag en geef de variabele werklocatie door aan script.wekker_met_ochtendroutine"
+    - alias: "Start de wekker en ochtendroutine"
       action: script.turn_on
       target:
-        entity_id: script.wekker_met_ochtendroutine
-      data:
-        variables:
-          werklocatie: >-
-            {% from 'date_functions.jinja' import vandaag %}
-            {{ states('input_select.werklocatie_' ~ vandaag()) | lower }}
+        entity_id: script.wekker_ochtendroutine
 
 - id: 8753cfbe-5d4b-4e2b-aca0-c9b43ebd3141
   alias: "Wekker: Statuscontrole"
@@ -30,7 +24,7 @@
         - "{{ now().month == 8 and now().day == 27 }}" # Einde zomervakantie
         - "{{ now().month == 10 and now().day == 22 }}" # Einde herfstvakantie
         - "{{ now().month == 1 and now().day == 7 }}" # Einde kerstvakantie
-        - "{{ now().month == 2 and now().day == 25 }}" # Einde voorjaarsvakantie
+        - "{{ now().month == 3 and now().day == 2 }}" # Einde voorjaarsvakantie
         - "{{ now().month == 5 and now().day == 5 }}" # Einde meivakantie
   variables:
     wekkermodus: "wekker"

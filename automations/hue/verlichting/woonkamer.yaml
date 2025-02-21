@@ -120,7 +120,7 @@
                                 - "{{ is_state('sensor.drempelwaarde_woonkamer', 'schemer') }}"
                         - alias: "Alleen wanneer het script van de ochtendroutine inactief is"
                           condition: state
-                          entity_id: script.wekker_met_ochtendroutine
+                          entity_id: script.wekker_ochtendroutine
                           state: "off"
                         - alias: "Niet voor de ingestelde tijd, anders wordt de verlichting in de zomer heel vroeg ingeschakeld"
                           condition: time

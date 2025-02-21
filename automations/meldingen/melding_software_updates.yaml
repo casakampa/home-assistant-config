@@ -19,7 +19,6 @@
         - sensor.docker_mailserver
         - sensor.roundcube_webmail
         - sensor.fritz_box_5530_firmware
-        - sensor.seat_navi_system
       not_from:
         - "unavailable"
         - "unknown"
