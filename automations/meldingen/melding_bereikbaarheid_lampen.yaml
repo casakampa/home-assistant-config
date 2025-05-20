@@ -23,7 +23,7 @@
   actions:
     - parallel:
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "{{ aantal }} {{ lampen }}"
             data:

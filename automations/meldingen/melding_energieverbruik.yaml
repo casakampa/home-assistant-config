@@ -9,7 +9,7 @@
     kwh_teruggeleverd: "{{ states('sensor.dsmr_day_consumption_electricity_returned_merged', with_unit=True) }}"
     kwh_kwp: "{{ ( float(states('sensor.envoy_iq7a_energy_production_today'), 0) / 3.120 ) | round(2, 0.00) }}"
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} is teruggeleverd. kWh/kWp is {{ kwh_kwp }}."
         data:
@@ -25,7 +25,7 @@
       for:
         minutes: 10
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "Is al langer dan 10 minuten hoger dan 250 volt."
         data:

@@ -19,7 +19,7 @@
           data:
             brightness_pct: 100
             flash: long
-        - action: notify.iphone_12
+        - action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Waarschuwing: {{ trigger.to_state.name }} meet een temperatuur boven 50 graden"
             data:

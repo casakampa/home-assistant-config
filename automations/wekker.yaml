@@ -34,7 +34,7 @@
       repeat:
         while: "{{ is_state('sensor.wekkermodus', 'Vakantie') }}"
         sequence:
-          - action: notify.iphone_12
+          - action: notify.mobile_app_iphone_16_van_maarten
             data:
               message: "De wekker staat op Vakantiemodus. Wil je dit wijzigen?"
               data:

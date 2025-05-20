@@ -10,7 +10,7 @@
     entity_id: sensor.cv_gebruik_gisteren
     below: 1
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "De CV is gisteren niet actief geweest. Registreer dit even op MinderGas.nl"
         data:

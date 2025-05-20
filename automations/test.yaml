@@ -5,6 +5,6 @@
   triggers: []
   actions:
     - alias: "Stuur een bericht"
-      action: notify.iphone_12
+      action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "De wekker doet het"

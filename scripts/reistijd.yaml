@@ -19,7 +19,7 @@ traffic_travel_time_notification:
   sequence:
     - parallel:
         - alias: "Meld de verwachte reistijd"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "{{ bericht }}"
             data:

@@ -7,7 +7,7 @@ deurbel_start:
   sequence:
     - parallel:
         - alias: "Stuur een notificatie"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Er is aangebeld om {{ tijdstip }}"
             data:
@@ -57,7 +57,7 @@ deurbel_deur_geopend:
   sequence:
     - &verwijder_notificaties
       alias: "Verwijder de notificatie van de deurbel"
-      action: notify.mobile_app_iphone_12_van_maarten
+      action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "clear_notification"
         data:

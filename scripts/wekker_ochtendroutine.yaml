@@ -60,7 +60,7 @@ wekker_ochtendroutine:
           data:
             kamer: "woonkamer"
             station: "NPO Radio 2"
-            volume: 30
+            volume: 20
         # Schakel lamp uit
         - action: light.turn_off
           target:

@@ -18,7 +18,8 @@ recorder:
       - sun.sun
       # Accounts of personen
       # Telefoon
-      - device_tracker.iphone_12_van_maarten
+      - device_tracker.iphone_16_van_maarten
+      - device_tracker.iphone_16_van_maarten
       # Binaire sensoren
       - binary_sensor.slave_diagnostic_indication_boiler_otgw
       - binary_sensor.central_heating_activity
@@ -35,7 +36,7 @@ logbook:
       - sun.sun
       # Accounts of personen
       # Telefoon
-      - device_tracker.iphone_12_van_maarten
+      - device_tracker.iphone_16_van_maarten
   exclude:
     entities:
       - sensor.dsmr_reading_timestamp
@@ -58,7 +59,6 @@ input_button: !include input/button.yaml
 input_datetime: !include input/datetime.yaml
 input_number: !include input/number.yaml
 input_select: !include input/select.yaml
-notify: !include notify.yaml
 timer: !include timer.yaml
 template: !include templates.yaml
 mqtt: !include mqtt.yaml

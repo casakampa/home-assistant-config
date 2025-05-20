@@ -48,7 +48,7 @@
           entity_id: "{{ boolean_herhaal_herinnering }}"
       - &verwijder_notificatie_kliko
         alias: "Verwijder de notificaties van de kliko wegzetten"
-        action: notify.mobile_app_iphone_12_van_maarten
+        action: notify.mobile_app_iphone_16_van_maarten
         data:
           message: "clear_notification"
           data:
@@ -82,7 +82,7 @@
             - *boolean_herhaal_herinnering
             - parallel:
                 - *tts_kliko_wegzetten
-                - action: notify.iphone_12
+                - action: notify.mobile_app_iphone_16_van_maarten
                   data:
                     message: "Het {{ afvalsoort }} wordt morgen geleegd."
                     data:
@@ -102,7 +102,7 @@
                   - parallel:
                       - *tts_kliko_wegzetten
                       - alias: "Herinner mij regelmatig de kliko aan de weg te zetten"
-                        action: notify.iphone_12
+                        action: notify.mobile_app_iphone_16_van_maarten
                         data:
                           message: "Zet het {{ afvalsoort }} aan de weg."
                           data:
@@ -220,7 +220,7 @@
               - parallel:
                   - *tts_kliko_ophalen
                   - alias: "Herinner mij de kliko op te halen"
-                    action: notify.iphone_12
+                    action: notify.mobile_app_iphone_16_van_maarten
                     data:
                       message: "De kliko staat nog aan de weg"
                       data:

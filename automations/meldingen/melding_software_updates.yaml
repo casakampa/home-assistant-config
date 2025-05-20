@@ -42,7 +42,7 @@
         True) }}
   actions:
     - alias: "Stuur een notificatie over de software update"
-      action: notify.iphone_12
+      action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: |-
           Software: {{ state_attr(trigger.entity_id, 'friendly_name') }}.

@@ -13,7 +13,7 @@
         - "{{ is_state('zone.home', '0') }}"
         - "{{ is_state('switch.stekker_bioscoopkamer', 'on') }}"
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: >-
           {{ state_attr(trigger.entity_id, 'friendly_name').split(' ')[1] }} is {{ iif(trigger.to_state.state == 'on', 'open', 'dicht') }}

@@ -32,7 +32,7 @@
           entity_id: *stekker_wasmachine
       - &verwijder_notificatie_wasmachine
         alias: "Verwijder de notificaties van de wasmachine"
-        action: notify.mobile_app_iphone_12_van_maarten
+        action: notify.mobile_app_iphone_16_van_maarten
         data:
           message: "clear_notification"
           data:
@@ -62,7 +62,7 @@
           repeat:
             while: "{{ is_state(wasprogramma, 'Geen') }}"
             sequence:
-              - action: notify.iphone_12
+              - action: notify.mobile_app_iphone_16_van_maarten
                 data:
                   message: "Selecteer het wasprogramma 🧺"
                   data:
@@ -118,7 +118,7 @@
                                 target:
                                   entity_id: automation.wasprogramma_startuitstel
                           - alias: "Herinner mij eraan een wasprogramma te selecteren nadat startuitstel is geactiveerd"
-                            action: notify.iphone_12
+                            action: notify.mobile_app_iphone_16_van_maarten
                             data:
                               message: "Selecteer het juiste wasprogramma i.v.m. startuitstel ⏳"
                               data:
@@ -131,7 +131,7 @@
                         sequence:
                           - variables:
                               tag: "wasmachine_uitschakelen"
-                          - action: notify.iphone_12
+                          - action: notify.mobile_app_iphone_16_van_maarten
                             data:
                               message: "De wasmachine wordt over 30 seconden uitgeschakeld"
                               data:
@@ -160,7 +160,7 @@
           else:
             - stop: "Het programma Start is niet afgerond, de automatisering wordt gestopt."
       else:
-        - action: notify.iphone_12
+        - action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Er is niet aan de voorwaarden voldaan. De instellingen worden gereset, probeer het opnieuw."
             data:
@@ -210,7 +210,7 @@
         - "{{ is_state(wasprogramma, ['Geen', 'Startuitstel']) }}"
       then:
         - alias: "Er is geen wasprogramma geselecteerd, vraag alsnog om welk programma het gaat"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Startuitstel is afgelopen en de wasmachine is begonnen. Welk wasprogramma is actief?"
             data:
@@ -221,7 +221,7 @@
                 interruption-level: time-sensitive
       else:
         - alias: "Stuur een melding dat het wasprogramma is gestart"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Wasprogramma ({{ states(wasprogramma) | lower }}) is gestart."
             data:
@@ -273,7 +273,7 @@
                 variables:
                   tijdstip: "{{ tijdstip }}"
         - alias: "Stuur een eerste melding dat het wasprogramma is afgerond"
-          action: notify.iphone_12
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "Wasprogramma {{ states(wasprogramma) | lower }} is klaar ({{ tijdstip }})"
             data:
@@ -300,7 +300,7 @@
                       variables:
                         tijdstip: "{{ tijdstip }}"
               - alias: "Herinner mij om de was uit de wasmachine te halen"
-                action: notify.iphone_12
+                action: notify.mobile_app_iphone_16_van_maarten
                 data:
                   message: "{{ mededeling }} "
                   data:

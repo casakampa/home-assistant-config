@@ -10,7 +10,7 @@
     title: "⚠️ Waarschuwing ⚠️"
     message: "CV-druk is lager dan {{ trigger.below }} bar. Zo snel mogelijk bijvullen!"
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "{{ message }}"
         data:
@@ -52,7 +52,7 @@
     title: "⚠️ Waarschuwing ⚠️"
     message: "Controleer de CV ketel, er is een diagnosemelding."
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "{{ message }}"
         data:
@@ -82,7 +82,7 @@
           repeat:
             while: "{{ is_state( trigger.entity_id, 'on') }}"
             sequence:
-              - action: notify.iphone_12
+              - action: notify.mobile_app_iphone_16_van_maarten
                 data:
                   message: "De thermostaat is verhoogd naar {{ state_attr('climate.otgw','temperature') }} °C"
                   data:
@@ -95,7 +95,7 @@
                   minutes: 2
       else:
         - alias: "Verwijder de notificatie"
-          action: notify.mobile_app_iphone_12_van_maarten
+          action: notify.mobile_app_iphone_16_van_maarten
           data:
             message: "clear_notification"
             data:

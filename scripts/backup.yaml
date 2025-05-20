@@ -9,7 +9,7 @@ backup_script:
       data:
         name: >-
           Volledige backup van {{ moment }}
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: >-
           Backup {{ moment }} is gemaakt

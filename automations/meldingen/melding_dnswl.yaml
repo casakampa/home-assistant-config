@@ -8,7 +8,7 @@
   condition: >-
     {{ as_timestamp(now()) >= as_timestamp(states('input_datetime.dnswl_renew_date')) }}
   actions:
-    - action: notify.iphone_12
+    - action: notify.mobile_app_iphone_16_van_maarten
       data:
         message: "Het is 90 (of meer) dagen geleden dat je het DNSWL ID hebt verlengd. Verleng deze binnen 30 dagen en reset de timer."
         data:
