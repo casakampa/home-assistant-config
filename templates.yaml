@@ -1,34 +1,5 @@
 # Template based sensors and buttons
 - sensor:
-    - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
-      name: "Kleurtemperatuur verlichting"
-      icon: mdi:palette
-      state: >-
-        {% set elevation = float(state_attr('sun.sun', 'elevation'), 10) %}
-        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 30) %}
-        {% if elevation <= -5.0 %}
-          2500
-        {% elif elevation >= max_elevation %}
-          4000
-        {% else %}
-          {% set angle_factor = (elevation / max_elevation) + 1.5 %}
-          {% set temp = ((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 %}
-          {{ [temp, 4000] | min | round(-2) | int  }}
-        {% endif %}
-      unit_of_measurement: "K"
-    - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
-      name: "Z-Stack coordinator firmware"
-      state: >-
-        {% set source = 'sensor.z_stack_firmware_releases' -%}
-        {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
-        {% set version = states(source) -%}
-        {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) of niet (false) -#}
-        {% set no_prerelease = is_state_attr(source, 'prerelease', false) -%}
-        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
-        {{ version.split('_')[3] if version | length > 0 and has_value(source) and no_prerelease else this.state }}
-      availability: "{{ has_value('sensor.z_stack_firmware_releases') }}"
-      attributes:
-        html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
     # Bereken de buitentemperatuur op basis van de twee bronnen, wanneer beide beschikbaar zijn
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
       name: "Buitentemperatuur"
@@ -45,14 +16,16 @@
       state: "{{ this.attributes.lampen | count }}"
       attributes:
         lampen: "{{ states.light | rejectattr('state', 'in', ['on', 'off']) | rejectattr('entity_id', 'contains', 'zha') | map(attribute='name') | list }}"
+
 # Template binary sensor voor wekker
 - binary_sensor:
     - unique_id: c6a135b3-23d6-4417-b786-e1e7b04c5b06
       name: "Wekker"
       icon: >-
+        {% from 'date_functions.jinja' import vandaag %}
         {% if is_state('calendar.vakanties', 'on') %}
-          mdi:island
-        {% elif this.state == 'on' %}
+        mdi:island
+        {% elif is_state('input_boolean.wekker_' ~ vandaag(), 'on') %}
         mdi:alarm
         {%else %}
         mdi:alarm-off
@@ -62,7 +35,6 @@
         {{ 'on'
           if now().isoweekday() in range(6)
           and is_state('calendar.vakanties', 'off')
-          and is_state('binary_sensor.workday_sensor', 'on')
           and is_state('input_boolean.wekker_status', 'on')
           and is_state('input_boolean.wekker_' ~ vandaag(), 'on')
           and today_at(states('input_datetime.wektijd_' ~ vandaag())) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) < now() < today_at(states('input_datetime.wektijd_' ~ vandaag())) + timedelta(minutes=1)
@@ -70,11 +42,9 @@
       attributes:
         type: >-
           {% if is_state('calendar.vakanties', 'on') %}
-            Vakantie
+            Vakantie/vrije dag
           {% elif now().isoweekday() in [6, 7] %}
             Weekend
-          {% elif is_state('binary_sensor.workday_sensor', 'off') %}
-            Vrije dag
           {% else %}
             Werkdag
           {% endif %}
@@ -82,6 +52,25 @@
           {% if now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
             Thuiswerken
           {% endif %}
+
+# Z-Stack coordinator firmware sensor
+- trigger:
+    - trigger: state
+      entity_id: sensor.z_stack_firmware_releases
+  sensor:
+    - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
+      name: "Z-Stack coordinator firmware"
+      state: >-
+        {% set source = 'sensor.z_stack_firmware_releases' -%}
+        {# Vul de variabele 'version' met de nieuwste release van de Z-Stack coordinator firmware release van Koenkk -#}
+        {% set version = states(source) -%}
+        {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) of niet (false) -#}
+        {% set no_prerelease = is_state_attr(source, 'prerelease', false) -%}
+        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
+        {{ version.split('_')[3] if version | length > 0 and has_value(source) and no_prerelease else this.state }}
+      availability: "{{ has_value(trigger.entity_id) }}"
+      attributes:
+        html_url: "{{ state_attr('sensor.z_stack_firmware_releases', 'html_url') }}"
 
 # Afvalwijzer sensor
 - trigger:
@@ -119,6 +108,31 @@
             {{ afvalsoorten[trigger.to_state.state] }}
       availability: "{{ has_value(trigger.entity_id) }}"
 
+# Bereken minimale en maximale kleurtemperatuur aan de hand van de stand van de zon ten opzichte van de horizon
+- trigger:
+    - trigger: state
+      entity_id: sun.sun
+      attribute: elevation
+  sensor:
+    - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
+      name: "Kleurtemperatuur verlichting"
+      icon: mdi:palette
+      state: >-
+        {% set elevation = float(state_attr('sun.sun', 'elevation'), 10) %}
+        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 30) %}
+        {% if elevation <= -5.0 %}
+          2500
+        {% elif elevation >= max_elevation %}
+          4000
+        {% else %}
+          {% set angle_factor = (elevation / max_elevation) + 1.5 %}
+          {% set temp = ((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 %}
+          {{ [temp, 4000] | min | round(-2) | int  }}
+        {% endif %}
+      unit_of_measurement: "K"
+      availability: "{{ has_value(trigger.entity_id) }}"
+
+# Lampen met updates beschikbaar
 - trigger:
     - trigger: time_pattern
       minutes: "/45"
