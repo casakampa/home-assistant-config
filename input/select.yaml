@@ -8,36 +8,6 @@ wasprogramma:
     - Startuitstel
     - Overig
   icon: mdi:washing-machine
-werklocatie_maandag:
-  name: "Werklocatie maandag"
-  options:
-    - Apeldoorn
-    - Deventer
-  icon: &icon_work_location mdi:map-marker-radius-outline
-werklocatie_dinsdag:
-  name: "Werklocatie dinsdag"
-  options:
-    - Apeldoorn
-    - Deventer
-  icon: *icon_work_location
-werklocatie_woensdag:
-  name: "Werklocatie woensdag"
-  options:
-    - Apeldoorn
-    - Deventer
-  icon: *icon_work_location
-werklocatie_donderdag:
-  name: "Werklocatie donderdag"
-  options:
-    - Apeldoorn
-    - Deventer
-  icon: *icon_work_location
-werklocatie_vrijdag:
-  name: "Werklocatie vrijdag"
-  options:
-    - Apeldoorn
-    - Deventer
-  icon: *icon_work_location
 internet_radio_streams:
   name: "Radio Streams"
   options:
@@ -45,7 +15,7 @@ internet_radio_streams:
     #    - "BNR Nieuwsradio"
     - "Radio Veronica"
     - "NPO Radio 2"
-  #    - "GP Radio"
+    #    - "GP Radio"
   icon: mdi:radio-tower
 dimmer_mode:
   name: "Dimmer Mode"

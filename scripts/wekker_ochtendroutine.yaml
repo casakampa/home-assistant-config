@@ -43,7 +43,7 @@ wekker_ochtendroutine:
             entity_id: script.tts_statusupdate
     - alias: "Wacht totdat de statusupdate is afgelopen"
       delay:
-        seconds: 15
+        seconds: 5
     # Zet de radio aan
     - alias: "Zet de radio aan met deze instellingen"
       action: script.prepare_streaming_radio
@@ -70,29 +70,19 @@ wekker_ochtendroutine:
       if:
         - "{{ is_state('input_boolean.thuiswerk_status', 'off') }}"
       then:
-        - variables:
-            werklocatie: >-
-              {% from 'date_functions.jinja' import vandaag %}
-              {{ states('input_select.werklocatie_' ~ vandaag()) | lower }}
         # Bereken op de achtergrond de reistijd naar de betreffende werklocatie zodat deze gegevens actueel zijn
         - alias: "Bereken reistijd naar Aventus locatie"
           action: script.turn_on
           target:
             entity_id: script.calculate_traffic_travel_time_aventus_location
-          data:
-            variables:
-              werklocatie: "{{ werklocatie }}"
         # Eem wachten...
         - delay:
-            minutes: "{{ iif(now().isoweekday() in range(1, 4), 20, 35) }}"
+            minutes: 35
         # Stuur een melding van de reistijd naar de werklocatie
         - alias: "Vertel reistijd naar Aventus locatie"
           action: script.turn_on
           target:
             entity_id: script.traffic_travel_time_notification
-          data:
-            variables:
-              werklocatie: "{{ werklocatie }}"
         # Nog even tijdrekken
         - delay:
             minutes: 5
@@ -124,9 +114,6 @@ wekker_ochtendroutine:
           action: script.turn_on
           target:
             entity_id: script.traffic_travel_time_notification
-          data:
-            variables:
-              werklocatie: "{{ werklocatie }}"
       else:
         stop: "De ochtendroutine is gestopt want er wordt thuisgewerkt"
 

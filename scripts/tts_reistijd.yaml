@@ -7,12 +7,12 @@ traffic_travel_time_notification:
       example: "Apeldoorn"
   variables:
     tag: "{{ this.entity_id }}"
-    sensor_reistijd: "{{ states('sensor.reistijd_huis_naar_aventus_' + werklocatie + '_duration_in_traffic') }}"
-    subtitle: "Reistijd naar Aventus {{ werklocatie | title }}"
+    sensor_reistijd: "{{ states('sensor.reistijd_huis_naar_aventus_apeldoorn_duration_in_traffic') | round(0, 'ceil') }}"
+    subtitle: "Reistijd naar Aventus"
     bericht: >-
-      {{ 'Verkeersinformatie: De verwachte reistijd naar ' ~ werklocatie | title ~ ' is ' ~ 
+      {{ 'Verkeersinformatie: De verwachte reistijd naar Apeldoorn is ' ~ 
       iif(is_number(sensor_reistijd), sensor_reistijd ~ ' minuten.' ~ 
-        iif(int(sensor_reistijd, 35) >= iif( werklocatie == 'Apeldoorn', 45, 55),
+        iif(int(sensor_reistijd, 35) >=  45,
         ' Dit is langer dan gewoonlijk!',
         ''),
       'niet beschikbaar') }}
@@ -50,7 +50,7 @@ calculate_traffic_travel_time_aventus_location:
         - alias: "Update de sensor voor actuele informatie"
           action: homeassistant.update_entity
           target:
-            entity_id: "sensor.reistijd_huis_naar_aventus_{{werklocatie }}_duration_in_traffic"
+            entity_id: "sensor.reistijd_huis_naar_aventus_apeldoorn_duration_in_traffic"
         - delay:
             minutes: 2
             seconds: 30
