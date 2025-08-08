@@ -1,0 +1,18 @@
+- id: c1d3f7ba-0210-4dd3-8d8f-f3f5ac1b554e
+  alias: "Verlichting: Badkamer (wandschakelaar)"
+  description: "Activeer verlichting badkamer op basis van Hue Wandschakelaar"
+  initial_state: true
+  mode: restart
+  triggers:
+    - trigger: event
+      event_type: zha_event
+      event_data:
+        device_id: adfb3be55de3f2b6164d0688f6486870
+        cluster_id: 64512
+  conditions:
+    - "{{ trigger.event.data.args.press_type in ['short_release'] }}"
+  actions:
+    - alias: "Stuur de verlichting aan"
+      action: script.hue_wandschakelaar_white_basic_logica
+      data:
+        light: "light.lamp_badkamer"

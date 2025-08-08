@@ -13,7 +13,7 @@
     - "{{ trigger.event.data.args.press_type in ['short_release', 'long_release', 'hold'] }}"
   actions:
     - alias: "Stuur de verlichting aan"
-      action: script.hue_dimmer_basic_logica
+      action: script.hue_dimmer_white_ambiance_basic_logica
       data:
         command: "{{ trigger.event.data.command }}"
         media_player: "media_player.chromecast_woonkamer"

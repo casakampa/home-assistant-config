@@ -29,10 +29,10 @@
                 - "{{ trigger.id in ['sun', 'sensor'] and is_state('device_tracker.gamepc_ryzen5', 'home') }}"
                 - "{{ trigger.id == 'stekker_aan' and is_state('sun.sun', 'below_horizon') }}"
           sequence:
-            - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_basic_logica"
+            - alias: "Stuur de verlichting aan in de slaapkamer via script.hue_dimmer_white_ambiance_basic_logica"
               action: script.turn_on
               target:
-                entity_id: script.hue_dimmer_basic_logica
+                entity_id: script.hue_dimmer_white_ambiance_basic_logica
               data:
                 variables:
                   light: "light.voorkamer_zha_group_0x000b"
