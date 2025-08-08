@@ -8,16 +8,16 @@ hue_motion_light_logica:
       example: "trigger.entity_id"
     helderheid_dag:
       description: "Helderheid verlichting overdag"
-      example: 60
+      example: "60"
     helderheid_nacht:
       description: "Helderheid verlichting in de nacht"
-      example: 20
+      example: "20"
     sensor_lichtsterkte:
       description: "De gemeten lichtsterkte"
-      example: 100
+      example: "100"
     drempelwaarde:
       description: "Onder deze drempelwaarde wordt het script geactiveerd"
-      example: 20
+      example: "20"
     lamp:
       description: "Aan te sturen lamp(en)"
       example: "light.lamp_overloop"

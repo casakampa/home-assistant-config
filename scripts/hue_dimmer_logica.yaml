@@ -1,5 +1,121 @@
-hue_dimmer_basic_logica:
-  alias: "Dimmer: Verlichting aansturing"
+hue_dimmer_white_basic_logica:
+  alias: "Dimmer: aansturing Hue White"
+  description: "Stuurt verlichting aan waarvan de kleurtemperatuur niet gewijzigd kan worden."
+  icon: mdi:lightbulb-on-outline
+  mode: restart
+  fields:
+    brightness:
+      description: "The initial brightness"
+      example: "50"
+    light:
+      description: "The initial lights"
+      example: "light.lamp_badkamer"
+    area:
+      description: "The initial area"
+      example: "light.alle_lampen_zha_group_0x0006"
+  variables:
+    anchor:
+      - &turn_on_entities
+        action: light.turn_on
+        target:
+          entity_id: "{{ light }}"
+  sequence:
+    - alias: "Gebruik de variabele command om te bepalen welke actie er nodig is."
+      choose:
+        - conditions:
+            - "{{ command == 'on_short_release' }}"
+          sequence:
+            - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
+              choose:
+                - conditions:
+                    - condition: time
+                      after: input_datetime.light_home_day_time
+                    - condition: time
+                      before: input_datetime.light_home_night_time
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: "{{ float(brightness) if brightness is defined else float(50) }}"
+                - conditions:
+                    - alias: "Tijdsspannes tussen ingestelde tijden"
+                      or:
+                        - condition: time
+                          after: "06:00"
+                          before: input_datetime.light_home_day_time
+                        - condition: time
+                          after: input_datetime.light_home_night_time
+                          before: "23:59:59"
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: 10
+                - conditions:
+                    - alias: "Nacht"
+                      condition: time
+                      after: "00:00"
+                      before: "06:00"
+                  sequence:
+                    - <<: *turn_on_entities
+                      data:
+                        brightness_pct: 10
+              default:
+                - stop: "Er was geen passend scenario voor de automatisering Hue Dimmer."
+                  error: true
+        - conditions:
+            - "{{ command == 'on_long_release' }}"
+          sequence:
+            - action: light.turn_on
+              target:
+                entity_id: "{{ area }}"
+              data:
+                brightness_pct: 100
+        - conditions:
+            - "{{ command == 'up_short_release' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                brightness_step_pct: 10
+        - conditions:
+            - "{{ command == 'up_hold' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
+        - conditions:
+            - "{{ command == 'down_short_release' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                brightness_step_pct: -10
+        - conditions:
+            - "{{ command == 'down_hold' }}"
+          sequence:
+            - <<: *turn_on_entities
+              data:
+                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
+        - conditions:
+            - "{{ command == 'off_short_release' }}"
+          sequence:
+            - action: light.turn_off
+              target:
+                entity_id: "{{ light }}"
+        - conditions:
+            - "{{ command == 'off_long_release' }}"
+          sequence:
+            - if:
+                - "{{ is_state(area, 'on') }}"
+              then:
+                - parallel:
+                    - alias: "Zet alle lampen in het huis uit"
+                      action: light.turn_off
+                      target:
+                        entity_id: "{{ area }}"
+              else:
+                - stop: "Er is geen verlichting om uit te schakelen."
+
+hue_dimmer_white_ambiance_basic_logica:
+  alias: "Dimmer: aansturing Hue White Ambiance"
+  description: "Stuurt verlichting aan waarvan de kleurtemperatuur wel gewijzigd kan worden."
   icon: mdi:lightbulb-on-outline
   mode: restart
   fields:
@@ -18,10 +134,6 @@ hue_dimmer_basic_logica:
   variables:
     anchor:
       - &color_temp "{{ states('sensor.kleurtemperatuur_verlichting') }}"
-      - &turn_on_entities
-        action: light.turn_on
-        target:
-          entity_id: "{{ light }}"
   sequence:
     - alias: "Gebruik de variabele command om te bepalen welke actie er nodig is."
       choose:
@@ -147,8 +259,9 @@ hue_dimmer_basic_logica:
                           target:
                             entity_id: input_boolean.play_streaming_radio
 
-hue_dimmer_multimedia_logica:
-  alias: "Dimmer: Multimedia aansturing"
+hue_dimmer_white_ambiance_multimedia_logica:
+  alias: "Dimmer: aansturing Hue White Ambiance en multimedia"
+  description: "Stuurt audio aan en verlichting aan waarvan de kleurtemperatuur wel gewijzigd kan worden."
   icon: mdi:lightbulb-on-outline
   mode: restart
   fields:

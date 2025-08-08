@@ -1,0 +1,61 @@
+hue_wandschakelaar_white_basic_logica:
+  alias: "Wandschakelaar: aansturing Hue White"
+  description: "Stuurt verlichting aan waarvan de kleurtemperatuur niet gewijzigd kan worden."
+  icon: mdi:lightbulb-on-outline
+  mode: restart
+  fields:
+    brightness:
+      description: "The initial brightness"
+      example: "50"
+    light:
+      description: "The initial lights"
+      example: "light.lamp_badkamer"
+  variables:
+    anchor:
+      - &turn_on_entities
+        action: light.turn_on
+        target:
+          entity_id: "{{ light }}"
+  sequence:
+    - if: "{{ is_state(light, 'off') }}"
+      then:
+        - alias: "Routines om te bepalen op welke wijze een lamp ingeschakeld moet worden"
+          choose:
+            - conditions:
+                - condition: time
+                  after: input_datetime.light_home_day_time
+                - condition: time
+                  before: input_datetime.light_home_night_time
+              sequence:
+                - <<: *turn_on_entities
+                  data:
+                    brightness_pct: 50
+            - conditions:
+                - alias: "Tijdsspannes tussen ingestelde tijden"
+                  or:
+                    - condition: time
+                      after: "06:00"
+                      before: input_datetime.light_home_day_time
+                    - condition: time
+                      after: input_datetime.light_home_night_time
+                      before: "23:59:59"
+              sequence:
+                - <<: *turn_on_entities
+                  data:
+                    brightness_pct: 20
+            - conditions:
+                - alias: "Nacht"
+                  condition: time
+                  after: "00:00"
+                  before: "06:00"
+              sequence:
+                - <<: *turn_on_entities
+                  data:
+                    brightness_pct: 5
+          default:
+            - stop: "Er was geen passend scenario voor de automatisering Hue Dimmer."
+              error: true
+      else:
+        - action: light.turn_off
+          target:
+            entity_id: "{{ light }}"
