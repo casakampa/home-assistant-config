@@ -1,26 +1,3 @@
-{% macro uitgesproken_tijd(tijdstip) %}
-  {%- set uren, minuten = tijdstip.split(':') | map('int') | list -%}
-  {%- set uitgesproken_klokuur = (uren % 12) or 12 -%}
-  {%- set uitgesproken_volgend_uur = ((uren + 1) % 12) or 12 -%}
-  {%- if minuten == 0 -%}
-    {{ uitgesproken_klokuur }} uur
-  {%- elif minuten in [29, 59] -%}
-    1 minuut voor {{ 'half ' if minuten == 29 }}{{ uitgesproken_volgend_uur }}
-  {%- elif minuten in [15, 45] -%}
-    kwart {{ 'over ' ~ uitgesproken_klokuur if minuten == 15 else 'voor ' ~ uitgesproken_volgend_uur }}
-  {%- elif minuten == 30 -%}
-    half {{ uitgesproken_volgend_uur }}
-  {%- elif 16 <= minuten < 31 -%}
-    {{ 30 - minuten }} minuten voor half {{ uitgesproken_volgend_uur }}
-  {%- elif 31 <= minuten < 45 -%}
-    {{ minuten - 30 }} over half {{ uitgesproken_volgend_uur }}
-  {%- elif minuten < 30 -%}
-    {{ minuten }} over {{ uitgesproken_klokuur }}
-  {%- else -%}
-    {{ 60 - minuten }} minuten voor {{ uitgesproken_volgend_uur }}
-  {%- endif -%}
-{% endmacro %}
-
 {% macro uitgesproken_tijd_v3(tijdstip) %}
 {%- set uren, minuten = tijdstip.split(':') | map('int') | list -%}
 {%- set uitgesproken_klokuur = (uren % 12) or 12 -%}

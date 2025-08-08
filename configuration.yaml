@@ -19,7 +19,6 @@ recorder:
       # Accounts of personen
       # Telefoon
       - device_tracker.iphone_16_van_maarten
-      - device_tracker.iphone_16_van_maarten
       # Binaire sensoren
       - binary_sensor.slave_diagnostic_indication_boiler_otgw
       - binary_sensor.central_heating_activity
