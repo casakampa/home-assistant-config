@@ -22,6 +22,7 @@
         - sensor.hue_dimmer_woonkamer_v2_power
         - sensor.hue_dimmer_eethoek_v2_power
         - sensor.hue_dimmer_voorkamer_v2_power
+        - sensor.hue_wandschakelaar_badkamer_power
       below: input_number.drempelwaarde_batterijniveau
   mode: queued
   conditions:
