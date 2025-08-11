@@ -5,6 +5,12 @@
   triggers:
     - trigger: time
       at: "06:00"
+      weekday:
+        - "mon"
+        - "tue"
+        - "wed"
+        - "thu"
+        - "fri"
     - trigger: state
       entity_id:
         - input_boolean.thuiswerken_maandag
@@ -59,8 +65,13 @@
       at:
         - "08:30" # een vroege afspraak of les
         - "09:00" # prima tijd om rustig aan te doen en te beginnen
+      weekday:
+        - "mon"
+        - "tue"
+        - "wed"
+        - "thu"
+        - "fri"
   conditions:
-    - "{{ is_state('binary_sensor.workday_sensor', 'on')}}"
     - "{{ is_state('input_boolean.thuiswerk_status', 'on')}}"
     - "{{ is_state('device_tracker.ave_5cd2156vvx', 'home')}}"
   actions:
@@ -69,4 +80,4 @@
         entity_id: light.woonkamer_en_keuken_zha_group_0x0007
     - action: media_player.turn_off
       target:
-        entity_id: media_player.chromecast_woonkamer
+        entity_id: media_player.sonos_woonkamer
