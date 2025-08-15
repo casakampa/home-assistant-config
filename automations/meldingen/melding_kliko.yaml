@@ -182,7 +182,6 @@
     boolean_herinnering: "input_boolean.kliko_ophalen_herinnering"
     boolean_herhaal_herinnering: "input_boolean.kliko_ophalen_herhaal_herinnering"
     sensor_vandaag: "sensor.afvalwijzer_today"
-    werkdag: "binary_sensor.workday_sensor"
     tag: "notification_kliko_ophalen"
     subtitle: "🗑️ Kliko 🗑️"
   conditions:
@@ -198,7 +197,7 @@
                 - condition: trigger
                   id: "tijdstip"
                 # Er wordt niet gewerkt - kans is groot dat het vakantie is
-                - "{{ is_state(werkdag, 'off') }}"
+                - "{{ is_state('calendar.vakanties', 'off') }}"
                 # Er is iemand thuis
                 - "{{ states('zone.home') >= '1' }}"
             # Trigger wanneer de voordeur opent, maar alleen als ik niet op het werk ben
@@ -207,10 +206,8 @@
                   id: "voordeur"
                 # Er niet wordt gewerkt
                 - "{{ is_state('zone.aventus_apeldoorn', '0') }}"
-                - "{{ is_state('zone.aventus_deventer', '0') }}"
-                - alias: "Enkel na dit tijdstip"
-                  condition: time
-                  after: "13:00"
+                # Na het onderstaande tijdstip
+                - "{{ now() >= today_at('13:00') }}"
       then:
         - *boolean_herhaal_herinnering
         - alias: "Herinner de kliko op te halen"

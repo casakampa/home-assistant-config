@@ -282,3 +282,27 @@
             entity_id: input_datetime.melatonine_out_of_stock
           data:
             date: "{{ (now() + timedelta(days=90)).strftime('%Y-%m-%d') }}"
+- button:
+    - unique_id: af2b6881-ec33-4909-8d52-31dc409e2bf5
+      name: "Stop VSCode"
+      icon: mdi:microsoft-visual-studio-code
+      press:
+        - action: hassio.addon_stop
+          data:
+            addon: a0d7b954_vscode
+- button:
+    - unique_id: 14066d6e-27ca-4d88-8039-03ba607b1984
+      name: "Start VSCode"
+      icon: mdi:microsoft-visual-studio-code
+      press:
+        - action: hassio.addon_start
+          data:
+            addon: a0d7b954_vscode
+- button:
+    - unique_id: bfe230f1-af8e-403c-a60d-bca291cb6ba2
+      name: "Herstart Piper"
+      icon: mdi:pipe
+      press:
+        - action: hassio.addon_restart
+          data:
+            addon: core_piper

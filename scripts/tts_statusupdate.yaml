@@ -2,6 +2,7 @@ tts_statusupdate:
   alias: "TTS: Statusupdate"
   icon: "mdi:speaker-message"
   variables:
+    media_player: media_player.sonos_slaapkamer
     dagdeel: >-
       {% set hour = now().hour %}
       {% if hour < 12 %}
@@ -11,28 +12,34 @@ tts_statusupdate:
       {% else %}
         Goedenavond
       {% endif %}
-    dag: >
+    dag: >-
       {% from 'date_functions.jinja' import vandaag %}
-      Het is {{ vandaag() }}
-    tijd: >
+      {{ vandaag() }}
+    tijd: >-
       {% from 'tts_functions.jinja' import uitgesproken_tijd_v3 %}
       {% set nu = now().strftime('%H:%M') %}
-      en {{ uitgesproken_tijd_v3(nu) }}
-    buitentemperatuur: >
+      {{ uitgesproken_tijd_v3(nu) }}
+    buitentemperatuur: >-
       {{ iif(has_value('sensor.buitentemperatuur'),
-      'Buiten is het momenteel ' ~ states('sensor.buitentemperatuur').replace('.', ' komma ') ~ ' graden',
-      'De buitentemperatuur is momenteel niet beschikbaar')
+      'Het is buiten ' + states('sensor.buitentemperatuur').replace('.', ' komma ') + ' graden',
+      'De buitentemperatuur is niet beschikbaar')
       }}
-    afvalsoort: "{{ iif( is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}"
+    afvalsoort: >-
+      {{ iif(is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}
     kliko: >-
       {% if int(states('sensor.afvalwijzer_next_in_days')) <= 2 %}
-        {{ states('sensor.afvalwijzer_volgende_leging') }} wordt de {{ afvalsoort }}-kliko geleegd.
+      De {{ afvalsoort }}-kliko wordt {{ states('sensor.afvalwijzer_volgende_leging') }} geleegd
       {% endif %}
+    weersverwachting: >-
+      {{ 'De weersverwachting is ' +
+      iif(has_value('sensor.thuis_weather_forecast'),
+      states('sensor.thuis_weather_forecast'),
+      'niet beschikbaar')
+      }}
   sequence:
     - action: media_player.volume_set
       target:
-        entity_id:
-          - media_player.sonos_slaapkamer
+        entity_id: "{{ media_player }}"
       data:
         volume_level: "{{ states('input_number.sonos_media_volume') | int / 100 }}"
     - action: tts.speak
@@ -40,10 +47,10 @@ tts_statusupdate:
         entity_id: tts.piper
       data:
         cache: false
-        media_player_entity_id:
-          - media_player.sonos_slaapkamer
+        media_player_entity_id: "{{ media_player }}"
         message: >-
           {{ dagdeel }}!
-          {{ dag }}, {{ tijd }}.
+          Het is {{ dag }}, en {{ tijd }}.
           {{ buitentemperatuur }}.
-          {{ kliko }}.
+          {{ weersverwachting }}.
+          {{ kliko }}
