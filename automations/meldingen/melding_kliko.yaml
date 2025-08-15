@@ -197,7 +197,7 @@
                 - condition: trigger
                   id: "tijdstip"
                 # Er wordt niet gewerkt - kans is groot dat het vakantie is
-                - "{{ is_state('calendar.vakanties', 'off') }}"
+                - "{{ is_state('calendar.vakanties', 'on') }}"
                 # Er is iemand thuis
                 - "{{ states('zone.home') >= '1' }}"
             # Trigger wanneer de voordeur opent, maar alleen als ik niet op het werk ben
