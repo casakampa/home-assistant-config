@@ -15,14 +15,23 @@
 {% endmacro %}
 
 {%- macro tijdverschil(tijdstip) -%}
-  {%- set verschil = (now() - today_at(tijdstip)).seconds -%}
-  {%- set uren = verschil // 3600 -%}
-  {%- set minuten = (verschil % 3600) // 60 -%}
-  {%- if uren > 0 -%}
-  {{ uren }} uur en {{ minuten }} {{ 'minuut' if minuten == 1 else 'minuten'}} geleden
-  {%- elif minuten > 0 -%}
-  {{ minuten }} {{ 'minuut' if minuten == 1 else 'minuten'}} geleden
+  {%- set s = (now() - today_at(tijdstip)).total_seconds() | int -%}
+  {%- set dagen = s // 86400 -%}
+  {%- set uren = (s % 86400) // 3600 -%}
+  {%- set minuten = (s % 3600) // 60 -%}
+  {%- if minuten < 1 -%}
+    {{ 'zojuist' }}
   {%- else -%}
-  zojuist
-  {%- endif -%}
+    {%- set parts = [] -%}
+    {%- if dagen > 0 -%}
+      {%- set parts = parts + [ dagen ~ ' ' ~ ('dag' if dagen == 1 else 'dagen') ] -%}
+    {%- endif -%}
+    {%- if uren > 0 -%}
+      {%- set parts = parts + [ uren ~ ' uur' ] -%}
+    {%- endif -%}
+    {%- if minuten > 0 -%}
+      {%- set parts = parts + [ minuten ~ ' ' ~ ('minuut' if minuten == 1 else 'minuten') ] -%}
+    {%- endif -%}
+    {{ parts|join(' en ') ~ ' geleden' }}
+  {% endif %}
 {%- endmacro -%}

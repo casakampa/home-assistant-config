@@ -243,7 +243,7 @@
     # Wasmachine is klaar en staat standby
     - trigger: numeric_state
       entity_id: sensor.stekker_wasmachine_power_consumption
-      below: 4
+      below: 5
       for:
         minutes: "{{ float(states('input_number.wasprogramma_wachttijd_programma_afgerond'), 5) }}"
   variables:
