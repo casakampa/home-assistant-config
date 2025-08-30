@@ -2,7 +2,7 @@
   scan_interval: 600
   timeout: 30
   headers:
-    user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0"
+    user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:142.0) Gecko/20100101 Firefox/142.0"
   sensor:
     - name: "Home Assistant Core"
       unique_id: 026b7fc5-a6a6-4849-97cd-a0438b0b5e0a
