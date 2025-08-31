@@ -59,6 +59,8 @@
           {% if now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
             Thuiswerken
           {% endif %}
+        last_updated: >-
+          {{ today_at('02:00') }}
 
 # Z-Stack coordinator firmware sensor
 - trigger:
