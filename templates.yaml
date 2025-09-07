@@ -21,34 +21,37 @@
         lampen: "{{ states.light | rejectattr('state', 'in', ['on', 'off']) | rejectattr('entity_id', 'contains', 'zha') | map(attribute='name') | list }}"
 
 # Template binary sensor voor wekker
-- binary_sensor:
+- trigger:
+    - trigger: state
+      entity_id: sensor.time
+      from: ~
+      to: ~
+    - trigger: event
+      event_type: event_template_reloaded
+  binary_sensor:
     - unique_id: c6a135b3-23d6-4417-b786-e1e7b04c5b06
-      variables:
-        calendar: calendar.vakanties
-        wekker_status: input_boolean.wekker_status
-        vandaag: >-
-          {% from 'date_functions.jinja' import vandaag %}
-          {{ vandaag() }}
       name: "Wekker"
       icon: >-
-        {% if is_state(calendar, 'on') %}
+        {% from 'date_functions.jinja' import vandaag %}
+        {% if is_state('calendar.vakanties', 'on') %}
         mdi:island
-        {% elif is_state('input_boolean.wekker_' + vandaag, 'on') %}
+        {% elif is_state('input_boolean.wekker_' + vandaag(), 'on') %}
         mdi:alarm
         {%else %}
         mdi:alarm-off
         {% endif %}
       state: >-
+        {% from 'date_functions.jinja' import vandaag %}
         {{ 'on'
           if now().isoweekday() in range(6)
-          and is_state(calendar, 'off')
-          and is_state(wekker_status, 'on')
-          and is_state('input_boolean.wekker_' + vandaag, 'on')
-          and today_at(states('input_datetime.wektijd_' + vandaag )) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) < now() < today_at(states('input_datetime.wektijd_' + vandaag )) + timedelta(minutes=1)
+          and is_state('calendar.vakanties', 'off')
+          and is_state('input_boolean.wekker_status', 'on')
+          and is_state('input_boolean.wekker_' + vandaag(), 'on')
+          and today_at(states('input_datetime.wektijd_' + vandaag() )) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) == today_at(states('sensor.time'))
           else 'off' }}
       attributes:
         type: >-
-          {% if is_state(calendar, 'on') %}
+          {% if is_state('calendar.vakanties', 'on') %}
             Vakantie/vrije dag
           {% elif now().isoweekday() in [6, 7] %}
             Weekend
@@ -59,8 +62,6 @@
           {% if now().isoweekday() in range(6) and is_state('input_boolean.thuiswerk_status', 'on') %}
             Thuiswerken
           {% endif %}
-        last_updated: >-
-          {{ today_at('02:00') }}
 
 # Z-Stack coordinator firmware sensor
 - trigger:

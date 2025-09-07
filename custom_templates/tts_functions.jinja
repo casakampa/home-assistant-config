@@ -16,16 +16,12 @@
 
 {%- macro tijdverschil(tijdstip) -%}
   {%- set s = (now() - today_at(tijdstip)).total_seconds() | int -%}
-  {%- set dagen = s // 86400 -%}
   {%- set uren = (s % 86400) // 3600 -%}
   {%- set minuten = (s % 3600) // 60 -%}
-  {%- if minuten < 1 -%}
+  {%- if 0 < s < 60 -%}
     {{ 'zojuist' }}
   {%- else -%}
     {%- set parts = [] -%}
-    {%- if dagen > 0 -%}
-      {%- set parts = parts + [ dagen ~ ' ' ~ ('dag' if dagen == 1 else 'dagen') ] -%}
-    {%- endif -%}
     {%- if uren > 0 -%}
       {%- set parts = parts + [ uren ~ ' uur' ] -%}
     {%- endif -%}
