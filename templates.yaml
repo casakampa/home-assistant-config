@@ -3,7 +3,7 @@
     # Bereken de buitentemperatuur op basis van de twee bronnen, wanneer beide beschikbaar zijn
     - unique_id: 6666735d-54d5-4288-b3ed-2e39c07ce654
       variables:
-        thuis: weather.thuis
+        thuis: weather.knmi_thuis
         home: weather.home
       name: "Buitentemperatuur"
       icon: mdi:thermometer

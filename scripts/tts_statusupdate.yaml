@@ -31,7 +31,7 @@ tts_statusupdate:
       De {{ afvalsoort }}-kliko wordt {{ states('sensor.afvalwijzer_volgende_leging') }} geleegd
       {% endif %}
     weersverwachting: >-
-      {{ 'De weersverwachting is ' +
+      {{ 'De weersverwachting: ' +
       iif(has_value('sensor.thuis_weather_forecast'),
       states('sensor.thuis_weather_forecast'),
       'niet beschikbaar')
