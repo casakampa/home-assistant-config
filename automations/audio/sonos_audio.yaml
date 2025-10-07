@@ -1,5 +1,5 @@
 - id: 0bb4ce9e-cb8d-41e7-9da7-01a69d280518
-  alias: Streaming Radio
+  alias: "Sonos Streaming Radio"
   description: >
     Deze automatisering regelt de aansturing van de audio en de volumeregeling ervan.
   triggers:

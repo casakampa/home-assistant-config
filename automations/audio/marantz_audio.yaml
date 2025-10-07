@@ -1,0 +1,37 @@
+- id: 1f5fa63d-3650-4fea-9c03-24dba038409b
+  alias: "Marantz Audio"
+  description: >
+    Deze automatisering regelt de aansturing van de audio en de volumeregeling ervan.
+  triggers:
+    - trigger: state
+      entity_id: input_number.marantz_media_volume
+      id: ha_input_volume
+    - trigger: state
+      entity_id: media_player.home_theater
+      from: "off"
+      id: marantz_input_volume
+  conditions:
+    - "{{ has_value('media_player.home_theater') }}"
+  actions:
+    - choose:
+        - conditions:
+            - "{{ trigger.id == 'ha_input_volume' }}"
+            - "{{ not is_state('media_player.home_theater', 'off') }}"
+          sequence:
+            - alias: "Synchroniseer het Home Assistant volume met de Marantz AV-receiver."
+              action: media_player.volume_set
+              target:
+                entity_id: media_player.home_theater
+              data:
+                volume_level: "{{ min(float(states('input_number.marantz_media_volume'), 25.0) / 100, iif(is_state_attr('media_player.home_theater', 'source', 'HEOS Music'), 0.55, 0.80)) }}"
+        - conditions:
+            - "{{ trigger.id == 'marantz_input_volume' }}"
+          sequence:
+            alias: "Synchroniseer het volume van de Marantz AV-receiver met Home Assistant bij het inschakelen van de receiver"
+            action: input_number.set_value
+            target:
+              entity_id: input_number.marantz_media_volume
+            data:
+              value: "{{ float(state_attr('media_player.home_theater', 'volume_level'), 0.25) * 100 }}"
+      default:
+        - stop: "Geen geldige condities"

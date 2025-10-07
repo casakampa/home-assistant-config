@@ -92,3 +92,9 @@ sonos_media_volume:
   max: 80
   step: 1
   icon: mdi:knob
+marantz_media_volume:
+  name: "Afspeelvolume"
+  min: 0
+  max: 80
+  step: 0.5
+  icon: mdi:knob
