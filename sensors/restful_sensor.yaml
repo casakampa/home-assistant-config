@@ -225,3 +225,18 @@
   headers:
     content-type: application/json
     user-agent: *ua_string
+
+# Request average usage per degree day from https://www.mindergas.nl/api/usage_per_degree_day
+- platform: rest
+  unique_id: 6b42a30b-4a4e-4d78-b8ea-289540d787d2
+  scan_interval: 86400
+  name: "Gemiddeld verbruik per graaddag"
+  icon: mdi:home-thermometer-outline
+  resource: https://www.mindergas.nl/api/usage_per_degree_day
+  value_template: "{{ value_json.avg_last_365_days.value }}"
+  headers:
+    Content-Type: application/json
+    Accept: application/json
+    API-VERSION: 1.0
+    AUTH-TOKEN: !secret mindergas_api_token
+  unit_of_measurement: "m³"
