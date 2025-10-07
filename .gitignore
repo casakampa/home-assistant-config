@@ -13,3 +13,4 @@ tts
 aanwezigheidssimulatie.yaml
 www/custom-cards
 blueprints
+.ha_run.lock
