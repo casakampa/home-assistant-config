@@ -22,6 +22,7 @@
       id: "turn_off"
   conditions:
     - "{{ is_state('input_boolean.visite', 'off') }}"
+    - "{{ is_state('calendar.reizen', 'off') }}"
     - alias: "Tijdstip waarop de stekker ingeschakeld dient te worden"
       condition: time
       after: input_datetime.light_home_day_time
