@@ -60,7 +60,9 @@
       then:
         - alias: "Vraag herhaaldelijk naar het ingestelde wasprogramma"
           repeat:
-            while: "{{ is_state(wasprogramma, 'Geen') }}"
+            while: 
+              - "{{ is_state(wasprogramma, 'Geen') }}"
+              - "{{ is_state(stekker, 'on') }}"
             sequence:
               - action: notify.mobile_app_iphone_16_van_maarten
                 data:

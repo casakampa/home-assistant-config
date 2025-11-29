@@ -20,12 +20,14 @@ tts_statusupdate:
       {% set nu = now().strftime('%H:%M') %}
       {{ uitgesproken_tijd_v3(nu) }}
     buitentemperatuur: >-
-      {{ iif(has_value('sensor.buitentemperatuur'),
-      'Het is buiten ' + states('sensor.buitentemperatuur').replace('.', ' komma ') + ' graden',
+      {{ iif(has_value('weather.knmi_thuis'),
+      'Het is buiten ' + state_attr('weather.knmi_thuis', 'temperature') | replace('.', ' komma ') + ' graden',
       'De buitentemperatuur is niet beschikbaar')
       }}
     afvalsoort: >-
-      {{ iif(is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'), 'groente, fruit en tuinafval', state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}
+      {{ iif(is_state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort', 'GFT'),
+        'groente, fruit en tuinafval',
+        state_attr('sensor.afvalwijzer_volgende_leging', 'afvalsoort')) }}
     kliko: >-
       {% if int(states('sensor.afvalwijzer_next_in_days')) <= 2 %}
       De {{ afvalsoort }}-kliko wordt {{ states('sensor.afvalwijzer_volgende_leging') }} geleegd
@@ -34,7 +36,7 @@ tts_statusupdate:
       {{ 'De weersverwachting: ' +
       iif(has_value('sensor.thuis_weather_forecast'),
       states('sensor.thuis_weather_forecast'),
-      'niet beschikbaar')
+      'is niet beschikbaar')
       }}
   sequence:
     - action: media_player.volume_set
