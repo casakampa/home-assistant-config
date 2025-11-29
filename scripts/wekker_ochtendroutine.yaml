@@ -32,10 +32,12 @@ wekker_ochtendroutine:
       delay:
         minutes: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15) }}"
     - parallel:
-        - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden"
+        - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden, en of het rolgordijn geopend moet worden"
           action: script.turn_on
           target:
-            entity_id: script.controle_daglicht_woonkamer
+            entity_id:
+              - script.controle_daglicht_woonkamer
+              - script.controle_rolgordijn_keuken
         # Tijd voor een update
         - alias: "Geef een statusupdate voor vanochtend"
           action: script.turn_on
@@ -87,30 +89,36 @@ wekker_ochtendroutine:
         - delay:
             minutes: 5
         - parallel:
-            # Controle op spelende chromecast in woonkamer
-            - if:
+            - alias: "Controle op spelende chromecast in woonkamer"
+              if:
                 - "{{ is_state('media_player.chromecast_woonkamer', 'playing') }}"
               then:
-                # Schakel Chromecast uit
-                - action: media_player.turn_off
+                - alias: "Schakel Chromecast uit"
+                  action: media_player.turn_off
                   target:
                     entity_id: media_player.chromecast_woonkamer
-            # Controle op actieve streaming radio
-            - if:
+            - alias: "Controle op actieve streaming radio"
+              if:
                 - "{{ is_state('input_boolean.play_streaming_radio', 'on') }}"
               then:
-                # Stop de muziek op Sonos luidsprekers
-                - action: input_boolean.turn_off
+                - alias: "Stop de muziek op Sonos luidsprekers"
+                  action: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.play_streaming_radio
-            # Schakel lampen uit
-            - action: light.turn_off
+            - alias: "Schakel lampen uit"
+              action: light.turn_off
               target:
                 entity_id: light.woonkamer_eethoek_keuken_zha_group_0x0008
+            - alias: "Open het rolgordijn"
+              if:
+                - "{{ is_state('cover.aqara_rolgordijn_keuken', 'closed') }}"
+              then:
+                - action: cover.open_cover
+                  target:
+                    entity_id: cover.aqara_rolgordijn_keuken
         - delay:
             seconds: 1
-        # Stuur een laatste melding van de reistijd naar werklocatie
-        - alias: "Vertel reistijd naar Aventus locatie"
+        - alias: "Stuur een laatste melding van de reistijd naar werklocatie"
           action: script.turn_on
           target:
             entity_id: script.traffic_travel_time_notification
@@ -142,3 +150,22 @@ controle_daglicht_woonkamer:
                 color_temp_kelvin: "{{ states('sensor.kleurtemperatuur_verlichting') }}"
       else:
         stop: "Er is voldoende daglicht aanwezig, de verlichting blijft uitgeschakeld."
+
+# Dit script wordt geactiveerd door het script wekker_ochtendroutine
+controle_rolgordijn_keuken:
+  alias: "Open rolgordijn keuken, wanneer er genoeg daglicht is"
+  icon: "mdi:format-list-checkbox"
+  description: "Wanneer het schemert of nacht is volgens de sensor woonkamer, houd het rolgordijn gesloten"
+  sequence:
+    - alias: "Besluit op basis van informatie of het rolgordijn opent of gesloten blijft"
+      if:
+        - "{{ is_state('sensor.drempelwaarde_woonkamer', 'dag') }}"
+        - "{{ is_state('cover.aqara_rolgordijn_keuken', 'closed') }}"
+        - "{{ int(states('sensor.aqara_rolgordijn_keuken_power')) >= int(states('input_number.drempelwaarde_batterijniveau')) }}"
+      then:
+        - alias: "Open het rolgordijn"
+          action: cover.open_cover
+          target:
+            entity_id: cover.aqara_rolgordijn_keuken
+      else:
+        stop: "Er is nog niet voldoende daglicht aanwezig, het rolgordijn blijft dicht."

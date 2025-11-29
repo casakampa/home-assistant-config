@@ -1,0 +1,39 @@
+- id: 3c6e8d32-8070-4284-9ffa-c7f53fb3581b
+  alias: "Rolgordijn: Keuken"
+  description: "Open of sluit het rolgordijn in de keuken op basis van sensor.drempelwaarde_achtertuin"
+  triggers:
+    - trigger: state
+      entity_id: sensor.drempelwaarde_achtertuin
+      from: "nacht"
+      to: "schemer"
+      id: open
+    - trigger: state
+      entity_id: sensor.drempelwaarde_achtertuin
+      from: "schemer"
+      to: "nacht"
+      id: close
+  conditions:
+    - "{{ int(states('sensor.aqara_rolgordijn_keuken_power')) >= int(states('input_number.drempelwaarde_batterijniveau')) }}"
+  actions:
+    - alias: "Kies de juiste actie"
+      choose:
+        - conditions:
+            - "{{ trigger.id == 'open' }}"
+            - "{{ is_state('cover.aqara_rolgordijn_keuken', 'closed') }}"
+            - "{{ now() <= today_at('8:50') }}"
+          sequence:
+            - alias: "Open het rolgordijn"
+              action: cover.open_cover
+              target:
+                entity_id: cover.aqara_rolgordijn_keuken
+        - conditions:
+            - "{{ trigger.id == 'close' }}"
+            - "{{ is_state('cover.aqara_rolgordijn_keuken', 'open') }}"
+            - "{{ now() >= today_at('16:20') }}"
+          sequence:
+            - alias: "Sluit het rolgordijn"
+              action: cover.close_cover
+              target:
+                entity_id: cover.aqara_rolgordijn_keuken
+      default:
+        - stop: "Geen geldige voorwaarden"
