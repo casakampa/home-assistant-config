@@ -64,10 +64,10 @@ kliko_interval_herinnering:
 # Batterij monitoring
 drempelwaarde_batterijniveau:
   name: "Batterijniveau"
-  initial: 15
+  initial: 10
   min: 5
-  max: 25
-  step: 5
+  max: 15
+  step: 2.5
   icon: mdi:battery-alert
   unit_of_measurement: "%"
 thermostaat_maximum_temperatuur:

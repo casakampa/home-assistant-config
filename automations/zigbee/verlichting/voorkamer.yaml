@@ -8,7 +8,7 @@
       to: "on"
       id: stekker_aan
     - trigger: state
-      entity_id: sensor.drempelwaarde_woonkamer
+      entity_id: sensor.drempelwaarde_achtertuin
       id: sensor
     - trigger: state
       entity_id: sun.sun
@@ -37,7 +37,7 @@
                 variables:
                   light: "light.voorkamer_zha_group_0x000b"
                   command: >
-                    {{ iif(is_state('sensor.drempelwaarde_woonkamer', 'dag'), 'off', 'on') }}_short_release
+                    {{ iif(is_state('sensor.drempelwaarde_achtertuin', 'dag'), 'off', 'on') }}_short_release
         - conditions:
             - "{{ trigger.id == 'stekker_uit' }}"
           sequence:
