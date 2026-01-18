@@ -59,6 +59,7 @@ timer: !include timer.yaml
 template: !include templates.yaml
 mqtt: !include mqtt.yaml
 rest: !include rest.yaml
+modbus: !include modbus.yaml
 
 zha:
   zigpy_config:
