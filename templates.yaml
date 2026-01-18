@@ -64,21 +64,21 @@
           {% endif %}
 
 # Z-Stack coordinator firmware sensor
-- trigger:
-    - trigger: state
-      entity_id: sensor.z_stack_firmware_releases
-  sensor:
-    - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
-      name: "Z-Stack coordinator firmware"
-      state: >-
-        {% set version = states(trigger.entity_id) -%}
-        {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) of niet (false) -#}
-        {% set no_prerelease = is_state_attr(version, 'prerelease', false) -%}
-        {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
-        {{ version.split('_')[3] if version | length > 0 and has_value(trigger.entity_id) and no_prerelease else this.state }}
-      availability: "{{ has_value(trigger.entity_id) }}"
-      attributes:
-        html_url: "{{ state_attr(trigger.entity_id, 'html_url') }}"
+# - trigger:
+#     - trigger: state
+#       entity_id: sensor.z_stack_firmware_releases
+#   sensor:
+#     - unique_id: 1927a36b-0b02-4f91-bac4-67c1bd643d39
+#       name: "Z-Stack coordinator firmware"
+#       state: >-
+#         {% set version = states(trigger.entity_id) -%}
+#         {# Vul de variabele 'prerelease' en controleer of deze versie een prerelease is (true) of niet (false) -#}
+#         {% set no_prerelease = is_state_attr(version, 'prerelease', false) -%}
+#         {# Vul de sensor met de nieuwe waarde na controle of 'version' inhoud heeft en of er sprake is van een prerelease, behoud anders de huidige staat (this.state) -#}
+#         {{ version.split('_')[3] if version | length > 0 and has_value(trigger.entity_id) and no_prerelease else this.state }}
+#       availability: "{{ has_value(trigger.entity_id) }}"
+#       attributes:
+#         html_url: "{{ state_attr(trigger.entity_id, 'html_url') }}"
 
 # Afvalwijzer sensor
 - trigger:
