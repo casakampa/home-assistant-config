@@ -5,3 +5,279 @@ binary_sensor:
       - topic: "doorbell/status"
     enabled_by_default: false
     icon: mdi:bell-ring-outline
+
+sensor:
+  # Slave 11
+  - name: "Groep 1: Stroom"
+    unique_id: "modbus_sdm120_11_stroom"
+    state_topic: "modbus2mqtt/sdm120/11/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 1: Vermogen"
+    unique_id: "modbus_sdm120_11_vermogen"
+    state_topic: "modbus2mqtt/sdm120/11/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 1: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_11_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/11/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 12
+  - name: "Groep 2: Stroom"
+    unique_id: "modbus_sdm120_12_stroom"
+    state_topic: "modbus2mqtt/sdm120/12/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 2: Vermogen"
+    unique_id: "modbus_sdm120_12_vermogen"
+    state_topic: "modbus2mqtt/sdm120/12/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 2: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_12_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/12/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 14
+  - name: "Groep 4: Stroom"
+    unique_id: "modbus_sdm120_14_stroom"
+    state_topic: "modbus2mqtt/sdm120/14/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 4: Vermogen"
+    unique_id: "modbus_sdm120_14_vermogen"
+    state_topic: "modbus2mqtt/sdm120/14/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 4: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_14_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/14/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 15
+  - name: "Groep 5: Stroom"
+    unique_id: "modbus_sdm120_15_stroom"
+    state_topic: "modbus2mqtt/sdm120/15/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 5: Vermogen"
+    unique_id: "modbus_sdm120_15_vermogen"
+    state_topic: "modbus2mqtt/sdm120/15/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 5: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_15_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/15/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 16
+  - name: "Groep 6: Stroom"
+    unique_id: "modbus_sdm120_16_stroom"
+    state_topic: "modbus2mqtt/sdm120/16/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 6: Vermogen"
+    unique_id: "modbus_sdm120_16_vermogen"
+    state_topic: "modbus2mqtt/sdm120/16/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 6: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_16_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/16/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 17
+  - name: "Groep 7: Stroom"
+    unique_id: "modbus_sdm120_17_stroom"
+    state_topic: "modbus2mqtt/sdm120/17/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 7: Vermogen"
+    unique_id: "modbus_sdm120_17_vermogen"
+    state_topic: "modbus2mqtt/sdm120/17/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 7: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_17_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/17/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 18
+  - name: "Groep 8: Stroom"
+    unique_id: "modbus_sdm120_18_stroom"
+    state_topic: "modbus2mqtt/sdm120/18/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 8: Vermogen"
+    unique_id: "modbus_sdm120_18_vermogen"
+    state_topic: "modbus2mqtt/sdm120/18/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 8: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_18_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/18/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 19
+  - name: "Groep 9: Stroom"
+    unique_id: "modbus_sdm120_19_stroom"
+    state_topic: "modbus2mqtt/sdm120/19/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 9: Vermogen"
+    unique_id: "modbus_sdm120_19_vermogen"
+    state_topic: "modbus2mqtt/sdm120/19/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 9: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_19_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/19/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 20
+  - name: "Groep 10: Stroom"
+    unique_id: "modbus_sdm120_20_stroom"
+    state_topic: "modbus2mqtt/sdm120/20/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 10: Vermogen"
+    unique_id: "modbus_sdm120_20_vermogen"
+    state_topic: "modbus2mqtt/sdm120/20/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 10: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_20_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/20/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 21
+  - name: "Groep 11: Stroom"
+    unique_id: "modbus_sdm120_21_stroom"
+    state_topic: "modbus2mqtt/sdm120/21/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 11: Vermogen"
+    unique_id: "modbus_sdm120_21_vermogen"
+    state_topic: "modbus2mqtt/sdm120/21/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 11: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_21_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/21/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
+
+  # Slave 22
+  - name: "Groep 12: Stroom"
+    unique_id: "modbus_sdm120_22_stroom"
+    state_topic: "modbus2mqtt/sdm120/22/stroom/state"
+    value_template: "{{ value_json.stroom | float }}"
+    unit_of_measurement: "A"
+    device_class: current
+    state_class: measurement
+
+  - name: "Groep 12: Vermogen"
+    unique_id: "modbus_sdm120_22_vermogen"
+    state_topic: "modbus2mqtt/sdm120/22/vermogen/state"
+    value_template: "{{ value_json.vermogen | float }}"
+    unit_of_measurement: "W"
+    device_class: power
+    state_class: measurement
+
+  - name: "Groep 12: Energie totaal (kWh)"
+    unique_id: "modbus_sdm120_22_energie_totaal_kwh"
+    state_topic: "modbus2mqtt/sdm120/22/energie_totaal_kwh/state"
+    value_template: "{{ value_json.energie_totaal_kwh | float }}"
+    unit_of_measurement: "kWh"
+    device_class: energy
+    state_class: total_increasing
