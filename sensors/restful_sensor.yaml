@@ -206,6 +206,44 @@
     content-type: application/json
     user-agent: *ua_string
 
+# Check GitHub repository golles/ha-knmi via https://api.github.com/repos/golles/ha-knmi/releases
+- platform: rest
+  unique_id: 5bd4460d-942a-4d27-b73e-ed14acd47ef8
+  scan_interval: 86400
+  resource: https://api.github.com/repos/golles/ha-knmi/releases
+  name: "HA-KNMI"
+  icon: mdi:weather-cloudy-clock
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
+# Check GitHub repository BlackZork/mqmgateway via https://api.github.com/repos/BlackZork/mqmgateway/releases
+- platform: rest
+  unique_id: bb325a35-1ae2-4a07-b914-c57909697436
+  scan_interval: 86400
+  resource: https://api.github.com/repos/BlackZork/mqmgateway/releases
+  name: "MQMGateway"
+  icon: mdi:connection
+  value_template: "{{ value_json.0.tag_name }}"
+  json_attributes:
+    - prerelease
+    - html_url
+  username: !secret github_username
+  password: !secret github_personal_access_token
+  authentication: basic
+  headers:
+    accept: application/vnd.github.v3+json
+    content-type: application/json
+    user-agent: *ua_string
+
 # Request maximum sun elevation for today via https://api.met.no/weatherapi/sunrise/3.0/sun
 - platform: rest
   unique_id: b8ad79f9-6e2e-41aa-8c84-1fe35ccf3a3c
