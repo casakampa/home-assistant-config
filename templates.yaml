@@ -22,10 +22,8 @@
 
 # Template binary sensor voor wekker
 - trigger:
-    - trigger: state
-      entity_id: sensor.time
-      from: ~
-      to: ~
+    - trigger: time_pattern
+      minutes: "/1"
     - trigger: event
       event_type: event_template_reloaded
   binary_sensor:
@@ -33,30 +31,31 @@
       name: "Wekker"
       variables:
         vakanties: calendar.vakanties
-        vandaag: >-
+        dag: >-
           {% from 'date_functions.jinja' import vandaag %}
           {{ vandaag() }}
+        wekker_dag: "input_boolean.wekker_{{ dag }}"
       icon: >-
         {% if is_state(vakanties, 'on') %}
         mdi:island
-        {% elif is_state('input_boolean.wekker_' + vandaag, 'on') %}
+        {% elif is_state(wekker_dag, 'on') %}
         mdi:alarm
-        {%else %}
+        {% else %}
         mdi:alarm-off
         {% endif %}
       state: >-
         {{ 'on'
-          if now().isoweekday() in range(6)
+          if now().isoweekday() <= 5
           and is_state(vakanties, 'off')
           and is_state('input_boolean.wekker_status', 'on')
-          and is_state('input_boolean.wekker_' + vandaag, 'on')
-          and today_at(states('input_datetime.wektijd_' + vandaag )) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) == today_at(states('sensor.time'))
+          and is_state(wekker_dag, 'on')
+          and today_at(states('input_datetime.wektijd_' + dag )) - timedelta(minutes=int(states('input_number.wekker_wake_up_tijdsspanne'), 15)) == today_at(states('sensor.time'))
           else 'off' }}
       attributes:
         type: >-
           {% if is_state(vakanties, 'on') %}
             Vakantie/vrije dag
-          {% elif now().isoweekday() in [6, 7] %}
+          {% elif now().isoweekday() > 5 %}
             Weekend
           {% else %}
             Werkdag
@@ -124,9 +123,10 @@
 
 # Bereken minimale en maximale kleurtemperatuur aan de hand van de stand van de zon ten opzichte van de horizon
 - trigger:
-    - trigger: state
-      entity_id: sun.sun
-      attribute: elevation
+    - trigger: time_pattern
+      minutes: "/1"
+    - trigger: event
+      event_type: event_template_reloaded
   sensor:
     - unique_id: 0a9bb00d-92b7-4dea-9200-549826a3d8e9
       name: "Kleurtemperatuur verlichting"
@@ -144,7 +144,7 @@
           {{ [temp, 4000] | min | round(-2) | int  }}
         {% endif %}
       unit_of_measurement: "K"
-      availability: "{{ has_value(trigger.entity_id) }}"
+      availability: "{{ has_value('sun.sun') }}"
 
 # Lampen met updates beschikbaar
 - trigger:
