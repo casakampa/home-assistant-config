@@ -1,18 +1,19 @@
-{% macro uitgesproken_tijd_v3(tijdstip) %}
+{%- macro uitgesproken_tijd_v3(tijdstip) -%}
 {%- set uren, minuten = tijdstip.split(':') | map('int') | list -%}
 {%- set uitgesproken_klokuur = (uren % 12) or 12 -%}
 {%- set uitgesproken_volgend_uur = ((uren + 1) % 12) or 12 -%}
-  {%- if minuten == 0 -%}Het is {{ uitgesproken_klokuur }} uur
-  {%- elif minuten in range(1, 5) -%} {{ minuten }} {{ 'minuten' if minuten > 1 else 'minuut' }} geleden was het {{ uitgesproken_klokuur }} uur
-  {%- elif minuten in range(16, 20) -%} {{ minuten - 15 }} {{ 'minuten' if minuten - 15 > 1 else 'minuut' }} geleden was het kwart over {{ uitgesproken_klokuur }}
-  {%- elif minuten in range(31, 35) -%} {{ minuten - 30 }} {{ 'minuten' if minuten - 30 > 1 else 'minuut' }} geleden was het half {{ uitgesproken_volgend_uur }}
-  {%- elif minuten in range(46, 50) -%} {{ minuten - 45 }} {{ 'minuten' if minuten - 45 > 1 else 'minuut' }} geleden was het kwart voor {{ uitgesproken_volgend_uur }}
-  {%- elif minuten in range(5, 15) or minuten in range(20, 30) or minuten in range(35, 45) or minuten in range(50, 60) -%}
-  Over {{ 15 - minuten if minuten < 15 else 30 - minuten if minuten < 30 else 45 - minuten if minuten < 45 else 60 - minuten }} {{ 'minuut' if minuten in [1, 14, 16, 29, 31, 44, 46, 59] else 'minuten' }} is het {{ 'kwart over ' ~ uitgesproken_klokuur if minuten < 15 else ('half ' if minuten < 30 else 'kwart voor ') ~ uitgesproken_volgend_uur if minuten < 45 else uitgesproken_volgend_uur ~ ' uur' }}
-  {%- elif minuten in [15, 30, 45] -%}
-  Het is {{ 'kwart over ' ~ uitgesproken_klokuur if minuten == 15 else ('half ' if minuten == 30 else 'kwart voor ') ~ uitgesproken_volgend_uur }}
-  {%- endif -%}
-{% endmacro %}
+{%- if minuten == 0 -%}Het is {{ uitgesproken_klokuur }} uur
+{%- elif minuten in range(1, 5) -%}{{ minuten }} {{ 'minuut' if minuten == 1 else 'minuten' }} geleden was het {{ uitgesproken_klokuur }} uur
+{%- elif minuten in range(16, 20) -%}{{ minuten - 15 }} {{ 'minuut' if minuten - 15 == 1 else 'minuten' }} geleden was het kwart over {{ uitgesproken_klokuur }}
+{%- elif minuten in range(31, 35) -%}{{ minuten - 30 }} {{ 'minuut' if minuten - 30 == 1 else 'minuten' }} geleden was het half {{ uitgesproken_volgend_uur }}
+{%- elif minuten in range(46, 50) -%}{{ minuten - 45 }} {{ 'minuut' if minuten - 45 == 1 else 'minuten' }} geleden was het kwart voor {{ uitgesproken_volgend_uur }}
+{%- elif minuten in range(5, 15) or minuten in range(20, 30) or minuten in range(35, 45) or minuten in range(50, 60) -%}
+{%- set resterend = 15 - minuten if minuten < 15 else 30 - minuten if minuten < 30 else 45 - minuten if minuten < 45 else 60 - minuten -%}
+Over {{ resterend }} {{ 'minuut' if resterend == 1 else 'minuten' }} is het {{ 'kwart over ' ~ uitgesproken_klokuur if minuten < 15 else ('half ' if minuten < 30 else 'kwart voor ') ~ uitgesproken_volgend_uur if minuten < 45 else uitgesproken_volgend_uur ~ ' uur' }}
+{%- elif minuten in [15, 30, 45] -%}
+Het is {{ 'kwart over ' ~ uitgesproken_klokuur if minuten == 15 else ('half ' if minuten == 30 else 'kwart voor ') ~ uitgesproken_volgend_uur }}
+{%- endif -%}
+{%- endmacro -%}
 
 {%- macro tijdverschil(tijdstip) -%}
   {%- set s = (now() - today_at(tijdstip)).total_seconds() | int -%}

@@ -80,7 +80,7 @@ hue_dimmer_white_basic_logica:
           sequence:
             - <<: *turn_on_entities
               data:
-                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
+                color_temp_kelvin: "{{ min((state_attr(light, 'color_temp_kelvin') + 200), state_attr(light, 'max_color_temp_kelvin') | int(6535)) }}"
         - conditions:
             - "{{ command == 'down_short_release' }}"
           sequence:
@@ -92,7 +92,7 @@ hue_dimmer_white_basic_logica:
           sequence:
             - <<: *turn_on_entities
               data:
-                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
+                color_temp_kelvin: "{{ max((state_attr(light, 'color_temp_kelvin') - 200), state_attr(light, 'min_color_temp_kelvin') | int(2202)) }}"
         - conditions:
             - "{{ command == 'off_short_release' }}"
           sequence:
@@ -198,7 +198,7 @@ hue_dimmer_white_ambiance_basic_logica:
           sequence:
             - <<: *turn_on_entities
               data:
-                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
+                color_temp_kelvin: "{{ min((state_attr(light, 'color_temp_kelvin') + 200), state_attr(light, 'max_color_temp_kelvin') | int(6535)) }}"
         - conditions:
             - "{{ command == 'down_short_release' }}"
           sequence:
@@ -210,7 +210,7 @@ hue_dimmer_white_ambiance_basic_logica:
           sequence:
             - <<: *turn_on_entities
               data:
-                color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
+                color_temp_kelvin: "{{ max((state_attr(light, 'color_temp_kelvin') - 200), state_attr(light, 'min_color_temp_kelvin') | int(2202)) }}"
         - conditions:
             - "{{ command == 'off_short_release' }}"
           sequence:
@@ -312,8 +312,7 @@ hue_dimmer_white_ambiance_multimedia_logica:
                   {{ sonos_speaker }}
                 message: >-
                   {% from 'tts_functions.jinja' import uitgesproken_tijd_v3 %}
-                  {% set nu = now().strftime('%H:%M') %}
-                  {{ uitgesproken_tijd_v3(nu) }}
+                  {{ uitgesproken_tijd_v3(now().strftime('%H:%M')) }}
       default:
         - choose:
             - conditions:
@@ -517,7 +516,7 @@ hue_dimmer_white_ambiance_multimedia_logica:
                       sequence:
                         - <<: *turn_on_entities
                           data:
-                            color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') + 200 }}"
+                            color_temp_kelvin: "{{ min((state_attr(light, 'color_temp_kelvin') + 200), state_attr(light, 'max_color_temp_kelvin') | int(6535)) }}"
                     - conditions:
                         - "{{ command == 'down_short_release' }}"
                         - "{{ is_state(light, 'on') }}"
@@ -531,7 +530,7 @@ hue_dimmer_white_ambiance_multimedia_logica:
                       sequence:
                         - <<: *turn_on_entities
                           data:
-                            color_temp_kelvin: "{{ state_attr(light, 'color_temp_kelvin') - 200 }}"
+                            color_temp_kelvin: "{{ max((state_attr(light, 'color_temp_kelvin') - 200), state_attr(light, 'min_color_temp_kelvin') | int(2202)) }}"
                     - conditions:
                         - "{{ command == 'off_short_release' }}"
                         - "{{ is_state(light, 'on') }}"

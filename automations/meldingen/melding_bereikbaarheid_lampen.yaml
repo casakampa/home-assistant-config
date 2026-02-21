@@ -9,15 +9,15 @@
   variables:
     tag: &tag "bereikbaarheid_lampen"
     aantal: >-
-      {% set aantal = int(states(trigger.entity_id)) %}
+      {% set aantal = int(states(trigger.entity_id), 0) %}
       {% if aantal >= 1 %}
-        {{'Er' ~ ' ' ~ ('zijn' if aantal > 1 else 'is') ~ ' ' ~ aantal ~ ' ' ~ 'lamp' ~ ('en' if aantal > 1) ~ ' ' ~ 'onbereikbaar:'}}
+        Er {{ 'zijn' if aantal > 1 else 'is' }} {{ aantal }} lamp{{ 'en' if aantal > 1 }} onbereikbaar:
       {% else %}
         Alle lampen zijn bereikbaar
       {% endif %}
     lampen: >-
-      {% set lampen = state_attr(trigger.entity_id, 'lampen') %}
-      {{ lampen | join(', ') }}
+      {{ state_attr(trigger.entity_id, 'lampen') | default([]) | join(', ') }}
+    melding: "{{ aantal }} {{ lampen }}"
   conditions:
     - "{{ has_value(trigger.entity_id) }}"
   actions:
@@ -25,14 +25,14 @@
         - alias: "Stuur een notificatie over de bereikbaarheid van de lamp(en)"
           action: notify.mobile_app_iphone_16_van_maarten
           data:
-            message: "{{ aantal }} {{ lampen }}"
+            message: "{{ melding }}"
             data:
               tag: *tag
               push:
                 interruption-level: passive
         - action: persistent_notification.create
           data:
-            message: "{{ aantal }} {{ lampen }}"
+            message: "{{ melding }}"
             notification_id: *tag
         - if: >-
             {{ today_at(states('input_datetime.light_home_day_time')) < now() < today_at(states('input_datetime.light_home_night_time')) }}
