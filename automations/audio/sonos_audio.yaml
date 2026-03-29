@@ -26,7 +26,18 @@
     - trigger: state
       entity_id: input_boolean.mute_streaming_radio
       id: mute_volume
+    - trigger: state
+      entity_id: media_player.sonos_woonkamer
+      attribute: "media_artist"
+      not_to:
+        - "none"
+        - "unknown"
+        - "unavailable"
+        - "paused"
+      id: check_media_artist_for_auto_mute
   mode: queued
+  trace:
+    stored_traces: 25
   variables:
     boolean_woonkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_woonkamer', 'on') }}"
     boolean_slaapkamer_is_on: "{{ is_state('input_boolean.play_media_sonos_slaapkamer', 'on') }}"
@@ -37,18 +48,17 @@
           | selectattr('state', 'eq', 'playing')
           | map(attribute='entity_id')
           | list }}
-      - &muted_media_player >-
-        {{ states.media_player
-          | selectattr('entity_id', 'contains', 'sonos')
-          | selectattr('state', 'eq', 'playing')
-          | selectattr('attributes.is_volume_muted', 'eq', True)
-          | map(attribute='entity_id')
-          | list }}
       - &unmute_media_player
         alias: "Hef demping luidspreker(s) op"
         action: media_player.volume_mute
         target:
-          entity_id: *muted_media_player
+          entity_id: >-
+            {{ states.media_player
+              | selectattr('entity_id', 'contains', 'sonos')
+              | selectattr('state', 'eq', 'playing')
+              | selectattr('attributes.is_volume_muted', 'eq', True)
+              | map(attribute='entity_id')
+              | list }}
         data:
           is_volume_muted: false
   actions:
@@ -76,6 +86,37 @@
                   action: script.turn_off
                   target:
                     entity_id: script.mute_media_players
+        - conditions:
+            - "{{ trigger.id == 'check_media_artist_for_auto_mute' }}"
+            - "{{ is_state(trigger.entity_id, 'playing') }}"
+            - "{{ not is_state(trigger.entity_id, 'ZPSTR_CONNECTING') }}"
+          sequence:
+            - alias: "Bepaal of de muziek automatisch gedempt moet worden of dat het dempen opgeheven moet worden."
+              if:
+                - alias: "Controleer welke artiest er wordt afgespeeld"
+                  condition: template
+                  value_template: >-
+                    {% set artist = state_attr('media_player.sonos_woonkamer',
+                      iif(
+                          is_state('input_select.internet_radio_streams',
+                          'Qmusic Foute uur nonstop'),
+                          'media_title',
+                          'media_artist')
+                          )
+                      | default('')
+                      | title %}
+                    {% set song_to_mute = ['Davina','Hazes','Borsato','Hiigo','Lange Frans','Anouk','break'] %}
+                    {{ (song_to_mute | select('in', artist) | list | length) > 0 }}
+              then:
+                - alias: "Demp actieve luidspreker(s)."
+                  action: input_boolean.turn_on
+                  target:
+                    entity_id: input_boolean.mute_streaming_radio
+              else:
+                - alias: "Heft demping actieve luidspreker(s) op"
+                  action: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.mute_streaming_radio
         - conditions:
             - "{{ trigger.id == 'ha_volume' }}"
           sequence:
@@ -171,15 +212,15 @@
                   action: media_player.media_stop
                   target:
                     entity_id: *playing_media_player
-            - if: >
+            - if: >-
                 {{ states.media_player
-                  | selectattr('entity_id', 'contains', 'sonos')
-                  | selectattr('attributes.is_volume_muted', 'eq', True)
-                  | map(attribute='entity_id')
-                  | list
-                  | count >= 1 }}
+                | selectattr('entity_id', 'contains', 'sonos')
+                | selectattr('attributes.is_volume_muted', 'eq', True)
+                | map(attribute='entity_id')
+                | list
+                | count >= 1 }}
               then:
-                - *unmute_media_player
+                # - *unmute_media_player
                 - alias: "Heft demping luidspreker(s) op."
                   action: input_boolean.turn_off
                   target:
