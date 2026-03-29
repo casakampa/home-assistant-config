@@ -25,12 +25,12 @@ wekker_ochtendroutine:
       target:
         entity_id: light.slaapkamer_zha_group_0x0005
       data:
-        transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) | multiply(60, 900) - 5 }}" # -5 seconden vanwege de delay
+        transition: "{{ int(states('input_number.wekker_wake_up_tijdsspanne'), 15) | multiply(60, 900) - 5 }}" # -5 seconden vanwege de delay
         brightness_pct: "{{ int(states('input_number.wekker_wake_up_lichtsterkte'), 80) }}"
         color_temp_kelvin: "{{ int(states('input_number.wekker_wake_up_kleurtemperatuur'), 3000) }}"
     - alias: "Wacht evenlang als dat de verlichting nodig heeft om de juiste helderheid te bereiken, alvorens verder te gaan"
       delay:
-        minutes: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15) }}"
+        minutes: "{{ float(states('input_number.wekker_wake_up_tijdsspanne'), 15.0) }}"
     - parallel:
         - alias: "Bepaal of de verlichting in de woonkamer en keuken ingeschakeld moet worden, en of het rolgordijn geopend moet worden"
           action: script.turn_on
@@ -56,15 +56,14 @@ wekker_ochtendroutine:
     - delay:
         minutes: 5
     - parallel:
-        # Zet de radio aan
-        - alias: "Zet de radio aan met deze instellingen"
-          action: script.prepare_streaming_radio
+        - alias: "Stel 20% volume in op Sonos luidspreker(s)"
+          action: input_number.set_value
+          target:
+            entity_id: input_number.sonos_media_volume
           data:
-            kamer: "woonkamer"
-            station: "NPO Radio 2"
-            volume: 20
-        # Schakel lamp uit
-        - action: light.turn_off
+            value: 20
+        - alias: "Schakel verlichting slaapkamer uit"
+          action: light.turn_off
           target:
             entity_id: light.slaapkamer_zha_group_0x0005
     # Controleer of er wordt thuisgewerkt vandaag

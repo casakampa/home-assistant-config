@@ -17,7 +17,7 @@
         - sensor.docker_mailserver
         - sensor.roundcube_webmail
         - sensor.fritz_box_5530_firmware
-        - sensor.intel_nuc12_bios
+        #        - sensor.intel_nuc12_bios
         - sensor.mqmgateway
         - sensor.ha_knmi
       not_from:
