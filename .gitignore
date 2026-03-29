@@ -1,4 +1,5 @@
 .HA_VERSION
+.cache
 .cloud
 .shopping_list.json
 .storage
