@@ -105,7 +105,23 @@
                           )
                       | default('')
                       | title %}
-                    {% set song_to_mute = ['Davina','Hazes','Borsato','Hiigo','Lange Frans','Anouk','break'] %}
+                    {% set song_to_mute = [
+                                          'Davina',
+                                          'Hazes',
+                                          'Borsato',
+                                          'Hiigo',
+                                          'Lange Frans',
+                                          'Anouk',
+                                          'Styles',
+                                          'Niall',
+                                          'Neil Diamond',
+                                          'Bakermat',
+                                          'Donnie',
+                                          'Estelle',
+                                          'Lykke Li',
+                                          'Joling',
+                                          'Gordon',
+                                          'Suzan & Freek'] %}
                     {{ (song_to_mute | select('in', artist) | list | length) > 0 }}
               then:
                 - alias: "Demp actieve luidspreker(s)."
