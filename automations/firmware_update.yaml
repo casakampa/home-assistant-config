@@ -1,0 +1,21 @@
+- id: f11a04d7-3768-4539-b43b-408f1b72c746
+  alias: "Automatische firmware update"
+  description: >-
+    De automatisering controleert iedere 30 minuten of er een update beschikbaar is voor apparaten met het label zha_auto_update.
+    Is dit het geval, dan controleert het of er een update bezig is, anders wordt een nieuwe update gestart.
+  triggers:
+    - trigger: time_pattern
+      minutes: "/30"
+  variables:
+    updatebare_devices: >-
+      {{label_entities('zha_auto_update')
+        | select("is_state", "on")
+        | list
+      }}
+  conditions:
+    - "{{ updatebare_devices | count >= 1 }}"
+    - "{{ is_state_attr(updatebare_devices | first, 'in_progress', false) }}"
+  actions:
+    - action: update.install
+      data:
+        entity_id: "{{ updatebare_devices | first }}"
