@@ -34,7 +34,15 @@
         - "unknown"
         - "unavailable"
         - "paused"
-      id: check_media_artist_for_auto_mute
+      id: check_radio_stream_media_artist
+    - trigger: template
+      value_template: >-
+        {% set entity_id = 'media_player.sonos_slaapkamer' %}
+        {% set radio_streams = ['Radio 10', 'Radio Veronica'] %}
+        {{ is_state(entity_id, "playing") and state_attr(entity_id, "media_artist") == None and states('input_select.internet_radio_streams') in radio_streams }}
+      for:
+        milliseconds: 400
+      id: mute_radio_commercial
   mode: queued
   trace:
     stored_traces: 25
@@ -87,7 +95,7 @@
                   target:
                     entity_id: script.mute_media_players
         - conditions:
-            - "{{ trigger.id == 'check_media_artist_for_auto_mute' }}"
+            - "{{ trigger.id == 'check_radio_stream_media_artist' }}"
             - "{{ is_state(trigger.entity_id, 'playing') }}"
             - "{{ not is_state(trigger.entity_id, 'ZPSTR_CONNECTING') }}"
           sequence:
@@ -105,7 +113,7 @@
                           )
                       | default('')
                       | title %}
-                    {% set song_to_mute = [
+                    {% set artist_to_mute = [
                                           'Davina',
                                           'Hazes',
                                           'Borsato',
@@ -121,8 +129,12 @@
                                           'Lykke Li',
                                           'Joling',
                                           'Gordon',
+                                          'Swims',
+                                          'Sombr',
+                                          'Pardoel',
+                                          'Ella Langley',
                                           'Suzan & Freek'] %}
-                    {{ (song_to_mute | select('in', artist) | list | length) > 0 }}
+                    {{ (artist_to_mute | select('in', artist) | list | length) > 0 }}
               then:
                 - alias: "Demp actieve luidspreker(s)."
                   action: input_boolean.turn_on
@@ -133,6 +145,13 @@
                   action: input_boolean.turn_off
                   target:
                     entity_id: input_boolean.mute_streaming_radio
+        - conditions:
+            - "{{ trigger.id == 'mute_radio_commercial' }}"
+          sequence:
+            - alias: "Demp actieve luidspreker(s)."
+              action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.mute_streaming_radio
         - conditions:
             - "{{ trigger.id == 'ha_volume' }}"
           sequence:

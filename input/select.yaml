@@ -11,11 +11,10 @@ wasprogramma:
 internet_radio_streams:
   name: "Radio Streams"
   options:
-    - "Qmusic Foute uur nonstop"
-    #    - "BNR Nieuwsradio"
-    - "Radio Veronica"
     - "NPO Radio 2"
-    #    - "GP Radio"
+    - "Radio 10"
+    - "Qmusic Foute uur nonstop"
+    - "Radio Veronica"
   icon: mdi:radio-tower
 dimmer_mode:
   name: "Dimmer Mode"

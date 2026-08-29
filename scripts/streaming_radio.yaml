@@ -11,10 +11,9 @@ start_streaming_radio:
         media_content_id: >-
           {%- set stations = {
               'Qmusic Foute uur nonstop': 'x-rincon-mp3radio://icecast-qmusicnl-cdp.triple-it.nl/Qmusic_nl_fouteuur_64.aac',
-              'BNR Nieuwsradio': 'x-rincon-mp3radio://stream.bnr.nl/bnr_mp3_128_20',
-              'Radio Veronica': 'x-rincon-mp3radio://playerservices.streamtheworld.com/api/livestream-redirect/VERONICA.mp3',
+              'Radio Veronica': 'x-rincon-mp3radio://playerservices.streamtheworld.com/api/livestream-redirect/veronica.mp3',
               'NPO Radio 2': 'x-rincon-mp3radio://icecast.omroep.nl/radio2-bb-mp3',
-              'GP Radio': 'x-rincon-mp3radio://playerservices.streamtheworld.com/api/livestream-redirect/GRAND_PRIX_RADIO'
+              'Radio 10': 'x-rincon-mp3radio://playerservices.streamtheworld.com/api/livestream-redirect/radio10.mp3'
             } -%}
           {{ stations[states('input_select.internet_radio_streams')] }}
         media_content_type: "music"
