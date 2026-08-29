@@ -5,15 +5,17 @@
     - trigger: sun
       event: sunset
   variables:
-    kwh_opgewekt: "{{ float(states('sensor.envoy_iq7a_energy_production_today'), 0)  }}"
+    kwh_opgewekt: >-
+      {{ float(states('sensor.zolder_rs_48_6000_100_links_l2_yield_today', 0 ))
+      + float(states('sensor.zolder_rs_48_6000_100_midden_l3_yield_today', 0 ))
+      + float(states('sensor.zolder_rs_48_6000_100_rechts_l1_yield_today', 0 )) }}
     kwh_teruggeleverd: "{{ states('sensor.dsmr_day_consumption_electricity_returned_merged', with_unit=True) }}"
-    kwh_kwp: "{{ ( float(states('sensor.envoy_iq7a_energy_production_today'), 0) / 3.120 ) | round(2, 0.00) }}"
   actions:
     - action: notify.mobile_app_iphone_16_van_maarten
       data:
-        message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} is teruggeleverd. kWh/kWp is {{ kwh_kwp }}."
+        message: "Er is {{ kwh_opgewekt }} kWh opgewekt, waarvan {{ kwh_teruggeleverd }} is teruggeleverd. kWh/kWp is {{ (kwh_opgewekt / 10.08) | round(2) }}."
         data:
-          subtitle: "☀ Energierapport zonnepanelen ☀"
+          subtitle: "☀  Energierapport zonnepanelen ☀"
 
 - id: afb5ee92-83a6-45a3-a900-0a2e0fa9c59e
   alias: "Melding: Langdurig hoge netspanning"

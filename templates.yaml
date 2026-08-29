@@ -8,10 +8,10 @@
       name: "Buitentemperatuur"
       icon: mdi:thermometer
       state: "{{ (( state_attr(thuis, 'temperature') + state_attr(home, 'temperature')) / 2 ) | round(1, 0) }}"
-      unit_of_measurement: "°C"
       availability: "{{ is_number(state_attr(thuis, 'temperature')) and is_number(state_attr(home, 'temperature')) }}"
       device_class: temperature
       state_class: measurement
+      unit_of_measurement: "°C"
     # Monitor de bereikbaarheid van de lampen in het Zigbee netwerk
     - unique_id: 64e5a09e-ad87-4fd5-8af1-d9b24409f57e
       name: "Onbereikbare lampen"
@@ -19,6 +19,21 @@
       state: "{{ this.attributes.lampen | count }}"
       attributes:
         lampen: "{{ states.light | rejectattr('state', 'in', ['on', 'off']) | rejectattr('entity_id', 'contains', 'zha') | map(attribute='name') | list }}"
+    # Template sensor voor actuele opwek van zonne-energie
+    - unique_id: 5a065b0d-6b5a-44b3-a29f-65b329a5ad0e
+      name: "Victron: actuele opwek zonne-energie"
+      icon: mdi:solar-power-variant
+      state: >-
+        {{ float(states('sensor.zolder_rs_48_6000_100_links_l2_pv_power_total', 0))
+        + float(states('sensor.zolder_rs_48_6000_100_midden_l3_pv_power_total', 0))
+        + float(states('sensor.zolder_rs_48_6000_100_rechts_l1_pv_power_total', 0)) }}
+      availability: >-
+        {{ has_value('sensor.zolder_rs_48_6000_100_links_l2_pv_power_total')
+        and has_value('sensor.zolder_rs_48_6000_100_midden_l3_pv_power_total')
+        and has_value('sensor.zolder_rs_48_6000_100_rechts_l1_pv_power_total') }}
+      device_class: power
+      state_class: measurement
+      unit_of_measurement: "W"
 
 # Template binary sensor voor wekker
 - trigger:
@@ -116,13 +131,14 @@
       icon: mdi:palette
       state: >-
         {% set elevation = float(state_attr('sun.sun', 'elevation'), 10) %}
-        {% set max_elevation = min(float(states('sensor.max_sun_elevation'), 60), 30) %}
+        {% set max_elevation = max(float(states('sensor.max_sun_elevation'), 60), 30) %}
         {% if elevation <= -5.0 %}
           2500
         {% elif elevation >= max_elevation %}
           4000
         {% else %}
-          {% set angle_factor = (elevation / max_elevation) + 1.5 %}
+          {% set base_factor = 1 + (max_elevation * 0.03) | round(1) %}
+          {% set angle_factor = (elevation / max_elevation) + base_factor %}
           {% set temp = ((elevation + 5.0) * 1500 / (max_elevation + 5.0)) * angle_factor + 2500 %}
           {{ [temp, 4000] | min | round(-2) | int  }}
         {% endif %}
