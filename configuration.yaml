@@ -1,9 +1,5 @@
 default_config:
 
-http:
-  use_x_forwarded_for: true
-  trusted_proxies: !secret http_trusted_proxies
-
 # mariadb database (add-on)
 recorder:
   purge_keep_days: 5
