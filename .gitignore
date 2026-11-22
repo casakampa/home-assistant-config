@@ -12,6 +12,6 @@ tts
 *.conf
 *.db*
 aanwezigheidssimulatie.yaml
-www/custom-cards
+www/community
 blueprints
 .ha_run.lock

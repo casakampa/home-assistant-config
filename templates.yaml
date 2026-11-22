@@ -22,7 +22,7 @@
     # Template sensor voor actuele opwek van zonne-energie
     - unique_id: 5a065b0d-6b5a-44b3-a29f-65b329a5ad0e
       name: "Victron: actuele opwek zonne-energie"
-      icon: mdi:solar-power-variant
+      icon: mdi:solar-power
       state: >-
         {{ float(states('sensor.zolder_rs_48_6000_100_links_l2_pv_power_total', 0))
         + float(states('sensor.zolder_rs_48_6000_100_midden_l3_pv_power_total', 0))
@@ -34,7 +34,21 @@
       device_class: power
       state_class: measurement
       unit_of_measurement: "W"
-
+    # Template sensor voor totale opwek van zonne-energie voor vandaag
+    - unique_id: ad781f4e-f535-4001-89a3-a61c46677a04
+      name: "Victron: totale opwek zonne-energie"
+      icon: mdi:solar-power-variant
+      state: >-
+        {{ float(states('sensor.zolder_rs_48_6000_100_links_l2_yield_today', 0))
+        + float(states('sensor.zolder_rs_48_6000_100_midden_l3_yield_today', 0))
+        + float(states('sensor.zolder_rs_48_6000_100_rechts_l1_yield_today', 0)) }}
+      availability: >-
+        {{ has_value('sensor.zolder_rs_48_6000_100_links_l2_yield_today')
+        and has_value('sensor.zolder_rs_48_6000_100_midden_l3_yield_today')
+        and has_value('sensor.zolder_rs_48_6000_100_rechts_l1_yield_today') }}
+      device_class: energy
+      state_class: total
+      unit_of_measurement: "kWh"
 # Template binary sensor voor wekker
 - trigger:
     - trigger: time_pattern
@@ -242,17 +256,6 @@
         nacht
         {% endif %}
       availability: "{{ has_value(trigger.entity_id) }}"
-# Knoppen om scripts te activeren
-- button:
-    - unique_id: 8c50d327-0425-43a5-82c3-2531d24357ec
-      name: "Reset DNSWL timer"
-      icon: mdi:calendar-refresh
-      press:
-        - action: input_datetime.set_datetime
-          target:
-            entity_id: input_datetime.dnswl_renew_date
-          data:
-            date: "{{ (now() + timedelta(days=90)).strftime('%Y-%m-%d') }}"
 - button:
     - unique_id: 98f4f388-1b66-49ec-9985-e24546d1e9f4
       name: "Reset Melatonine melding"

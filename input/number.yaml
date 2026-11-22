@@ -38,9 +38,9 @@ verlichting_woonkamer_lichtsterkte:
 # Wasmachine
 wasprogramma_wachttijd_programma_afgerond:
   name: "Wachttijd wasprogramma afgerond"
-  initial: 5
-  min: 2
-  max: 10
+  initial: 10
+  min: 6
+  max: 16
   step: 1
   icon: mdi:progress-check
   unit_of_measurement: "min"

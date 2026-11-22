@@ -148,10 +148,26 @@
         - conditions:
             - "{{ trigger.id == 'mute_radio_commercial' }}"
           sequence:
-            - alias: "Demp actieve luidspreker(s)."
-              action: input_boolean.turn_on
-              target:
-                entity_id: input_boolean.mute_streaming_radio
+            - alias: "Demp de luidsprekers afhankelijk van de situatie op de correcte wijze"
+              if:
+                - "{{ is_state('script.wekker_ochtendroutine', 'on') }}"
+              then:
+                - alias: "Demp actieve luidspreker(s) zonder melding om onderbreking van de ochtendupdate te voorkomen."
+                  action: media_player.volume_mute
+                  target:
+                    entity_id: *playing_media_player
+                  data:
+                    is_volume_muted: true
+                - alias: "Wacht tot er een media_artist beschikbaar is"
+                  wait_template: >-
+                    {% set entity_id = 'media_player.sonos_slaapkamer' %}
+                    {{ is_state(entity_id, 'playing') and not state_attr(entity_id, 'media_artist') == None }}
+                - *unmute_media_player
+              else:
+                - alias: "Demp actieve luidspreker(s)."
+                  action: input_boolean.turn_on
+                  target:
+                    entity_id: input_boolean.mute_streaming_radio
         - conditions:
             - "{{ trigger.id == 'ha_volume' }}"
           sequence:

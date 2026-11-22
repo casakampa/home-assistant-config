@@ -15,26 +15,7 @@
   headers:
     accept: application/vnd.github.v3+json
     content-type: application/json
-    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:148.0) Gecko/20100101 Firefox/148.0"
-
-# Check GitHub repository xirixiz/homeassistant-afvalwijzer via https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
-- platform: rest
-  unique_id: 0ecd889e-2679-44d1-ac34-30531c35ddcb
-  scan_interval: 86400
-  resource: https://api.github.com/repos/xirixiz/homeassistant-afvalwijzer/releases
-  name: "Afvalwijzer"
-  icon: mdi:delete-restore
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
+    user-agent: &ua_string "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:160.0) Gecko/20100101 Firefox/160.0"
 
 # Check GitHub repository nextcloud/server via https://api.github.com/repos/nextcloud/server/releases
 - platform: rest
@@ -43,25 +24,6 @@
   resource: https://api.github.com/repos/nextcloud/server/releases
   name: "Nextcloud"
   icon: mdi:folder-sync
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
-
-# Check GitHub repository kalkih/mini-graph-card via https://api.github.com/repos/kalkih/mini-graph-card/releases
-- platform: rest
-  unique_id: 8ad8b831-6662-40e9-abb3-e5bae0f8da52
-  scan_interval: 172800
-  resource: https://api.github.com/repos/kalkih/mini-graph-card/releases
-  name: "Mini Graph"
-  icon: mdi:chart-timeline-variant
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease
@@ -130,44 +92,6 @@
     content-type: application/json
     user-agent: *ua_string
 
-# Check GitHub repository piitaya/lovelace-mushroom via https://api.github.com/repos/piitaya/lovelace-mushroom/releases
-- platform: rest
-  unique_id: 4d604fc3-6443-47f9-9d5f-51c468b09c59
-  scan_interval: 172800
-  resource: https://api.github.com/repos/piitaya/lovelace-mushroom/releases
-  name: "Lovelace Mushroom"
-  icon: mdi:mushroom
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
-
-# Check GitHub repository RomRider/apexcharts-card via https://api.github.com/repos/romrider/apexcharts-card/releases
-- platform: rest
-  unique_id: c4ab2f5e-721c-4f21-9d40-46a3f2e4d96c
-  scan_interval: 172800
-  resource: https://api.github.com/repos/romrider/apexcharts-card/releases
-  name: "Apexcharts Card"
-  icon: mdi:chart-areaspline
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
-
 # Check GitHub repository docker-mailserver/docker-mailserver via https://api.github.com/repos/docker-mailserver/docker-mailserver/releases
 - platform: rest
   unique_id: a1bb24aa-cb85-43c2-b9c8-67e16837981a
@@ -206,25 +130,6 @@
     content-type: application/json
     user-agent: *ua_string
 
-# Check GitHub repository golles/ha-knmi via https://api.github.com/repos/golles/ha-knmi/releases
-- platform: rest
-  unique_id: 5bd4460d-942a-4d27-b73e-ed14acd47ef8
-  scan_interval: 86400
-  resource: https://api.github.com/repos/golles/ha-knmi/releases
-  name: "HA-KNMI"
-  icon: mdi:weather-cloudy-clock
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
-
 # Check GitHub repository BlackZork/mqmgateway via https://api.github.com/repos/BlackZork/mqmgateway/releases
 - platform: rest
   unique_id: bb325a35-1ae2-4a07-b914-c57909697436
@@ -232,25 +137,6 @@
   resource: https://api.github.com/repos/BlackZork/mqmgateway/releases
   name: "MQMGateway"
   icon: mdi:connection
-  value_template: "{{ value_json.0.tag_name }}"
-  json_attributes:
-    - prerelease
-    - html_url
-  username: !secret github_username
-  password: !secret github_personal_access_token
-  authentication: basic
-  headers:
-    accept: application/vnd.github.v3+json
-    content-type: application/json
-    user-agent: *ua_string
-
-# Check GitHub repository tomer-w/ha-victron-mqtt via https://api.github.com/repos/tomer-w/ha-victron-mqtt/releases
-- platform: rest
-  unique_id: ed20b558-7831-4e8d-9656-1e978b9d9528
-  scan_interval: 86400
-  resource: https://api.github.com/repos/tomer-w/ha-victron-mqtt/releases
-  name: "Victron MQTT"
-  icon: mdi:solar-power-variant
   value_template: "{{ value_json.0.tag_name }}"
   json_attributes:
     - prerelease

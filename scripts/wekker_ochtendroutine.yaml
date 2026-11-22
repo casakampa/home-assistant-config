@@ -51,7 +51,7 @@ wekker_ochtendroutine:
       action: script.prepare_streaming_radio
       data:
         kamer: "slaapkamer"
-        station: "NPO Radio 2"
+        station: "Radio 10"
         volume: 15
     - delay:
         minutes: 5

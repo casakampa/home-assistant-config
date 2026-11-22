@@ -152,7 +152,7 @@
 - id: af50ee17-cd5d-423b-a0b4-a070c0a369cb
   alias: "Melding: Kliko ophalen"
   description: "Deze automatisering regelt alles vanaf de herinnering tot het registreren dat de kliko is opgehaald."
-  mode: parallel
+  mode: single
   trace:
     stored_traces: 25
   triggers:

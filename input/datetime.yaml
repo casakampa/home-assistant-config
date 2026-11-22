@@ -58,11 +58,6 @@ time_for_testing:
   has_time: true
   initial: "12:00"
 
-dnswl_renew_date:
-  name: "DNSWL verversdatum"
-  icon: mdi:refresh
-  has_date: true
-
 melatonine_out_of_stock:
   name: "Melatonine ophalen"
   icon: mdi:refresh

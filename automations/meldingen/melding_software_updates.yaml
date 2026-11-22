@@ -6,19 +6,15 @@
         - sensor.home_assistant_core
         - sensor.home_assistant_supervisor
         - sensor.home_assistant_os
-        - sensor.afvalwijzer
         - sensor.dsmr_reader
         - sensor.nextcloud
         - sensor.caddy
         - sensor.authelia
-        - sensor.apexcharts_card
-        - sensor.lovelace_mushroom
         - sensor.docker_mailserver
         - sensor.roundcube_webmail
         - sensor.fritz_box_5530_firmware
         - sensor.intel_nuc12_bios
         - sensor.mqmgateway
-        - sensor.ha_knmi
         - sensor.zolder_cerbo_gx_mk2_available_version
       not_from:
         - "unavailable"
@@ -39,7 +35,7 @@
       condition: template
       value_template: >-
         {{ iif(trigger.entity_id == 'sensor.nextcloud',
-        version(states('sensor.nextcloud') >= 'v34.0.0'),
+        version(states('sensor.nextcloud') >= 'v35.0.0'),
         True) }}
   actions:
     - alias: "Stuur een notificatie over de software update"
